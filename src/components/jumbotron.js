@@ -3,7 +3,7 @@ import Lead from "./lead"
 import Button from "./button"
 
 const Jumbotron = styled.div`
-  margin: 80px 0;
+  padding: 80px 0;
   text-align: center;
 
   h1 {

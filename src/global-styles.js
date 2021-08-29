@@ -55,30 +55,12 @@ body {
   line-height: 1.5;
 }
 
-a {
-  color: #fefe54;
-  text-decoration: none;
-  background-color: transparent;
-}
-
-a:hover, a:focus {
-  background: #aa5500;
-}
-
-a:hover, a:active {
-  outline: 0;
-}
-
-a:focus {
-  outline: thin solid #333;
-  outline: 5px auto -webkit-focus-ring-color;
-  outline-offset: -2px;
-}
-
 h1, h2, h3, h4, h5, h6 {
+  font-weight: bold;
   margin: 0;
   color: #ffffff;
   text-rendering: optimizelegibility;
+  line-height: 1;
 }
 
 h1 {
@@ -88,11 +70,36 @@ h1 {
 
 h2 {
   text-align: center;
-  white-space: nowrap;
+  margin-bottom: 1rem;
 }
 
 h3 {
   color: #fe54fe;
+}
+
+p {
+  margin: 0 0 1rem 0;
+}
+
+p:last-child {
+  margin: 0;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+nav li:before {
+  content: none;
+}
+
+figure {
+  margin: 0;
+}
+
+ul {
+  margin: 0;
 }
 `;
 
