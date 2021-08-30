@@ -17,9 +17,6 @@ contract Lenia is ERC721, ERC721Enumerable, Ownable {
     bool private _hasSaleStarted;
     string public baseURI;
 
-    address private t1 = 0xc9b6321dc216D91E626E9BAA61b06B0E4d55bdb1;
-    address private t2 = 0xBD152AcFA5f810Cba903c2eFe7074Be88E335f50;
-
     constructor() ERC721("Lenia", "LENIA") {
         _hasSaleStarted = false;
     }
