@@ -6,7 +6,6 @@ const containerMaxWidths = {
   sm: spaceWidth * 12 * 5,
   md: spaceWidth * 12 * 7,
   lg: spaceWidth * 12 * 10,
-  xl: spaceWidth * 12 * 12,
 }
 
 const createContainerMaxWidthsRules = () => {

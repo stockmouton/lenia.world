@@ -1,14 +1,28 @@
-import * as React from "react"
-
+import React, { useEffect } from "react"
 import Layout from "../components/layout"
 import Seo from "../components/seo"
+import Container from "../components/container"
+import Jumbotron from "../components/jumbotron"
+import Lead from "../components/lead"
+import Shauns from "../images/shauns.gif"
 
-const NotFoundPage = () => (
-  <Layout>
-    <Seo title="404: Not found" />
-    <h1>404: Not Found</h1>
-    <p>You just hit a route that doesn&#39;t exist... the sadness.</p>
-  </Layout>
-)
+const NotFoundPage = () => {
+  useEffect(() => setTimeout(() => window.location.replace("/"), 5000))
+
+  return (
+    <Layout>
+      <Seo title="404: Not found" />
+      <Container>
+        <Jumbotron>
+          <h1>404: Page Not Found</h1>
+          <img src={Shauns} />
+          <Lead>
+            <p>But fret not traveller, you will be redirected to our homepage in a few seconds...</p>
+          </Lead>
+        </Jumbotron>
+      </Container>
+    </Layout>
+  )
+}
 
 export default NotFoundPage

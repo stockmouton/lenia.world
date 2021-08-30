@@ -1,8 +1,8 @@
-import * as React from "react"
 import styled from "styled-components"
 import Button from "./button"
+import Link from "./link"
 
-const NavBar = styled.div`
+const NavBar = styled.nav`
   position: fixed;
   top: 0;
   right: 0;
@@ -10,7 +10,7 @@ const NavBar = styled.div`
   z-index: 1030;
   background: #bbbbbb;
 `
-NavBar.Brand = styled.a`
+NavBar.Brand = styled(Link)`
   background: #0e1a8e;
   color: #fefe54;
   display: block;
@@ -26,10 +26,10 @@ NavBar.Brand = styled.a`
 
 NavBar.List = styled.ul`
   position: relative;
-  left: 0;
+  right: 0;
   display: block;
   float: left;
-  margin: 0 20px 0 0;
+  margin: 0 20px;
   list-style: none;
 `
 
@@ -39,7 +39,7 @@ NavBar.Item = styled.li`
   list-style: none;
 `
 
-NavBar.Link = styled.a`
+NavBar.Link = styled(Link)`
   color: #000000;
   padding: 0 10px;
   display: block;

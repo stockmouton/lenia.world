@@ -9,3 +9,5 @@ const HeroUnit = styled.div`
   border-radius: 0;
   box-shadow: 0 0 0 4px #00aaaa;
 `
+
+export default HeroUnit
