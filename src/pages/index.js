@@ -29,19 +29,22 @@ const IndexPage = () => (
     <Sidebar>
         <Sidebar.List>
           <Sidebar.Item>
+            <Sidebar.Link href="#summary">Summary</Sidebar.Link>
+          </Sidebar.Item>
+          <Sidebar.Item>
             <Sidebar.Link href="#nifty-gritty">The N(i)FTy gritty</Sidebar.Link>
           </Sidebar.Item>
           <Sidebar.Item>
             <Sidebar.Link href="#leniadex">Leniadex</Sidebar.Link>
           </Sidebar.Item>
           <Sidebar.Item>
-            <Sidebar.Link href="#a-bit-of-history">A bit of history</Sidebar.Link>
+            <Sidebar.Link href="#research">The research</Sidebar.Link>
           </Sidebar.Item>
           <Sidebar.Item>
             <Sidebar.Link href="#but-why-owning-you-say">But why owning you say</Sidebar.Link>
           </Sidebar.Item>
           <Sidebar.Item>
-              <Sidebar.Link href="#roadmap">(A sort of) Roadmap</Sidebar.Link>
+              <Sidebar.Link href="#roadmap">Roadmap</Sidebar.Link>
           </Sidebar.Item>
           <Sidebar.Item>
             <Sidebar.Link href="#the-folks-we-care-about">The folks we care about</Sidebar.Link>
@@ -56,26 +59,40 @@ const IndexPage = () => (
       </Sidebar>
     <Container>
       <Jumbotron>
-        <h1>Enter the Lenia Metaverse...</h1>
+        <h1>Enter the Leniaverse...</h1>
         <Lead>
           <p>The dry part: Lenia is a collection of 1337 artificial life-forms discovered via evolutionary computation. They live as unique digital collectibles (NFT) on the Ethereum blockchain.</p>
           <p>The wet part: If you ever let your cactus or your Tamagotchi die because you were too busy or just sadistic, then this is for you. It's the power of math baby: they are born (or not), they move (or not) and they live their life unapologetically usually with nobody lifting their little finger...</p>
         </Lead>
         <Button>Mint day to be announced!</Button>
       </Jumbotron>
+      <Section id="summary">
+        <Section.Header><h1>Summary</h1></Section.Header>
+        <ul>
+          <li>200 Lenias to mint. Those Lenias are <a href="https://creativecommons.org/publicdomain/zero/1.0/">public domain</a></li>
+          <li>Mint date: TBA</li>
+          <li>50% of minting proceeds are sent to StockMouton DAO</li>
+          <li>You can only mint Lenias one par one, use that opportunity to write a message which will be forever linked to your purchase!</li>
+          <li>Lenias a pure mathematical creatures. Their properties are fully stored on chain.</li>
+          <li>Outside of different visual assets stored on IPFS for compatibility with other platformes (like Opensea). Lenias can be rendered thanks to the rendering engine store in the smart contract.</li>
+          <li>No explicit rules for attribute scarcity, all lenias are equally rare</li>
+          <li>Owners of the first Lenia collection will have access to revenue sharing for subsequent collection (see roadmap for more details).</li>
+          <li>A part of the benefit will be redistributed to the seesheaperd association</li> 
+          <li>Another part of the benefit will be redistributed to the researchers which started this research field</li> 
+        </ul>
+
+      </Section>
       <Section id="leniadex">
         <Section.Header><h1>Leniadex</h1></Section.Header>
         <p>
-          Each time a lenia is minted, thw owner will be able to decide to show it to the community or not. This move cannot be undone.
-          If one decides to show it, the Lenia will appear in the pokedex and in OpenSea (A marketplace).
+          Each time a lenia is minted, the community can access the Lenia and its properties right here, just go on the pokedex page!
         </p>
-        
-        <p>The Pokedex for Lenia is the best example. We can have the name, the traits, some funny description like the Pokedex in the Pokemon Gameboy Game with the video.</p>
+        <p>The Pokedex for Lenia is the best example. We can have the name, the traits, some funny description.</p>
         <p>It will also show the creatures you own</p>
       </Section>
       <Section id="nifty-gritty">
         <Section.Header><h1>The N(i)FTy Gritty</h1></Section.Header>
-        <p>The first NFTS which are note designed but discovered: All of the creatures that will be showcased in this collections are discovered in very complex mathematical world. Those wolrd are actually so complex taht it would be very tedious (if not impossible) to discover them by hands. This is why we designed sone Artificial intelligence to help us find them.</p>
+        <p>The first NFTS which are note designed but discovered: All of the creatures that will be showcased in this collections are discovered in very complex mathematical world. Those world are actually so complex taht it would be very tedious (if not impossible) to discover them by hands. This is why we designed sone Artificial intelligence to help us find them.</p>
         <p>Every Lenia minted in this very first collection will give you access to revenue sharing:
           - 1% of all sales on the secondary market will be redistributed to lenia's owners
           - 1% of all future sales of new lenia collections (see roadmap) will be redistributed to lenia's owners
@@ -99,14 +116,19 @@ const IndexPage = () => (
           What comes out of this cutting edge research will fueled innovation in the Stockmouton DAO.
         </p>
       </Section>
-      <Section id="a-bit-of-history">
-        <Section.Header><h1>A bit of history</h1></Section.Header>
-        <p>Introduce the researcher behind the lenia, the whole concept, link to the references, etc.</p>
+      <Section id="research">
+        <Section.Header><h1>A state of the art articifial life research subject</h1></Section.Header>
+        <p>Lenias are not just nice and complex mathematical animations. They are a research subject in the field of artificial life.</p>
+        <p>Many questions are still unanswered in this field and this project aim to help researchers answer one of the hard questions: how one can automatically and efficiently discovers those mathematical creatures?</p>
+        <p>The answers lies in the field of Artificial Intelligence and requires the work of many to bear fruits!</p>
+        <p>This is why we participates in the <a href="https://openlenia.github.io/">Open Science Lenia initiative</a> by opensourcing of AI tools to search for Lenias!</p>
+
+        <p>If you want to learn more about it, check <a href="https://chakazul.github.io/lenia.html">Bert Chan website</a> and come in our <a href="">Discord</a>, Morgan will be more than happy to satisfy your curiosity!</p>
       </Section>
       <Section id="roadmap">
-        <Section.Header><h1>(A sort of) Roadmap</h1></Section.Header>
+        <Section.Header><h1>Roadmap</h1></Section.Header>
         <p>Well the roadmap but in a wonky funny way.</p>
-        <p>25% we release the javascript rendering engine and open the playground</p>
+        <p>25% we release the javascript rendering engine and open the playground.</p>
         <p>50%</p>
         <p>100% We redistribute money to our collaborators and the association to save the ocean. 3 Eth will be used to load up our AWS account. And we start working like monkeys on the higher complexity mathematical space for more lenias.</p>
       </Section>
@@ -146,7 +168,7 @@ const IndexPage = () => (
               pictureSrc="https://pbs.twimg.com/profile_images/1115639997183426564/NC2UpU3A_400x400.png" 
               twitterHandle="morgangiraud"
               role="Big Brain Energy"
-              description={<p>The collection creator, spent way too much time running his exploratory algorithms to discover these creatures.</p>}
+              description={<p>The collection creator, spent way too much time running his AI robots to discover these creatures.</p>}
             />
           </Grid.Cell>
           <Grid.Cell>
