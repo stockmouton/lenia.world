@@ -5,8 +5,10 @@
   "version": "0.1.0",
   "author": "Alex Orange <alex.orange@stockmouton.com>",
   "dependencies": {
+    "@nomiclabs/hardhat-etherscan": "^2.1.6",
     "@openzeppelin/contracts": "^4.3.1",
     "babel-plugin-styled-components": "^1.13.2",
+    "dotenv": "^10.0.0",
     "gatsby": "^3.11.1",
     "gatsby-plugin-gatsby-cloud": "^2.11.0",
     "gatsby-plugin-image": "^1.11.0",
@@ -18,11 +20,13 @@
     "gatsby-source-filesystem": "^3.11.0",
     "gatsby-transformer-sharp": "^3.11.0",
     "gh-pages": "^3.2.3",
+    "hardhat-gas-reporter": "^1.0.4",
     "prop-types": "^15.7.2",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
     "react-helmet": "^6.1.0",
     "sanitize.css": "^12.0.1",
+    "solidity-coverage": "^0.7.17",
     "styled-components": "^5.3.0"
   },
   "devDependencies": {
@@ -31,7 +35,7 @@
     "chai": "^4.3.4",
     "ethereum-waffle": "^3.4.0",
     "ethers": "^5.4.6",
-    "hardhat": "^2.6.1",
+    "hardhat": "^2.6.2",
     "prettier": "2.3.2"
   },
   "keywords": [
@@ -42,11 +46,12 @@
     "build": "gatsby build",
     "develop": "gatsby develop",
     "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,md}\"",
-    "start": "npm run develop",
+    "start": "yarn run develop",
     "serve": "gatsby serve",
     "clean": "gatsby clean",
     "test": "echo \"Write tests! -> https://gatsby.dev/unit-testing\" && exit 1",
-    "deploy": "gatsby build && gh-pages -d public -b prod"
+    "deploy": "gatsby build && gh-pages -d public -b prod",
+    "sm-compile": "hardhat compile"
   },
   "repository": {
     "type": "git",

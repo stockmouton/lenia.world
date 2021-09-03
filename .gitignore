@@ -31,3 +31,7 @@ trash
 # Gatsby related
 .cache/
 public
+
+# Hardhat related
+artifacts/
+cache/
