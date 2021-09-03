@@ -110,7 +110,7 @@ const IndexPage = () => (
         <p>50%</p>
         <p>100% We redistribute money to our collaborators and the association to save the ocean. 3 Eth will be used to load up our AWS account. And we start working like monkeys on the higher complexity mathematical space for more lenias.</p>
       </Section>
-      <Section id="the-folks-we-care-about">
+      {/* <Section id="the-folks-we-care-about">
         <Section.Header><h1>The folks we care about</h1></Section.Header>
         <p>The following people or organizations will be donated:</p>
         <ul>
@@ -136,7 +136,7 @@ const IndexPage = () => (
             />
           </Grid.Cell>
         </Grid>
-      </Section>
+      </Section> */}
       <Section id="family-portrait">
         <Section.Header><h1>Family Portrait</h1></Section.Header>
         <Grid>
