@@ -6,7 +6,9 @@
   "author": "Alex Orange <alex.orange@stockmouton.com>",
   "dependencies": {
     "@openzeppelin/contracts": "^4.3.1",
+    "@walletconnect/web3-provider": "^1.6.5",
     "babel-plugin-styled-components": "^1.13.2",
+    "buffer": "^6.0.3",
     "gatsby": "^3.11.1",
     "gatsby-plugin-gatsby-cloud": "^2.11.0",
     "gatsby-plugin-image": "^1.11.0",
@@ -17,21 +19,26 @@
     "gatsby-plugin-styled-components": "^4.12.0",
     "gatsby-source-filesystem": "^3.11.0",
     "gatsby-transformer-sharp": "^3.11.0",
+    "process": "^0.11.10",
     "prop-types": "^15.7.2",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
     "react-helmet": "^6.1.0",
     "sanitize.css": "^12.0.1",
-    "styled-components": "^5.3.0"
+    "styled-components": "^5.3.0",
+    "web3": "^1.5.2",
+    "web3modal": "^1.9.4"
   },
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.2",
     "@nomiclabs/hardhat-waffle": "^2.0.1",
     "chai": "^4.3.4",
+    "dotenv": "^10.0.0",
     "ethereum-waffle": "^3.4.0",
     "ethers": "^5.4.6",
     "hardhat": "^2.6.1",
-    "prettier": "2.3.2"
+    "prettier": "2.3.2",
+    "webpack": "^5.51.1"
   },
   "keywords": [
     "lenia",
@@ -41,10 +48,15 @@
     "build": "gatsby build",
     "develop": "gatsby develop",
     "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,md}\"",
-    "start": "npm run develop",
+    "start": "yarn run develop",
     "serve": "gatsby serve",
     "clean": "gatsby clean",
-    "test": "echo \"Write tests! -> https://gatsby.dev/unit-testing\" && exit 1"
+    "test": "echo \"Write tests! -> https://gatsby.dev/unit-testing\" && exit 1",
+    "deploy": "gatsby build && gh-pages -d public -b prod",
+    "sm-compile": "hardhat compile",
+    "sm-test": "hardhat test",
+    "sm-serve": "hardhat node",
+    "sm-deploy": "hardhat run script/deploy.js"
   },
   "repository": {
     "type": "git",
