@@ -1,4 +1,4 @@
-import * as React from "react"
+import React from "react"
 import PropTypes from "prop-types"
 import styled from "styled-components"
 import { StaticImage } from "gatsby-plugin-image"
@@ -6,7 +6,7 @@ import { StaticImage } from "gatsby-plugin-image"
 import 'sanitize.css';
 import GlobalStyles from "../global-styles";
 import NavBar from "./navbar";
-import Button from "./button"
+import WalletConnectorButton from "./wallet-connector-button";
 import Link from "./link";
 import Footer from "./footer";
 
@@ -15,7 +15,6 @@ const Main = styled.main`
 `
 
 const Layout = ({ children }) => {
-
   return (
     <>
       <GlobalStyles />
@@ -44,7 +43,7 @@ const Layout = ({ children }) => {
             <NavBar.Link>OpenSea</NavBar.Link>
           </NavBar.Item>
           <NavBar.Item>
-            <NavBar.Button>Connect Wallet</NavBar.Button>
+            <WalletConnectorButton />
           </NavBar.Item>
         </NavBar.List>
       </NavBar>

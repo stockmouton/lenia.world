@@ -5,6 +5,7 @@ const Button = styled.button`
   padding: 0 10px;
   margin-bottom: 20px;
   color: #000000;
+  cursor: pointer;
   text-align: center;
   vertical-align: middle;
   background: #bbbbbb;
@@ -35,6 +36,16 @@ const Button = styled.button`
     margin: 10px 0 10px 10px;
     outline: 0;
     box-shadow: 0 0 0;
+  }
+
+  :disabled {
+    opacity: 0.5;
+  }
+
+  :disabled:hover {
+    cursor: not-allowed;
+    background: #bbbbbb;
+    color: #000000;
   }
 `
 

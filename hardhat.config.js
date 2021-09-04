@@ -25,6 +25,7 @@ module.exports = {
   solidity: "0.8.4",
   networks: {
     hardhat: {
+      chainId: 1337,
       initialBaseFeePerGas: 0, // workaround from https://github.com/sc-forks/solidity-coverage/issues/652#issuecomment-896330136 . Remove when that issue is closed.
       // accounts: process.env.PRIVATE_KEY !== undefined ? [{'privateKey': process.env.PRIVATE_KEY, 'balance': '10000'}] : [],
     },

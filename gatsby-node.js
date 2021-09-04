@@ -3,5 +3,27 @@
  *
  * See: https://www.gatsbyjs.com/docs/node-apis/
  */
+const path = require('path')
+const webpack = require('webpack')
 
-// You can delete this file if you're not using it
+exports.onCreateWebpackConfig = ({ actions }) => {
+  actions.setWebpackConfig({
+    resolve: {
+      fallback: {
+        assert: false,
+        Buffer: false,
+        crypto: false,
+        http: false,
+        https: false,
+        os: false,
+        stream: false,
+      }
+    },
+    plugins: [
+      new webpack.ProvidePlugin({
+        Buffer: path.join(__dirname, 'shims/buffer.js'),
+        process: 'process/browser'
+      }),
+    ],
+  })
+}
