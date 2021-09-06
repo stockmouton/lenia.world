@@ -5,6 +5,7 @@
   "version": "0.1.0",
   "author": "Alex Orange <alex.orange@stockmouton.com>",
   "dependencies": {
+    "@nomiclabs/hardhat-etherscan": "^2.1.6",
     "@openzeppelin/contracts": "^4.3.1",
     "@walletconnect/web3-provider": "^1.6.5",
     "babel-plugin-styled-components": "^1.13.2",
@@ -39,6 +40,7 @@
     "ethers": "^5.4.6",
     "hardhat": "^2.6.1",
     "hardhat-gas-reporter": "^1.0.4",
+    "gh-pages": "^3.2.3",
     "prettier": "2.3.2",
     "solidity-coverage": "^0.7.17",
     "webpack": "^5.51.1"
