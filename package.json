@@ -49,9 +49,10 @@
     "start": "yarn run develop",
     "serve": "gatsby serve",
     "clean": "gatsby clean",
-    "test": "echo \"Write tests! -> https://gatsby.dev/unit-testing\" && exit 1",
+    "test": "yarn run sm-test",
     "deploy": "gatsby build && gh-pages -d public -b prod",
-    "sm-compile": "hardhat compile"
+    "sm-compile": "hardhat compile",
+    "sm-test": "hardhat test"
   },
   "repository": {
     "type": "git",
