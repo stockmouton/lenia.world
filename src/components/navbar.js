@@ -51,4 +51,11 @@ NavBar.Link = styled(Link)`
   }
 `
 
+NavBar.Banner = styled.div`
+  background-color: #aa0000;
+  color: #ffffff;
+  width: 100%;
+  padding: 0 1rem;
+`
+
 export default NavBar

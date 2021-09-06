@@ -5,12 +5,22 @@ export const ETHEREUM_CHAIN_IDS = {
 }
 
 export const ETHEREUM_HEX_CHAIN_IDS = {
-  MAINNET: '0x1',
-  RINKEBY: '0x4',
-  HARDHAT: '0x539',
+  [ETHEREUM_CHAIN_IDS.MAINNET]: '0x1',
+  [ETHEREUM_CHAIN_IDS.RINKEBY]: '0x4',
+  [ETHEREUM_CHAIN_IDS.HARDHAT]: '0x539',
 }
 
-export const ALLOWED_CHAIN_ID = ETHEREUM_CHAIN_IDS[process.env.GATSBY_ETHEREUM_CHAIN] || ETHEREUM_CHAIN_IDS[MAINNET]
+export const allowedChainId = (() => {
+  if (process.env.NODE_ENV === 'production' && process.env.STAGING === true) return ETHEREUM_CHAIN_IDS.RINKEBY
+  if (process.env.NODE_ENV === 'production') return ETHEREUM_CHAIN_IDS.MAINNET
+  return ETHEREUM_CHAIN_IDS.HARDHAT
+})()
+
+export const chainName = (() => {
+  if (process.env.NODE_ENV === 'production' && process.env.STAGING === true) return 'Rinkeby Testnet'
+  if (process.env.NODE_ENV === 'production') return 'Ethereum Mainnet'
+  return 'Hardhat Network (localhost:8545)'
+})()
 
 export const getDecimalFromHex = hexString => parseInt(hexString, 16)
 
@@ -24,7 +34,7 @@ export const switchChainConnection = async () => {
       // check if the chain to connect to is installed
       await window.ethereum.request({
         method: 'wallet_switchEthereumChain',
-        params: [{ chainId: ETHEREUM_HEX_CHAIN_IDS[process.env.GATSBY_ETHEREUM_CHAIN] }], // Force connection to Rinkeby. TODO: add to env file
+        params: [{ chainId: ETHEREUM_HEX_CHAIN_IDS[allowedChainId] }],
       });
     } catch (error) {
       // This error code indicates that the chain has not been added to MetaMask
@@ -34,7 +44,7 @@ export const switchChainConnection = async () => {
             method: 'wallet_addEthereumChain',
             params: [
               {
-                chainId: ETHEREUM_HEX_CHAIN_IDS[process.env.GATSBY_ETHEREUM_CHAIN], // TODO: add to env file
+                chainId: ETHEREUM_HEX_CHAIN_IDS[allowedChainId],
                 rpcUrl: RINKEBY_RPC_URL,
               },
             ],
