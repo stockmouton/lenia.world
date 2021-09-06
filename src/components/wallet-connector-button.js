@@ -6,7 +6,7 @@ import Button from "./button"
 import Dropdown from "./dropdown";
 import Toast from './toast'
 import WalletConnectProvider from '@walletconnect/web3-provider'
-import { ALLOWED_CHAIN_ID } from '../utils/wallet'
+import { allowedChainId, chainName } from '../utils/wallet'
 
 const web3Modal = new Web3Modal({
   network: "mainnet",
@@ -43,14 +43,14 @@ const StyledButton = styled(Button)`
 `
 
 const WalletConnectorButton = () => {
-  const { initWeb3, resetWeb3, account, chainId } = useWeb3()
+  const { initWeb3Provider, resetWeb3Provider, account, chainId } = useWeb3()
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const [error, setError] = useState(null)
 
   const openWeb3Modal = async () => {
     try {
       const provider = await web3Modal.connect()
-      initWeb3(provider)
+      initWeb3Provider(provider)
     } catch(error) {
       if (error instanceof Error) {
         setError(error)
@@ -60,7 +60,7 @@ const WalletConnectorButton = () => {
 
   const handleDisconnect = async () => {
     try {
-      await resetWeb3()
+      await resetWeb3Provider()
       // If the cached provider is not cleared,
       // WalletConnect will default to the existing session
       // and does not allow to re-scan the QR code with a new wallet.
@@ -94,7 +94,7 @@ const WalletConnectorButton = () => {
   }
 
   const getConnectorButtonContent = () => {
-    if (account && chainId !== ALLOWED_CHAIN_ID) return 'Wrong Network! Please connect to Rinkeby'
+    if (account && chainId !== allowedChainId) return `Wrong Network! Please connect to ${chainName}`
     if (account) return getTruncatedAccount(account)
     return 'Connect Wallet'
   }
@@ -103,7 +103,7 @@ const WalletConnectorButton = () => {
     <>
       <StyledButton 
         onClick={handleClick}
-        disabled={account && chainId !== ALLOWED_CHAIN_ID}
+        disabled={account && chainId !== allowedChainId}
       >
         {getConnectorButtonContent()}
       </StyledButton>

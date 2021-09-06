@@ -12,6 +12,7 @@ import Sidebar from "../components/sidebar"
 import Grid from "../components/grid"
 import Profile from "../components/profile"
 import {Web3Provider} from "../components/web3-provider";
+import MintButton from "../components/mint-button";
 
 import Beast from "../images/beast.mp4"
 
@@ -62,7 +63,7 @@ const IndexPage = () => (
             <p>The dry part: Lenia is a collection of 1337 artificial life-forms discovered via evolutionary computation. They live as unique digital collectibles (NFT) on the Ethereum blockchain.</p>
             <p>The wet part: If you ever let your cactus or your Tamagotchi die because you were too busy or just sadistic, then this is for you. It's the power of math baby: they are born (or not), they move (or not) and they live their life unapologetically usually with nobody lifting their little finger...</p>
           </Lead>
-          <Button>Mint day to be announced!</Button>
+          <MintButton />
         </Jumbotron>
         <Section id="summary">
           <Section.Header><h1>Summary</h1></Section.Header>
