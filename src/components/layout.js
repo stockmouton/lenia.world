@@ -35,7 +35,7 @@ const Layout = ({ children }) => {
             <NavBar.Link href="https://twitter.com/lenia_nft">Twitter</NavBar.Link>
           </NavBar.Item>
           <NavBar.Item>
-            <NavBar.Link href="https://discord.gg/RGFDGMKg">Discord</NavBar.Link>
+            <NavBar.Link href="https://discord.gg/4TFNnCkJta">Discord</NavBar.Link>
           </NavBar.Item>
           <NavBar.Item>
             <NavBar.Link>Etherscan</NavBar.Link>

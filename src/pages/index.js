@@ -123,7 +123,7 @@ const IndexPage = () => (
         <p>The answers lies in the field of Artificial Intelligence and requires the work of many to bear fruits!</p>
         <p>This is why we participates in the <a href="https://openlenia.github.io/">Open Science Lenia initiative</a> by opensourcing of AI tools to search for Lenias!</p>
 
-        <p>If you want to learn more about it, check <a href="https://chakazul.github.io/lenia.html">Bert Chan website</a> and come in our <a href="">Discord</a>, Morgan will be more than happy to satisfy your curiosity!</p>
+        <p>If you want to learn more about it, check <a href="https://chakazul.github.io/lenia.html">Bert Chan website</a> and come in our <a href="https://discord.gg/4TFNnCkJta">Discord</a>, Morgan will be more than happy to satisfy your curiosity!</p>
       </Section>
       <Section id="roadmap">
         <Section.Header><h1>Roadmap</h1></Section.Header>
