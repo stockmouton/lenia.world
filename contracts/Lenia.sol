@@ -34,7 +34,7 @@ contract Lenia is ERC721, ERC721Enumerable, Ownable {
         _safeMint(msg.sender, supply);
     }
 
-    function flipSaleStarted() external onlyOwner {
+    function flipHasSaleStarted() external onlyOwner {
         _hasSaleStarted = !_hasSaleStarted;
     }
 

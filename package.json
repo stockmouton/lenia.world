@@ -5,12 +5,11 @@
   "version": "0.1.0",
   "author": "Alex Orange <alex.orange@stockmouton.com>",
   "dependencies": {
-    "@nomiclabs/hardhat-etherscan": "^2.1.6",
     "@openzeppelin/contracts": "^4.3.1",
+    "@walletconnect/web3-provider": "^1.6.5",
     "babel-plugin-styled-components": "^1.13.2",
-    "dotenv": "^10.0.0",
+    "buffer": "^6.0.3",
     "gatsby": "^3.11.1",
-    "gatsby-plugin-gatsby-cloud": "^2.11.0",
     "gatsby-plugin-image": "^1.11.0",
     "gatsby-plugin-manifest": "^3.11.0",
     "gatsby-plugin-offline": "^4.11.0",
@@ -19,24 +18,30 @@
     "gatsby-plugin-styled-components": "^4.12.0",
     "gatsby-source-filesystem": "^3.11.0",
     "gatsby-transformer-sharp": "^3.11.0",
-    "gh-pages": "^3.2.3",
-    "hardhat-gas-reporter": "^1.0.4",
+    "process": "^0.11.10",
     "prop-types": "^15.7.2",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
     "react-helmet": "^6.1.0",
     "sanitize.css": "^12.0.1",
-    "solidity-coverage": "^0.7.17",
-    "styled-components": "^5.3.0"
+    "styled-components": "^5.3.0",
+    "web3": "^1.5.2",
+    "web3modal": "^1.9.4"
   },
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.2",
+    "@nomiclabs/hardhat-etherscan": "^2.1.6",
     "@nomiclabs/hardhat-waffle": "^2.0.1",
     "chai": "^4.3.4",
+    "dotenv": "^10.0.0",
     "ethereum-waffle": "^3.4.0",
     "ethers": "^5.4.6",
-    "hardhat": "^2.6.2",
-    "prettier": "2.3.2"
+    "gh-pages": "^3.2.3",
+    "hardhat": "^2.6.1",
+    "hardhat-gas-reporter": "^1.0.4",
+    "prettier": "2.3.2",
+    "solidity-coverage": "^0.7.17",
+    "webpack": "^5.51.1"
   },
   "keywords": [
     "lenia",
@@ -52,7 +57,10 @@
     "test": "yarn run sm-test",
     "deploy": "gatsby build && gh-pages -d public -b prod",
     "sm-compile": "hardhat compile",
-    "sm-test": "hardhat test"
+    "sm-test": "hardhat test",
+    "sm-serve": "hardhat node",
+    "sm-deploy": "hardhat run --network localhost scripts/deploy.js",
+    "sm-start-sale": "hardhat start-sale --network localhost"
   },
   "repository": {
     "type": "git",

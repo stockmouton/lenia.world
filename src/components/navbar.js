@@ -1,5 +1,5 @@
 import styled from "styled-components"
-import Button from "./button"
+import WalletConnectorButton from "./wallet-connector-button"
 import Link from "./link"
 
 const NavBar = styled.nav`
@@ -19,7 +19,7 @@ NavBar.Brand = styled(Link)`
 
   :hover {
     color: #fefe54;
-    background: #000084;
+    background: #0e1a8e;
     text-decoration: none;
   }
 `
@@ -34,6 +34,7 @@ NavBar.List = styled.ul`
 `
 
 NavBar.Item = styled.li`
+  position: relative;
   float: left;
   margin-left: 0;
   list-style: none;
@@ -50,16 +51,11 @@ NavBar.Link = styled(Link)`
   }
 `
 
-NavBar.Button = styled(Button)`
-  background: #000000;
-  color: #bbbbbb;
-  margin-bottom: 0;
-  box-shadow: 0 0;
-
-  :active {
-    margin: 0;
-    background: #000084;
-  }
+NavBar.Banner = styled.div`
+  background-color: #aa0000;
+  color: #ffffff;
+  width: 100%;
+  padding: 0 1rem;
 `
 
 export default NavBar
