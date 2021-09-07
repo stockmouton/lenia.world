@@ -5,13 +5,11 @@
   "version": "0.1.0",
   "author": "Alex Orange <alex.orange@stockmouton.com>",
   "dependencies": {
-    "@nomiclabs/hardhat-etherscan": "^2.1.6",
     "@openzeppelin/contracts": "^4.3.1",
     "@walletconnect/web3-provider": "^1.6.5",
     "babel-plugin-styled-components": "^1.13.2",
     "buffer": "^6.0.3",
     "gatsby": "^3.11.1",
-    "gatsby-plugin-gatsby-cloud": "^2.11.0",
     "gatsby-plugin-image": "^1.11.0",
     "gatsby-plugin-manifest": "^3.11.0",
     "gatsby-plugin-offline": "^4.11.0",
@@ -34,12 +32,11 @@
     "@nomiclabs/hardhat-ethers": "^2.0.2",
     "@nomiclabs/hardhat-etherscan": "^2.1.6",
     "@nomiclabs/hardhat-waffle": "^2.0.1",
-    "gh-pages": "^3.2.3",
-    "hardhat-gas-reporter": "^1.0.4",
     "chai": "^4.3.4",
     "dotenv": "^10.0.0",
     "ethereum-waffle": "^3.4.0",
     "ethers": "^5.4.6",
+    "gh-pages": "^3.2.3",
     "hardhat": "^2.6.1",
     "hardhat-gas-reporter": "^1.0.4",
     "prettier": "2.3.2",
@@ -62,7 +59,8 @@
     "sm-compile": "hardhat compile",
     "sm-test": "hardhat test",
     "sm-serve": "hardhat node",
-    "sm-deploy": "hardhat run scripts/deploy.js"
+    "sm-deploy": "hardhat run --network localhost scripts/deploy.js",
+    "sm-start-sale": "hardhat start-sale --network localhost"
   },
   "repository": {
     "type": "git",

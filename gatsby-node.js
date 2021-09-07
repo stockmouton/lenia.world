@@ -24,6 +24,7 @@ exports.onCreateWebpackConfig = ({ actions }) => {
         Buffer: path.join(__dirname, 'shims/buffer.js'),
         process: 'process/browser'
       }),
+      new webpack.IgnorePlugin(/^electron$/)
     ],
   })
 }

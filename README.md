@@ -9,5 +9,9 @@ As easy as typing: `yarn`
 You won't believe it, just type: `yarn deploy`
 
 ## Run locally
-First compile the smart contracts : `yarn sm-compile`
-Then start your local 
+Launch a localhost node: `yarn sm-serve`
+Compile the smart contracts: `yarn sm-compile`
+Then deploy it: `yarn sm-deploy`
+Launch the website: `yarn serve`
+
+At this point you can connect your wallet. Add on of the dev private key to your wallet to enjoy those swet 10k ETH.

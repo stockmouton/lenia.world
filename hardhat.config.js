@@ -18,7 +18,7 @@ task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
 
 task("start-sale", "Start Lenia sale", async (taskArgs, hre) => {
   if (hre.hardhatArguments.network == null) {
-    throw new Error('Please add the missing --network <localhost|rinkeby> argument')
+    throw new Error('Please add the missing --network <localhost|rinkeby|goerli> argument')
   }
   const LeniaContract = await hre.ethers.getContractFactory("Lenia")
   const lenia = LeniaContract.attach(process.env.GATSBY_SMART_CONTRACT_ADDRESS)
@@ -56,6 +56,10 @@ module.exports = {
     },
     goerli: {
       url: process.env.GOERLI_URL || "",
+      accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
+    },
+    rinkeby: {
+      url: process.env.RINKEBY_URL || "",
       accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
     },
   },
