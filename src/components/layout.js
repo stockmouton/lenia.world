@@ -23,7 +23,7 @@ const Layout = ({ children }) => {
         <div>
           <NavBar.Brand href="#home">
             <StaticImage
-              src="../images/lenia-logo.png"
+              src="../images/orbium.png"
               width={27}
               quality={95}
               formats={["AUTO", "WEBP", "AVIF"]}
