@@ -1,10 +1,9 @@
-import * as React from "react"
+import React from "react"
 import Layout from "../components/layout"
 import Container from "../components/container";
 import Seo from "../components/seo"
 import Jumbotron from "../components/jumbotron"
 import Lead from "../components/lead"
-import Button from "../components/button"
 import HeroBackground from "../components/hero-background"
 import Section from "../components/section"
 import Panel from "../components/panel"
@@ -13,6 +12,7 @@ import Grid from "../components/grid"
 import Profile from "../components/profile"
 import {Web3Provider} from "../components/web3-provider";
 import MintButton from "../components/mint-button";
+import Link from "../components/link";
 
 import Beast from "../images/beast.mp4"
 
@@ -31,16 +31,16 @@ const IndexPage = () => (
               <Sidebar.Link href="#summary">Summary</Sidebar.Link>
             </Sidebar.Item>
             <Sidebar.Item>
-              <Sidebar.Link href="#nifty-gritty">The N(i)FTy gritty</Sidebar.Link>
-            </Sidebar.Item>
-            <Sidebar.Item>
               <Sidebar.Link href="#leniadex">Leniadex</Sidebar.Link>
             </Sidebar.Item>
             <Sidebar.Item>
-              <Sidebar.Link href="#research">The research</Sidebar.Link>
+              <Sidebar.Link href="#nifty-gritty">The N(i)FTy gritty</Sidebar.Link>
             </Sidebar.Item>
             <Sidebar.Item>
               <Sidebar.Link href="#but-why-owning-you-say">But why owning you say</Sidebar.Link>
+            </Sidebar.Item>
+            <Sidebar.Item>
+              <Sidebar.Link href="#research">The research</Sidebar.Link>
             </Sidebar.Item>
             <Sidebar.Item>
                 <Sidebar.Link href="#roadmap">Roadmap</Sidebar.Link>
@@ -65,10 +65,10 @@ const IndexPage = () => (
           </Lead>
           <MintButton />
         </Jumbotron>
-        <Section id="summary">
+        <Section id="#summary">
           <Section.Header><h1>Summary</h1></Section.Header>
           <ul>
-            <li>200 Lenias to mint. Those Lenias are <a href="https://creativecommons.org/publicdomain/zero/1.0/">public domain</a></li>
+            <li>200 Lenias to mint. Those Lenias are <Link href="https://creativecommons.org/publicdomain/zero/1.0/">public domain</Link></li>
             <li>Mint date: TBA</li>
             <li>50% of minting proceeds are sent to StockMouton DAO</li>
             <li>You can only mint Lenias one par one, use that opportunity to write a message which will be forever linked to your purchase!</li>
@@ -105,7 +105,6 @@ const IndexPage = () => (
             All minting information (Date, Price, etc.) will be announced soon.
             - The minting will happen as a dutch auction starting from 1 ETH and decreasing from here down to 0.05ETH every hour.
           </p>
-
         </Section>
         <Section id="but-why-owning-you-say">
           <Section.Header><h1>But why owning you say</h1></Section.Header>
@@ -120,9 +119,9 @@ const IndexPage = () => (
           <p>Lenias are not just nice and complex mathematical animations. They are a research subject in the field of artificial life.</p>
           <p>Many questions are still unanswered in this field and this project aim to help researchers answer one of the hard questions: how one can automatically and efficiently discovers those mathematical creatures?</p>
           <p>The answers lies in the field of Artificial Intelligence and requires the work of many to bear fruits!</p>
-          <p>This is why we participates in the <a href="https://openlenia.github.io/">Open Science Lenia initiative</a> by opensourcing of AI tools to search for Lenias!</p>
+          <p>This is why we participates in the <Link href="https://openlenia.github.io/">Open Science Lenia initiative</Link> by opensourcing of AI tools to search for Lenias!</p>
 
-          <p>If you want to learn more about it, check <a href="https://chakazul.github.io/lenia.html">Bert Chan website</a> and come in our <a href="https://discord.gg/4TFNnCkJta">Discord</a>, Morgan will be more than happy to satisfy your curiosity!</p>
+          <p>If you want to learn more about it, check <Link href="https://chakazul.github.io/lenia.html">Bert Chan website</Link> and come in our <Link href="https://discord.gg/4TFNnCkJta">Discord</Link>, Morgan will be more than happy to satisfy your curiosity!</p>
         </Section>
         <Section id="roadmap">
           <Section.Header><h1>Roadmap</h1></Section.Header>
@@ -175,8 +174,8 @@ const IndexPage = () => (
                 name="Alex Orange"
                 pictureSrc="https://pbs.twimg.com/profile_images/765306239920332800/y_6BlU3q_400x400.jpg" 
                 twitterHandle="orangealexandre"
-                role="The muscles"
-                description={<p>His main skill is knowing the creator, the other ones involve web and smart contract development.</p>}
+                role="Just the muscles"
+                description={<p>Web and smart contract development.</p>}
               />
             </Grid.Cell>
           </Grid>

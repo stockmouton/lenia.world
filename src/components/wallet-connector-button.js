@@ -6,24 +6,7 @@ import Button from "./button"
 import Dropdown from "./dropdown";
 import Toast from './toast'
 import WalletConnectProvider from '@walletconnect/web3-provider'
-import { allowedChainId, chainName } from '../utils/wallet'
-
-const web3Modal = new Web3Modal({
-  network: "mainnet",
-  cacheProvider: true,
-  // Tell Web3modal what providers we have available.
-  // Built-in web browser provider (only one can exist as a time)
-  // like MetaMask, Brave or Opera is added automatically by Web3modal
-  providerOptions: {
-    walletconnect: {
-      package: WalletConnectProvider,
-      options: {
-        // TODO: create our own Infura key
-        infuraId: "8043bb2cf99347b1bfadfb233c5325c0",
-      }
-    },
-  }
-})
+import { allowedChainId, chainDisplayName, networkName } from '../utils/wallet'
 
 const StyledButton = styled(Button)`
   background: #000000;
@@ -44,12 +27,34 @@ const StyledButton = styled(Button)`
 
 const WalletConnectorButton = () => {
   const { initWeb3Provider, resetWeb3Provider, account, chainId } = useWeb3()
+  const [web3Modal, setWeb3Modal] = useState(null)
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const [error, setError] = useState(null)
 
   const openWeb3Modal = async () => {
+    let modalInstance = web3Modal
+    if (modalInstance == null) {
+      modalInstance = new Web3Modal({
+        network: networkName,
+        cacheProvider: true,
+        // Tell Web3modal what providers we have available.
+        // Built-in web browser provider (only one can exist as a time)
+        // like MetaMask, Brave or Opera is added automatically by Web3modal
+        providerOptions: {
+          walletconnect: {
+            package: WalletConnectProvider,
+            options: {
+              // TODO: create our own Infura key
+              infuraId: "8043bb2cf99347b1bfadfb233c5325c0",
+            }
+          },
+        }
+      })
+      setWeb3Modal(modalInstance)
+    }
+    
     try {
-      const provider = await web3Modal.connect()
+      const provider = await modalInstance.connect()
       initWeb3Provider(provider)
     } catch(error) {
       if (error instanceof Error) {
@@ -94,7 +99,7 @@ const WalletConnectorButton = () => {
   }
 
   const getConnectorButtonContent = () => {
-    if (account && chainId !== allowedChainId) return `Wrong Network! Please connect to ${chainName}`
+    if (account && chainId !== allowedChainId) return `Wrong Network! Please connect to ${chainDisplayName}`
     if (account) return getTruncatedAccount(account)
     return 'Connect Wallet'
   }

@@ -1,5 +1,4 @@
 import styled from "styled-components"
-import WalletConnectorButton from "./wallet-connector-button"
 import Link from "./link"
 
 const NavBar = styled.nav`
