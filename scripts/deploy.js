@@ -25,7 +25,7 @@ async function main() {
   
   // We automatically edit the smart contract address for frontend development purposes
   if (hre.hardhatArguments.network === 'localhost') {
-    fs.writeFileSync(path.join(__dirname, "../.env.development"), `GATSBY_SMART_CONTRACT_ADDRESS=${lenia.address}`)
+    fs.writeFileSync(path.join(__dirname, "../.env.development"), `GATSBY_HARDHAT_SMART_CONTRACT_ADDRESS=${lenia.address}`)
   }
 }
 

@@ -30,7 +30,12 @@ module.exports = {
         icon: `src/images/orbium.png`, // This path is relative to the root of the site.
       },
     },
-    `gatsby-plugin-gatsby-cloud`,
+    {
+      resolve: `gatsby-plugin-env-variables`,
+      options: {
+        allowList: ['STAGING']
+      },
+    },
     // this (optional) plugin enables Progressive Web App + Offline functionality
     // To learn more, visit: https://gatsby.dev/offline
     // `gatsby-plugin-offline`,

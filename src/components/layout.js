@@ -19,7 +19,7 @@ const Layout = ({ children }) => {
     <>
       <GlobalStyles />
       <NavBar>
-        <NavBar.Banner>This website is in early alpha: please switch to the Rinkeby network for testing purposes and use at your own caution!</NavBar.Banner>
+        {process.env.STAGING && <NavBar.Banner>This website is in early alpha: please switch to the Rinkeby network for testing purposes and use at your own caution!</NavBar.Banner>}
         <div>
           <NavBar.Brand href="#home">
             <StaticImage

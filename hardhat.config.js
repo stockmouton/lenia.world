@@ -16,12 +16,16 @@ task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
   }
 })
 
+const getSmartContractAddress = (network) => {
+  if (network === 'rinkeby') return '0x1AEf2b1801A19Fa4E3486e77C3758a3265E96768'
+  return process.env.GATSBY_HARDHAT_SMART_CONTRACT_ADDRESS
+}
 task("start-sale", "Start Lenia sale", async (taskArgs, hre) => {
   if (hre.hardhatArguments.network == null) {
     throw new Error('Please add the missing --network <localhost|rinkeby|goerli> argument')
   }
   const LeniaContract = await hre.ethers.getContractFactory("Lenia")
-  const lenia = LeniaContract.attach(process.env.GATSBY_SMART_CONTRACT_ADDRESS)
+  const lenia = LeniaContract.attach(getSmartContractAddress(hre.hardhatArguments.network))
   let hasSaleStarted = await lenia.hasSaleStarted()
 
   if (hasSaleStarted) {
@@ -56,11 +60,11 @@ module.exports = {
     },
     goerli: {
       url: process.env.GOERLI_URL || "",
-      accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
+      accounts: process.env.GOERLI_PRIVATE_KEY !== undefined ? [process.env.GOERLI_PRIVATE_KEY] : [],
     },
     rinkeby: {
-      url: process.env.RINKEBY_URL || "",
-      accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
+      url: `https://eth-rinkeby.alchemyapi.io/v2/${process.env.ALCHEMY_API_KEY}`,
+      accounts: process.env.RINKEBY_PRIVATE_KEY !== undefined ? [process.env.RINKEBY_PRIVATE_KEY] : [],
     },
   },
   gasReporter: {

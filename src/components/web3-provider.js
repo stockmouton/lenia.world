@@ -1,8 +1,8 @@
 import React, { createContext, useState, useEffect, useContext } from 'react'
-import Web3 from 'web3'
 import Toast from './toast'
-import { allowedChainId, chainName, getDecimalFromHex, switchChainConnection} from '../utils/wallet'
+import { allowedChainId, chainDisplayName, getDecimalFromHex, switchChainConnection} from '../utils/wallet'
 
+const Web3 = typeof window !== 'undefined' ? require('web3') : null;
 const web3Context = createContext(null)
 
 export const Web3Provider = ({ children }) => {
@@ -18,7 +18,7 @@ export const Web3Provider = ({ children }) => {
       const newChainId = await web3Provider.eth.getChainId()
 
       if (newChainId !== allowedChainId) {
-        setError(new Error(`The website is in early alpha: please switch to ${chainName}`))
+        setError(new Error(`The website is in early alpha: please switch to ${chainDisplayName}`))
         switchChainConnection()
         return
       }
@@ -41,7 +41,7 @@ export const Web3Provider = ({ children }) => {
         setChainId(newChainId)
         if (newChainId === allowedChainId) return;
 
-        setError(new Error(`The website is in early alpha: please switch to ${chainName}`))
+        setError(new Error(`The website is in early alpha: please switch to ${chainDisplayName}`))
         switchChainConnection()
       })
     } catch(error) {

@@ -6,7 +6,7 @@
 const path = require('path')
 const webpack = require('webpack')
 
-exports.onCreateWebpackConfig = ({ actions }) => {
+exports.onCreateWebpackConfig = ({ stage, loaders, actions }) => {
   actions.setWebpackConfig({
     resolve: {
       fallback: {
@@ -17,6 +17,7 @@ exports.onCreateWebpackConfig = ({ actions }) => {
         https: false,
         os: false,
         stream: false,
+        electron: false,
       }
     },
     plugins: [
@@ -24,7 +25,6 @@ exports.onCreateWebpackConfig = ({ actions }) => {
         Buffer: path.join(__dirname, 'shims/buffer.js'),
         process: 'process/browser'
       }),
-      new webpack.IgnorePlugin(/^electron$/)
     ],
   })
 }

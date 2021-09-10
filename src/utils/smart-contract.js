@@ -1,8 +1,10 @@
-const TESTNET_SMART_CONTRACT_ADDRESS = ''
+import {ETHEREUM_CHAIN_IDS} from './wallet'
+
+const TESTNET_SMART_CONTRACT_ADDRESS = '0x1AEf2b1801A19Fa4E3486e77C3758a3265E96768'
 const MAINNET_SMART_CONTRACT_ADDRESS = ''
 
-export const smartContractAddress = (() => {
-  if (process.env.NODE_ENV === 'development') return process.env.GATSBY_SMART_CONTRACT_ADDRESS
-  if (process.env.STAGING) return TESTNET_SMART_CONTRACT_ADDRESS
-  return MAINNET_SMART_CONTRACT_ADDRESS
-})()
+export const getSmartContractAddress = (chainId) => {
+  if (chainId === ETHEREUM_CHAIN_IDS.MAINNET) return MAINNET_SMART_CONTRACT_ADDRESS
+  if (chainId === ETHEREUM_CHAIN_IDS.RINKEBY) return TESTNET_SMART_CONTRACT_ADDRESS
+  return process.env.GATSBY_HARDHAT_SMART_CONTRACT_ADDRESS
+}
