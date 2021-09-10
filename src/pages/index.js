@@ -60,7 +60,7 @@ const IndexPage = () => (
         <Jumbotron>
           <h1>Enter the Leniaverse...</h1>
           <Lead>
-            <p>The dry part: Lenia is a collection of 1337 artificial life-forms discovered via evolutionary computation. They live as unique digital collectibles (NFT) on the Ethereum blockchain.</p>
+            <p>The dry part: Lenia is a collection of 210 artificial life-forms discovered via evolutionary computation. They live as unique digital collectibles (NFT) on the Ethereum blockchain.</p>
             <p>The wet part: If you ever let your cactus or your Tamagotchi die because you were too busy or just sadistic, then this is for you. It's the power of math baby: they are born (or not), they move (or not) and they live their life unapologetically usually with nobody lifting their little finger...</p>
           </Lead>
           <MintButton />

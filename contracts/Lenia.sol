@@ -8,9 +8,9 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract Lenia is ERC721, ERC721Enumerable, Ownable {
 
-    uint256 public constant MAX_SUPPLY = 1337;
+    uint256 public constant MAX_SUPPLY = 210;
     uint256 private _price = 0.08 ether;
-    uint256 private _reserved = 26;
+    uint256 private _reserved = 21;
 
     uint256 public startingIndex;
 

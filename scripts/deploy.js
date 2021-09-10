@@ -1,19 +1,15 @@
-// We require the Hardhat Runtime Environment explicitly here. This is optional
-// but useful for running the script in a standalone fashion through `node <script>`.
-//
-// When running the script with `npx hardhat run <script>` you'll find the Hardhat
-// Runtime Environment's members available in the global scope.
 const hre = require("hardhat")
 const fs = require("fs")
 const path= require("path")
 
 async function main() {
-  // Hardhat always runs the compile task when running scripts with its command
-  // line interface.
-  //
-  // If this script is run directly using `node` you may want to call compile
-  // manually to make sure everything is compiled
-  // await hre.run('compile');
+  // // Load all metadata
+  // metadata = []
+  // for (let index = 0; index < 210; index++) {
+  //   let lenia_json = fs.readFileSync(`${__dirname}/fake/${index}-metadata.json`);
+  //   // let lenia_metadata = JSON.parse(lenia_json);
+  //   metadata.push(lenia_json)
+  // }
 
   // We get the contract to deploy
   const LeniaContract = await hre.ethers.getContractFactory("Lenia")
