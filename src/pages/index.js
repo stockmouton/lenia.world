@@ -13,6 +13,7 @@ import Profile from "../components/profile"
 import {Web3Provider} from "../components/web3-provider";
 import MintButton from "../components/mint-button";
 import Link from "../components/link";
+import LeniaDex from "../components/leniadex";
 
 import Beast from "../images/beast.mp4"
 
@@ -28,13 +29,10 @@ const IndexPage = () => (
       <Sidebar>
           <Sidebar.List>
             <Sidebar.Item>
-              <Sidebar.Link href="#summary">Summary</Sidebar.Link>
+              <Sidebar.Link href="#niftty-gritty">N(i)FTty-gritty</Sidebar.Link>
             </Sidebar.Item>
             <Sidebar.Item>
               <Sidebar.Link href="#leniadex">Leniadex</Sidebar.Link>
-            </Sidebar.Item>
-            <Sidebar.Item>
-              <Sidebar.Link href="#nifty-gritty">The N(i)FTy gritty</Sidebar.Link>
             </Sidebar.Item>
             <Sidebar.Item>
               <Sidebar.Link href="#but-why-owning-you-say">But why owning you say</Sidebar.Link>
@@ -60,51 +58,44 @@ const IndexPage = () => (
         <Jumbotron>
           <h1>Enter the Leniaverse...</h1>
           <Lead>
-            <p>The dry part: Lenia is a collection of 210 artificial life-forms discovered via evolutionary computation. They live as unique digital collectibles (NFT) on the Ethereum blockchain.</p>
-            <p>The wet part: If you ever let your cactus or your Tamagotchi die because you were too busy or just sadistic, then this is for you. It's the power of math baby: they are born (or not), they move (or not) and they live their life unapologetically usually with nobody lifting their little finger...</p>
+            <p>
+              Bonsoir beautiful stranger, join us on our big adventure in this uncharted part of the metaverse where mathematics meet life.
+              
+              After five long and unforgiving months of exploring a tiny part of this world, 204 unique life-forms have been discovered and ready to be unleashed on the Ethereum blockchain.
+
+              Their name: Lenia.
+            </p>
           </Lead>
           <MintButton />
         </Jumbotron>
-        <Section id="#summary">
-          <Section.Header><h1>Summary</h1></Section.Header>
+        <Section id="#niftty-gritty">
+          <Section.Header><h1>N(i)FTty-gritty</h1></Section.Header>
           <ul>
-            <li>200 Lenias to mint. Those Lenias are <Link href="https://creativecommons.org/publicdomain/zero/1.0/">public domain</Link></li>
+            <li>204 Lenia to mint.</li>
+            <li>You can only mint one Lenia per transaction</li>
             <li>Mint date: TBA</li>
-            <li>50% of minting proceeds are sent to StockMouton DAO</li>
-            <li>You can only mint Lenias one par one, use that opportunity to write a message which will be forever linked to your purchase!</li>
-            <li>Lenias a pure mathematical creatures. Their properties are fully stored on chain.</li>
-            <li>Outside of different visual assets stored on IPFS for compatibility with other platformes (like Opensea). Lenias can be rendered thanks to the rendering engine store in the smart contract.</li>
-            <li>No explicit rules for attribute scarcity, all lenias are equally rare</li>
-            <li>Owners of the first Lenia collection will have access to revenue sharing for subsequent collection (see roadmap for more details).</li>
-            <li>A part of the benefit will be redistributed to the seesheaperd association</li> 
-            <li>Another part of the benefit will be redistributed to the researchers which started this research field</li> 
+            <li>Price: TBA</li>
           </ul>
-
+          
+          <h2>Tokenomics</h2>
+          <ul>
+            <li>Every Lenia gives you automatic membership to the DAO</li>
+            <li>50% of primary sales are collected by the StockMouton DAO (the rest is sent to the creators)</li>
+            <li>7.5% of royalties on secondary sales, of which 33% are collected by the StockMouton DAO</li>
+            <li>All further decisions will be proposed and decided by the DAO after the primary sale is complete</li>
+          </ul>
+          
+          <h2>About the collection</h2>
+          <ul>
+            <li>Lenias are pure mathematical creatures and a subject of active research in the field of Articifial Life</li>
+            <li>They are also gorgeous and give some kind of meditative vibes.</li> 
+            <li>Their properties (and the rendering engine!) are fully stored on chain.</li>
+            <li>Those Lenia are <Link href="https://creativecommons.org/publicdomain/zero/1.0/">public domain</Link></li>
+          </ul>
         </Section>
         <Section id="leniadex">
           <Section.Header><h1>Leniadex</h1></Section.Header>
-          <p>
-            Each time a lenia is minted, the community can access the Lenia and its properties right here, just go on the pokedex page!
-          </p>
-          <p>The Pokedex for Lenia is the best example. We can have the name, the traits, some funny description.</p>
-          <p>It will also show the creatures you own</p>
-        </Section>
-        <Section id="nifty-gritty">
-          <Section.Header><h1>The N(i)FTy Gritty</h1></Section.Header>
-          <p>The first NFTS which are note designed but discovered: All of the creatures that will be showcased in this collections are discovered in very complex mathematical world. Those world are actually so complex taht it would be very tedious (if not impossible) to discover them by hands. This is why we designed sone Artificial intelligence to help us find them.</p>
-          <p>Every Lenia minted in this very first collection will give you access to revenue sharing:
-            - 1% of all sales on the secondary market will be redistributed to lenia's owners
-            - 1% of all future sales of new lenia collections (see roadmap) will be redistributed to lenia's owners
-          </p>
-          <p>
-            Each Lenia of the first collection will give you access to the Stockmouton DAO (more on the missionf of stockmouton here: stockmouton.com)
-          </p>
-          <p>At mint time, Lenia traits will be revealed but the creature itseld will not (see bestiray)</p>
-          <p>Every lenia, gives the owner exclusive access to the high resolution version displayed in the custom rendering engine (might need a beeffy computer thouhg). Plus the capacity to see how the creatures interact with itself in the playground</p>
-          <p>
-            All minting information (Date, Price, etc.) will be announced soon.
-            - The minting will happen as a dutch auction starting from 1 ETH and decreasing from here down to 0.05ETH every hour.
-          </p>
+          <LeniaDex />
         </Section>
         <Section id="but-why-owning-you-say">
           <Section.Header><h1>But why owning you say</h1></Section.Header>
@@ -124,7 +115,7 @@ const IndexPage = () => (
           <p>If you want to learn more about it, check <Link href="https://chakazul.github.io/lenia.html">Bert Chan website</Link> and come in our <Link href="https://discord.gg/4TFNnCkJta">Discord</Link>, Morgan will be more than happy to satisfy your curiosity!</p>
         </Section>
         <Section id="roadmap">
-          <Section.Header><h1>Roadmap</h1></Section.Header>
+          <Section.Header><h1>Draft</h1></Section.Header>
           <p>Well the roadmap but in a wonky funny way.</p>
           <p>25% we release the javascript rendering engine and open the playground.</p>
           <p>50%</p>
