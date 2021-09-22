@@ -36,3 +36,4 @@ public
 # Hardhat related
 artifacts/
 cache/
+src/artifacts.json

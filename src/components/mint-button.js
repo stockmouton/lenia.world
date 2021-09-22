@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react'
-import Lenia from '../../artifacts/contracts/Lenia.sol/Lenia.json'
+import artifacts from '../artifacts.json'
 import Button from './button'
 import {useWeb3} from "./web3-provider"
-import { getSmartContractAddress } from '../utils/smart-contract'
 import Toast from './toast'
 import styled from "styled-components"
 
@@ -19,7 +18,7 @@ const MintButton = () => {
   const [error, setError] = useState(null)
 
   useEffect(async () => {
-    const contract = web3Provider ? new web3Provider.eth.Contract(Lenia.abi, getSmartContractAddress(chainId)) : null
+    const contract = web3Provider ? new web3Provider.eth.Contract(artifacts.contracts.Lenia.abi, artifacts.contracts.Lenia.address) : null
 
     if (contract) {
       setContract(contract)

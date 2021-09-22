@@ -1,5 +1,6 @@
 import styled from "styled-components"
 import Link from "./link"
+import { createMediaQuery, BREAKPOINTS } from "../global-styles"
 
 const Sidebar = styled.nav`
   position: fixed;
@@ -7,33 +8,9 @@ const Sidebar = styled.nav`
   left: 0;
   margin-left: 16px;
   width: 264px;
-`
+  display: none;
 
-Sidebar.List = styled.ul`
-  margin: 10px 5px;
-  margin-left: -5px;
-  padding: 10px 15px;
-  border: 2px solid #000000;
-  box-shadow: 0 0 0 5px, 11px 13px 0 4px black;
-  background: #bbbbbb;
-  list-style: none;
-`
-
-Sidebar.Item = styled.li`
-  margin-left: 0;
-`
-
-Sidebar.Link = styled(Link)`
-  color: #000000;
-  margin-right: -10px;
-  margin-left: -10px;
-  padding: 0 8px;
-  display: block;
-
-  :hover {
-    color: #bbbbbb;
-    background: #000000;
-  }
+  ${createMediaQuery(BREAKPOINTS.xl, 'display: block')}
 `
 
 export default Sidebar

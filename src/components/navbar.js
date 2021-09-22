@@ -1,5 +1,7 @@
 import styled from "styled-components"
 import Link from "./link"
+import Button from "./button"
+import MenuButton from "./navbar-menu-button"
 
 const NavBar = styled.nav`
   position: fixed;
@@ -44,11 +46,30 @@ NavBar.Link = styled(Link)`
   padding: 0 10px;
   display: block;
 
-  :hover {
+  :hover, :focus {
     color: #bbbbbb;
     background: #000000;
   }
 `
+
+NavBar.Button = styled(Button)`
+  background: #000000;
+  color: #bbbbbb;
+  margin-bottom: 0;
+  box-shadow: 0 0;
+
+  :active {
+    margin: 0;
+    background: #000084;
+  }
+
+  :disabled:hover {
+    background: #000000;
+    color: #bbbbbb;
+  }
+`
+
+NavBar.MenuButton = MenuButton
 
 NavBar.Banner = styled.div`
   background-color: #aa0000;

@@ -1,6 +1,8 @@
 const path = require("path")
 require("dotenv").config({ path: path.join(__dirname, '.env.development') })
 
+require('hardhat-deploy');
+require("@nomiclabs/hardhat-ethers")
 require("@nomiclabs/hardhat-etherscan")
 require("@nomiclabs/hardhat-waffle")
 require("hardhat-gas-reporter")
@@ -16,16 +18,15 @@ task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
   }
 })
 
-const getSmartContractAddress = (network) => {
-  if (network === 'rinkeby') return '0x1AEf2b1801A19Fa4E3486e77C3758a3265E96768'
-  return process.env.GATSBY_HARDHAT_SMART_CONTRACT_ADDRESS
-}
 task("start-sale", "Start Lenia sale", async (taskArgs, hre) => {
   if (hre.hardhatArguments.network == null) {
     throw new Error('Please add the missing --network <localhost|rinkeby|goerli> argument')
   }
+
   const LeniaContract = await hre.ethers.getContractFactory("Lenia")
-  const lenia = LeniaContract.attach(getSmartContractAddress(hre.hardhatArguments.network))
+  const LeniaDeployment = await hre.deployments.get('Lenia')
+
+  const lenia = LeniaContract.attach(LeniaDeployment.address)
   let hasSaleStarted = await lenia.hasSaleStarted()
 
   if (hasSaleStarted) {
@@ -73,5 +74,8 @@ module.exports = {
   },
   etherscan: {
     apiKey: process.env.ETHERSCAN_API_KEY,
+  },
+  namedAccounts: {
+    deployer: 0,
   },
 }

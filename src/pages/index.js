@@ -8,6 +8,7 @@ import HeroBackground from "../components/hero-background"
 import Section from "../components/section"
 import Panel from "../components/panel"
 import Sidebar from "../components/sidebar"
+import Menu from "../components/menu"
 import Grid from "../components/grid"
 import Profile from "../components/profile"
 import {Web3Provider} from "../components/web3-provider";
@@ -26,42 +27,52 @@ const IndexPage = () => (
         </video>
       </HeroBackground>
       <Sidebar>
-          <Sidebar.List>
-            <Sidebar.Item>
-              <Sidebar.Link href="#summary">Summary</Sidebar.Link>
-            </Sidebar.Item>
-            <Sidebar.Item>
-              <Sidebar.Link href="#leniadex">Leniadex</Sidebar.Link>
-            </Sidebar.Item>
-            <Sidebar.Item>
-              <Sidebar.Link href="#nifty-gritty">The N(i)FTy gritty</Sidebar.Link>
-            </Sidebar.Item>
-            <Sidebar.Item>
-              <Sidebar.Link href="#but-why-owning-you-say">But why owning you say</Sidebar.Link>
-            </Sidebar.Item>
-            <Sidebar.Item>
-              <Sidebar.Link href="#research">The research</Sidebar.Link>
-            </Sidebar.Item>
-            <Sidebar.Item>
-                <Sidebar.Link href="#roadmap">Roadmap</Sidebar.Link>
-            </Sidebar.Item>
-            <Sidebar.Item>
-              <Sidebar.Link href="#the-folks-we-care-about">The folks we care about</Sidebar.Link>
-            </Sidebar.Item>
-            <Sidebar.Item>
-              <Sidebar.Link href="#family-portrait">Family Portrait</Sidebar.Link>
-            </Sidebar.Item>
-            <Sidebar.Item>
-              <Sidebar.Link href="#quite-queried-questions">Quite Queried Questions</Sidebar.Link>
-            </Sidebar.Item>
-          </Sidebar.List>
+          <Menu>
+            <Menu.Item>
+              <Menu.Link href="#summary">Summary</Menu.Link>
+            </Menu.Item>
+            <Menu.Item>
+              <Menu.Link href="#leniadex">Leniadex</Menu.Link>
+            </Menu.Item>
+            <Menu.Item>
+              <Menu.Link href="#nifty-gritty">The N(i)FTy gritty</Menu.Link>
+            </Menu.Item>
+            <Menu.Item>
+              <Menu.Link href="#but-why-owning-you-say">But why owning you say</Menu.Link>
+            </Menu.Item>
+            <Menu.Item>
+              <Menu.Link href="#research">The research</Menu.Link>
+            </Menu.Item>
+            <Menu.Item>
+                <Menu.Link href="#roadmap">Roadmap</Menu.Link>
+            </Menu.Item>
+            <Menu.Item>
+              <Menu.Link href="#the-folks-we-care-about">The folks we care about</Menu.Link>
+            </Menu.Item>
+            <Menu.Item>
+              <Menu.Link href="#family-portrait">Family Portrait</Menu.Link>
+            </Menu.Item>
+            <Menu.Item>
+              <Menu.Link href="#quite-queried-questions">Quite Queried Questions</Menu.Link>
+            </Menu.Item>
+          </Menu>
         </Sidebar>
       <Container>
         <Jumbotron>
           <h1>Enter the Leniaverse...</h1>
           <Lead>
+            <p>
+              Beyond the atrocious infinity of metaverses, there exists an uncharted world of purity, where even physics has no grasp. 
+              It's the power of big math baby! Just hold on your big machetes and go explore this universe of information with us!
+            </p>
+            {/* <p>Bonjour belle personne, il semble que vous soyez non seulement beau mais en plus incroyavblement intelligent pour parcourir ce coin du net!
+              
+            </p> */}
+            <p>
+              Howdy beautiful stranger, you are exactly right on time. Not only that but we think you are ready to join us on our little adventure in this uncharted part of the metaverse where mathematics meet life.
+              We recently spent five months exploring a tiny part of this world and after much sweat and tears (even blood), 204 unique life-forms called Lenia have been discovered and ready to be unleashed on the Ethereum blockchian.
+            </p>
             <p>The dry part: Lenia is a collection of 210 artificial life-forms discovered via evolutionary computation. They live as unique digital collectibles (NFT) on the Ethereum blockchain.</p>
-            <p>The wet part: If you ever let your cactus or your Tamagotchi die because you were too busy or just sadistic, then this is for you. It's the power of math baby: they are born (or not), they move (or not) and they live their life unapologetically usually with nobody lifting their little finger...</p>
           </Lead>
           <MintButton />
         </Jumbotron>
@@ -121,7 +132,7 @@ const IndexPage = () => (
           <p>The answers lies in the field of Artificial Intelligence and requires the work of many to bear fruits!</p>
           <p>This is why we participates in the <Link href="https://openlenia.github.io/">Open Science Lenia initiative</Link> by opensourcing of AI tools to search for Lenias!</p>
 
-          <p>If you want to learn more about it, check <Link href="https://chakazul.github.io/lenia.html">Bert Chan website</Link> and come in our <Link href="https://discord.gg/4TFNnCkJta">Discord</Link>, Morgan will be more than happy to satisfy your curiosity!</p>
+          <p>If you want to learn more about it, come in our <Link href="https://discord.gg/4TFNnCkJta">Discord</Link> and check <Link href="https://chakazul.github.io/lenia.html">Bert Chan website</Link>, Morgan will be more than happy to satisfy your curiosity!</p>
         </Section>
         <Section id="roadmap">
           <Section.Header><h1>Roadmap</h1></Section.Header>

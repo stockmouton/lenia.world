@@ -7,6 +7,15 @@ const fontSizeBase = 18
 const spaceWidth = fontSizeBase / 2
 const gridGutterWidth = spaceWidth * 2
 
+const BREAKPOINTS = {
+  xs: 'xs',
+  sm: 'sm',
+  md: 'md',
+  lg: 'lg',
+  xl: 'xl',
+  xxl: 'xxl',
+}
+
 // Define the minimum dimensions at which your layout will change,
 // adapting to different screen sizes, for use in media queries.
 const gridBreakpoints = {
@@ -14,10 +23,11 @@ const gridBreakpoints = {
   sm: 12 * 6 * spaceWidth, 
   md: 12 * 8 * spaceWidth,
   lg: 12 * 10 * spaceWidth,
-  xl: 12 * 12 * spaceWidth,
+  xl: 12 * 14 * spaceWidth,
+  xxl: 12 * 16 * spaceWidth,
 }
 
-const createBreakpointMediaQueries = rules => {
+const createMediaQueries = rules => {
   let mediaQueries = '';
   Object.keys(gridBreakpoints).forEach(breakpoint => {
     if (rules[breakpoint] == null) return
@@ -30,12 +40,20 @@ const createBreakpointMediaQueries = rules => {
   return mediaQueries;
 }
 
+const createMediaQuery = (bp, rules, order = 'min') => `
+@media (${order}-width: ${gridBreakpoints[bp]}px) {
+  ${rules};
+}
+`
+
 export {
   fontSizeBase,
   spaceWidth,
   gridBreakpoints,
   gridGutterWidth,
-  createBreakpointMediaQueries,
+  createMediaQueries,
+  createMediaQuery,
+  BREAKPOINTS,
 }
 
 const GlobalStyles = createGlobalStyle`
