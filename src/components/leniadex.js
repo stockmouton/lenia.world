@@ -15,7 +15,6 @@ import RainbowCreature from "../fake/rainbow.mp4"
 import SalviaCreature from "../fake/salvia.mp4"
 import WhiteBlackCreature from "../fake/whiteblack.mp4"
 
-const WRAPPER_ID = 'leniadex'
 
 const Wrapper = styled.div`
   width: 100%;
@@ -40,7 +39,6 @@ function setValue(attributes, key, value) {
 function replaceVideoURL(data) {
   return data.map(
     (d) => {
-      debugger
       if (d.image == 'blackwhite.mp4'){
         d.image= BlackWhiteCreature
       } else if (d.image == 'carmine-blue.mp4'){
@@ -74,7 +72,7 @@ const LeniaDex = () => {
   const width = 400;
   const height = 400;
   const k = height / width
-  const blue = "#3DB2FF"
+  const blue = "#ffffff"
   const key1 = "Robustness"
   const max_key1 = 1.
   const key2 = "Spread"
@@ -212,7 +210,7 @@ const LeniaDex = () => {
         .on("zoom", zoomed);
       svg.call(zoom).call(zoom.transform, d3.zoomIdentity);
     }
-  }, [nodeRef])
+  }, [])
 
   return (
     <div ref={nodeRef} />
