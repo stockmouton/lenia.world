@@ -20,6 +20,7 @@ const Caption = styled.figcaption`
 `
 
 const Article = styled.article`
+  margin: 0;
   padding: 1rem;
 `
 
