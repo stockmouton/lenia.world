@@ -1,29 +1,13 @@
 import React, {useState} from 'react'
 import { useWeb3 } from "./web3-provider"
 import Web3Modal from "web3modal"
-import styled from "styled-components"
-import Button from "./button"
+import NavBar from "./navbar"
 import Dropdown from "./dropdown";
+import Menu from "./menu"
 import Toast from './toast'
 import WalletConnectProvider from '@walletconnect/web3-provider'
 import { allowedChainId, chainDisplayName, networkName } from '../utils/wallet'
-
-const StyledButton = styled(Button)`
-  background: #000000;
-  color: #bbbbbb;
-  margin-bottom: 0;
-  box-shadow: 0 0;
-
-  :active {
-    margin: 0;
-    background: #000084;
-  }
-
-  :disabled:hover {
-    background: #000000;
-    color: #bbbbbb;
-  }
-`
+ 
 
 const WalletConnectorButton = () => {
   const { initWeb3Provider, resetWeb3Provider, account, chainId } = useWeb3()
@@ -106,20 +90,22 @@ const WalletConnectorButton = () => {
 
   return (
     <>
-      <StyledButton 
+      <NavBar.Button 
         onClick={handleClick}
         disabled={account && chainId !== allowedChainId}
       >
         {getConnectorButtonContent()}
-      </StyledButton>
+      </NavBar.Button>
       {isDropdownOpen && (
         <Dropdown onClickOutside={handleDropdownClickOutside}>
-          <Dropdown.Item>
-            <Dropdown.Button onClick={handleChangeProviderButtonClick}>Change</Dropdown.Button>
-          </Dropdown.Item>
-          <Dropdown.Item>
-            <Dropdown.Button onClick={handleDisconnect}>Disconnect</Dropdown.Button>
-          </Dropdown.Item>
+          <Menu>
+            <Menu.Item>
+              <Menu.Button onClick={handleChangeProviderButtonClick}>Change</Menu.Button>
+            </Menu.Item>
+            <Menu.Item>
+              <Menu.Button onClick={handleDisconnect}>Disconnect</Menu.Button>
+            </Menu.Item>
+          </Menu>
         </Dropdown>
       )}
       {error?.message && <Toast type="error" onClose={handleToastClose}>{error.message}</Toast>}

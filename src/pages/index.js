@@ -8,6 +8,7 @@ import HeroBackground from "../components/hero-background"
 import Section from "../components/section"
 import Panel from "../components/panel"
 import Sidebar from "../components/sidebar"
+import NavMenu from "../components/nav-menu"
 import Grid from "../components/grid"
 import Profile from "../components/profile"
 import {Web3Provider} from "../components/web3-provider";
@@ -27,27 +28,8 @@ const IndexPage = () => (
         </video>
       </HeroBackground>
       <Sidebar>
-          <Sidebar.List>
-            <Sidebar.Item>
-              <Sidebar.Link href="#niftty-gritty">N(i)FTty-gritty</Sidebar.Link>
-            </Sidebar.Item>
-            <Sidebar.Item>
-              <Sidebar.Link href="#leniadex">Leniadex</Sidebar.Link>
-            </Sidebar.Item>
-            <Sidebar.Item>
-              <Sidebar.Link href="#but-why-though">But Why Though</Sidebar.Link>
-            </Sidebar.Item>
-            <Sidebar.Item>
-              <Sidebar.Link href="#the-folks-we-care-about">The folks we care about</Sidebar.Link>
-            </Sidebar.Item>
-            <Sidebar.Item>
-              <Sidebar.Link href="#family-portrait">Family Portrait</Sidebar.Link>
-            </Sidebar.Item>
-            {/* <Sidebar.Item>
-              <Sidebar.Link href="#quite-queried-questions">Quite Queried Questions</Sidebar.Link>
-            </Sidebar.Item> */}
-          </Sidebar.List>
-        </Sidebar>
+          <NavMenu />
+      </Sidebar>
       <Container>
         <Jumbotron>
           <h1>Enter the Leniaverse...</h1>
@@ -111,7 +93,7 @@ const IndexPage = () => (
         </Section>
         <Section id="family-portrait">
           <Section.Header><h1>Family Portrait</h1></Section.Header>
-          <Grid>
+          <Grid md={2}>
             <Grid.Cell>
               <Profile
                 name="Morgan Giraud"

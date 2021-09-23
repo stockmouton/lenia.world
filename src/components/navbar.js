@@ -1,5 +1,7 @@
 import styled from "styled-components"
 import Link from "./link"
+import Button from "./button"
+import { createMediaQuery, BREAKPOINTS } from "../global-styles"
 
 const NavBar = styled.nav`
   position: fixed;
@@ -7,8 +9,14 @@ const NavBar = styled.nav`
   right: 0;
   left: 0;
   z-index: 1030;
-  background: #bbbbbb;
+  height: 27px;
 `
+
+NavBar.Wrapper = styled.div`
+  background: #bbbbbb;
+  height: 100%;
+`
+
 NavBar.Brand = styled(Link)`
   background: #0e1a8e;
   color: #fefe54;
@@ -28,8 +36,9 @@ NavBar.List = styled.ul`
   right: 0;
   display: block;
   float: left;
-  margin: 0 20px;
+  margin: 0;
   list-style: none;
+  height: 100%;
 `
 
 NavBar.Item = styled.li`
@@ -37,16 +46,46 @@ NavBar.Item = styled.li`
   float: left;
   margin-left: 0;
   list-style: none;
+  height: 100%;
+`
+NavBar.Item.UnderXl = styled(NavBar.Item)`
+  ${createMediaQuery(BREAKPOINTS.xl, 'display: none;')}
+`
+
+NavBar.Item.AboveMd = styled(NavBar.Item)`
+  display: none;
+
+  ${createMediaQuery(BREAKPOINTS.md, 'display: block;')}
 `
 
 NavBar.Link = styled(Link)`
   color: #000000;
   padding: 0 10px;
   display: block;
+  height: 100%;
 
-  :hover {
+  :hover, :focus {
     color: #bbbbbb;
     background: #000000;
+  }
+`
+
+NavBar.Button = styled(Button)`
+  background: #000000;
+  color: #bbbbbb;
+  margin-bottom: 0;
+  box-shadow: 0 0;
+  height: 100%;
+  vertical-align: top;
+
+  :active {
+    margin: 0;
+    background: #000084;
+  }
+
+  :disabled:hover {
+    background: #000000;
+    color: #bbbbbb;
   }
 `
 

@@ -31,7 +31,7 @@
     "web3modal": "^1.9.4"
   },
   "devDependencies": {
-    "@nomiclabs/hardhat-ethers": "^2.0.2",
+    "@nomiclabs/hardhat-ethers": "npm:hardhat-deploy-ethers",
     "@nomiclabs/hardhat-etherscan": "^2.1.6",
     "@nomiclabs/hardhat-waffle": "^2.0.1",
     "chai": "^4.3.4",
@@ -41,6 +41,7 @@
     "gatsby-plugin-env-variables": "^2.1.0",
     "gh-pages": "^3.2.3",
     "hardhat": "^2.6.1",
+    "hardhat-deploy": "^0.9.1",
     "hardhat-gas-reporter": "^1.0.4",
     "prettier": "2.3.2",
     "solidity-coverage": "^0.7.17",
@@ -52,17 +53,17 @@
   ],
   "scripts": {
     "build": "STAGING=${STAGING} gatsby build",
-    "start": "yarn develop && yarn sm-serve && yarn sm-compile && yarn sm-deploy",
     "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,md}\"",
     "develop": "gatsby develop",
     "serve": "gatsby serve",
     "clean": "gatsby clean",
     "test": "yarn sm-test",
     "deploy": "STAGING=${STAGING} gatsby build && gh-pages -d public -b prod",
+    "local-node": "hardhat node",
     "sm-compile": "hardhat compile",
     "sm-test": "hardhat test",
-    "sm-serve": "hardhat node",
-    "sm-deploy": "hardhat run --network ${NETWORK:-localhost} scripts/deploy.js",
+    "sm-deploy": "hardhat deploy --network ${NETWORK:-localhost} --export src/artifacts.json",
+    "sm-export": "hardhat export --network ${NETWORK:-localhost} --export src/artifacts.json",
     "sm-start-sale": "hardhat start-sale --network ${NETWORK:-localhost}"
   },
   "repository": {

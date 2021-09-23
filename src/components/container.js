@@ -1,5 +1,5 @@
 import styled from "styled-components"
-import { gridGutterWidth, spaceWidth, createBreakpointMediaQueries } from "../global-styles"
+import { gridGutterWidth, spaceWidth, createMediaQueries } from "../global-styles"
 
 // Define the maximum width of container for different screen sizes.
 const containerMaxWidths = {
@@ -23,7 +23,7 @@ const Container = styled.div`
   margin-right: auto;
   margin-left: auto;
 
-  ${createBreakpointMediaQueries(createContainerMaxWidthsRules())}
+  ${createMediaQueries(createContainerMaxWidthsRules())}
 `
 
 export default Container

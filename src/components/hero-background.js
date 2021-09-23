@@ -1,7 +1,7 @@
 import styled from "styled-components"
 
 const HeroBackground = styled.div`
-  position: absolute;
+  position: fixed;
   left: 0;
   right: 0;
   top: 0;
