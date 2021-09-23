@@ -4,8 +4,18 @@ import Fixedsys500cWoff from "./fonts/Fixedsys500c.woff";
 import Fixedsys500cTtf from "./fonts/Fixedsys500c.ttf";
 
 const fontSizeBase = 18
+const fontSizeBaseMobile = 16
 const spaceWidth = fontSizeBase / 2
 const gridGutterWidth = spaceWidth * 2
+
+const BREAKPOINTS = {
+  xs: 'xs',
+  sm: 'sm',
+  md: 'md',
+  lg: 'lg',
+  xl: 'xl',
+  xxl: 'xxl',
+}
 
 // Define the minimum dimensions at which your layout will change,
 // adapting to different screen sizes, for use in media queries.
@@ -14,10 +24,11 @@ const gridBreakpoints = {
   sm: 12 * 6 * spaceWidth, 
   md: 12 * 8 * spaceWidth,
   lg: 12 * 10 * spaceWidth,
-  xl: 12 * 12 * spaceWidth,
+  xl: 12 * 14 * spaceWidth,
+  xxl: 12 * 16 * spaceWidth,
 }
 
-const createBreakpointMediaQueries = rules => {
+const createMediaQueries = rules => {
   let mediaQueries = '';
   Object.keys(gridBreakpoints).forEach(breakpoint => {
     if (rules[breakpoint] == null) return
@@ -30,12 +41,20 @@ const createBreakpointMediaQueries = rules => {
   return mediaQueries;
 }
 
+const createMediaQuery = (bp, rules, order = 'min') => `
+@media (${order}-width: ${gridBreakpoints[bp]}px) {
+  ${rules};
+}
+`
+
 export {
   fontSizeBase,
   spaceWidth,
   gridBreakpoints,
   gridGutterWidth,
-  createBreakpointMediaQueries,
+  createMediaQueries,
+  createMediaQuery,
+  BREAKPOINTS,
 }
 
 const GlobalStyles = createGlobalStyle`
@@ -51,8 +70,10 @@ body {
   background-color: #0e1a8e;
   color: #bbbbbb;
   font-family: 'DOS', Monaco, Menlo, Consolas, "Courier New", monospace;
-  font-size: ${fontSizeBase}px;
+  font-size: ${fontSizeBaseMobile}px;
   line-height: 1.5;
+
+  ${createMediaQuery(BREAKPOINTS.sm, `font-size: ${fontSizeBase}px;`)}
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -64,8 +85,10 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 h1 {
-  font-size: 1.5rem;
+  font-size: 1.25rem;
   text-transform: uppercase;
+
+  ${createMediaQuery(BREAKPOINTS.sm, `font-size: 1.5rem;`)}
 }
 
 h2 {
