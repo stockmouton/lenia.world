@@ -2,7 +2,7 @@ import React from "react"
 import PropTypes from "prop-types"
 import styled from "styled-components"
 import { StaticImage } from "gatsby-plugin-image"
-
+import MenuButton from "./menu-button"
 import 'sanitize.css';
 import GlobalStyles, {createMediaQuery, BREAKPOINTS} from "../global-styles";
 import NavBar from "./navbar";
@@ -23,9 +23,8 @@ const Layout = ({ children }) => {
     <>
       <GlobalStyles />
       <NavBar>
-        {process.env.NODE_ENV === 'development' && <NavBar.Banner>This website is in development mode: please use the {networkName} network for testing your changes.</NavBar.Banner>}
         {process.env.STAGING && <NavBar.Banner>This website is in early alpha: please use the {networkName} network for testing purposes and use at your own caution!</NavBar.Banner>}
-        <div>
+        <NavBar.Wrapper>
           <NavBar.Brand href="#home">
             <StaticImage
               src="../images/orbium.png"
@@ -37,27 +36,30 @@ const Layout = ({ children }) => {
             {' '} Lenia
           </NavBar.Brand>
           <NavBar.List>
-            <NavBar.Item>
-              <NavBar.MenuButton />
-            </NavBar.Item>
-            <NavBar.Item>
+            <NavBar.Item.UnderXl>
+              <MenuButton />
+            </NavBar.Item.UnderXl>
+            <NavBar.Item.AboveMd>
               <NavBar.Link href="https://twitter.com/lenia_nft">Twitter</NavBar.Link>
-            </NavBar.Item>
-            <NavBar.Item>
+            </NavBar.Item.AboveMd>
+            <NavBar.Item.AboveMd>
               <NavBar.Link href="https://discord.gg/4TFNnCkJta">Discord</NavBar.Link>
-            </NavBar.Item>
-            <NavBar.Item>
+            </NavBar.Item.AboveMd>
+            {/* <NavBar.Item.AboveMd>
               <NavBar.Link>Etherscan</NavBar.Link>
-            </NavBar.Item>
-            <NavBar.Item>
+            </NavBar.Item.AboveMd>
+            <NavBar.Item.AboveMd>
               <NavBar.Link>OpenSea</NavBar.Link>
-            </NavBar.Item>
+            </NavBar.Item.AboveMd> */}
+            <NavBar.Item.AboveMd>
+              <NavBar.Link href="https://github.com/stockmouton/lenia.stockmouton.com">Github</NavBar.Link>
+            </NavBar.Item.AboveMd>
             <NavBar.Item>
               <WalletConnectorButton />
             </NavBar.Item>
           </NavBar.List>
-        </div>
-        </NavBar>
+        </NavBar.Wrapper>
+      </NavBar>
         
       <Main id="home">{children}</Main>
       <Footer>

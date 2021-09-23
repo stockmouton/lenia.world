@@ -4,6 +4,7 @@ import Fixedsys500cWoff from "./fonts/Fixedsys500c.woff";
 import Fixedsys500cTtf from "./fonts/Fixedsys500c.ttf";
 
 const fontSizeBase = 18
+const fontSizeBaseMobile = 16
 const spaceWidth = fontSizeBase / 2
 const gridGutterWidth = spaceWidth * 2
 
@@ -69,8 +70,10 @@ body {
   background-color: #0e1a8e;
   color: #bbbbbb;
   font-family: 'DOS', Monaco, Menlo, Consolas, "Courier New", monospace;
-  font-size: ${fontSizeBase}px;
+  font-size: ${fontSizeBaseMobile}px;
   line-height: 1.5;
+
+  ${createMediaQuery(BREAKPOINTS.sm, `font-size: ${fontSizeBase}px;`)}
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -82,8 +85,10 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 h1 {
-  font-size: 1.5rem;
+  font-size: 1.25rem;
   text-transform: uppercase;
+
+  ${createMediaQuery(BREAKPOINTS.sm, `font-size: 1.5rem;`)}
 }
 
 h2 {

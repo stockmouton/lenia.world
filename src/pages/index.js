@@ -8,7 +8,7 @@ import HeroBackground from "../components/hero-background"
 import Section from "../components/section"
 import Panel from "../components/panel"
 import Sidebar from "../components/sidebar"
-import Menu from "../components/menu"
+import NavMenu from "../components/nav-menu"
 import Grid from "../components/grid"
 import Profile from "../components/profile"
 import {Web3Provider} from "../components/web3-provider";
@@ -27,36 +27,8 @@ const IndexPage = () => (
         </video>
       </HeroBackground>
       <Sidebar>
-          <Menu>
-            <Menu.Item>
-              <Menu.Link href="#summary">Summary</Menu.Link>
-            </Menu.Item>
-            <Menu.Item>
-              <Menu.Link href="#leniadex">Leniadex</Menu.Link>
-            </Menu.Item>
-            <Menu.Item>
-              <Menu.Link href="#nifty-gritty">The N(i)FTy gritty</Menu.Link>
-            </Menu.Item>
-            <Menu.Item>
-              <Menu.Link href="#but-why-owning-you-say">But why owning you say</Menu.Link>
-            </Menu.Item>
-            <Menu.Item>
-              <Menu.Link href="#research">The research</Menu.Link>
-            </Menu.Item>
-            <Menu.Item>
-                <Menu.Link href="#roadmap">Roadmap</Menu.Link>
-            </Menu.Item>
-            <Menu.Item>
-              <Menu.Link href="#the-folks-we-care-about">The folks we care about</Menu.Link>
-            </Menu.Item>
-            <Menu.Item>
-              <Menu.Link href="#family-portrait">Family Portrait</Menu.Link>
-            </Menu.Item>
-            <Menu.Item>
-              <Menu.Link href="#quite-queried-questions">Quite Queried Questions</Menu.Link>
-            </Menu.Item>
-          </Menu>
-        </Sidebar>
+          <NavMenu />
+      </Sidebar>
       <Container>
         <Jumbotron>
           <h1>Enter the Leniaverse...</h1>
@@ -170,7 +142,7 @@ const IndexPage = () => (
         </Section> */}
         <Section id="family-portrait">
           <Section.Header><h1>Family Portrait</h1></Section.Header>
-          <Grid>
+          <Grid md={2}>
             <Grid.Cell>
               <Profile
                 name="Morgan Giraud"

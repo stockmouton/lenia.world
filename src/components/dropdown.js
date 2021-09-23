@@ -3,8 +3,8 @@ import styled from "styled-components"
 
 const StyledDropdown = styled.ul`
   position: absolute;
-  top: 20.5px;
-  left: 0;
+  top: 22px;
+  left: 10px;
   width: 100%;
   min-width: 160px;
 `
