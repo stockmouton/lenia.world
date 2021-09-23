@@ -35,13 +35,7 @@ const IndexPage = () => (
               <Sidebar.Link href="#leniadex">Leniadex</Sidebar.Link>
             </Sidebar.Item>
             <Sidebar.Item>
-              <Sidebar.Link href="#but-why-owning-you-say">But why owning you say</Sidebar.Link>
-            </Sidebar.Item>
-            <Sidebar.Item>
-              <Sidebar.Link href="#research">The research</Sidebar.Link>
-            </Sidebar.Item>
-            <Sidebar.Item>
-                <Sidebar.Link href="#roadmap">Roadmap</Sidebar.Link>
+              <Sidebar.Link href="#but-why-though">But Why Though</Sidebar.Link>
             </Sidebar.Item>
             <Sidebar.Item>
               <Sidebar.Link href="#the-folks-we-care-about">The folks we care about</Sidebar.Link>
@@ -49,9 +43,9 @@ const IndexPage = () => (
             <Sidebar.Item>
               <Sidebar.Link href="#family-portrait">Family Portrait</Sidebar.Link>
             </Sidebar.Item>
-            <Sidebar.Item>
+            {/* <Sidebar.Item>
               <Sidebar.Link href="#quite-queried-questions">Quite Queried Questions</Sidebar.Link>
-            </Sidebar.Item>
+            </Sidebar.Item> */}
           </Sidebar.List>
         </Sidebar>
       <Container>
@@ -97,57 +91,24 @@ const IndexPage = () => (
           <Section.Header><h1>Leniadex</h1></Section.Header>
           <LeniaDex />
         </Section>
-        <Section id="but-why-owning-you-say">
-          <Section.Header><h1>But why owning you say</h1></Section.Header>
-          <p>The perks of owning a Lenia in the future</p>
-          <p>
-            This project is not just about cool arts, speculation or redistribution to our community and partner. It is also a project which aims at advancing Artificial Life reseach.
-            What comes out of this cutting edge research will fueled innovation in the Stockmouton DAO.
-          </p>
-        </Section>
-        <Section id="research">
-          <Section.Header><h1>A state of the art articifial life research subject</h1></Section.Header>
+        <Section id="but-why-though">
+          <Section.Header><h1>But Why Though?</h1></Section.Header>
+          <h2>The Lenia Origins</h2>
+          <p>We are ML and crypto enthusiast, and we believe that beyond the hype, the future will be shaped by those 2 technologies</p>
+          <p>It just happens that the beautiful subject of artificial life is a perfect medium to provide a visual to NFTs</p>
+          <p>And NFTs are perfect to foster a community which can empower more research!</p>
           <p>Lenias are not just nice and complex mathematical animations. They are a research subject in the field of artificial life.</p>
           <p>Many questions are still unanswered in this field and this project aim to help researchers answer one of the hard questions: how one can automatically and efficiently discovers those mathematical creatures?</p>
           <p>The answers lies in the field of Artificial Intelligence and requires the work of many to bear fruits!</p>
           <p>This is why we participates in the <Link href="https://openlenia.github.io/">Open Science Lenia initiative</Link> by opensourcing of AI tools to search for Lenias!</p>
 
           <p>If you want to learn more about it, check <Link href="https://chakazul.github.io/lenia.html">Bert Chan website</Link> and come in our <Link href="https://discord.gg/4TFNnCkJta">Discord</Link>, Morgan will be more than happy to satisfy your curiosity!</p>
+
+          <h2>Stockmouton DAO</h2>
+          <p>That's why, beyond this NFT collection, we aim to build a DAO</p>
+          <p>This first collection is only the first step of the project, you can expect more state-of-the-art work which will contribute to the value of the DAO</p>
+          <p>The goal of the DAO will be defined by the DAO itself, as long as it keeps aligned with its value. see stockmouton.com for more information</p>  
         </Section>
-        <Section id="roadmap">
-          <Section.Header><h1>Draft</h1></Section.Header>
-          <p>Well the roadmap but in a wonky funny way.</p>
-          <p>25% we release the javascript rendering engine and open the playground.</p>
-          <p>50%</p>
-          <p>100% We redistribute money to our collaborators and the association to save the ocean. 3 Eth will be used to load up our AWS account. And we start working like monkeys on the higher complexity mathematical space for more lenias.</p>
-        </Section>
-        {/* <Section id="the-folks-we-care-about">
-          <Section.Header><h1>The folks we care about</h1></Section.Header>
-          <p>The following people or organizations will be donated:</p>
-          <ul>
-            <li>5% of all primary sales</li>
-            <li>1% of all secondary sales</li>
-          </ul>
-          <Grid>
-            <Grid.Cell>
-              <Profile
-                name="Bert Chan"
-                pictureSrc="https://pbs.twimg.com/profile_images/973083119661170688/bJWrUft8_400x400.jpg" 
-                twitterHandle="BertChakovsky"
-                role="Independent Researcher on Artificial Life"
-                description={<p>He is the original researcher behind the Lenia lifeforms and nothing would have been possible without his scientific work.</p>}
-              />
-            </Grid.Cell>
-            <Grid.Cell>
-            <Profile
-                name="Unknown Organization"
-                pictureSrc="https://previews.123rf.com/images/goldenadele/goldenadele1910/goldenadele191000002/132524846-save-the-ocean-square-vector-image-the-environment-protection-vector-design-for-a-poster-flyer-print.jpg" 
-                role="Protecting the world's oceans and marine life"
-                description={<p>COMING SOON...</p>}
-              />
-            </Grid.Cell>
-          </Grid>
-        </Section> */}
         <Section id="family-portrait">
           <Section.Header><h1>Family Portrait</h1></Section.Header>
           <Grid>
@@ -157,7 +118,7 @@ const IndexPage = () => (
                 pictureSrc="https://pbs.twimg.com/profile_images/1115639997183426564/NC2UpU3A_400x400.png" 
                 twitterHandle="morgangiraud"
                 role="Big Brain Energy"
-                description={<p>The collection creator, spent way too much time running his AI robots to discover these creatures.</p>}
+                description={<p>Nothing matters in the end.</p>}
               />
             </Grid.Cell>
             <Grid.Cell>
@@ -166,12 +127,12 @@ const IndexPage = () => (
                 pictureSrc="https://pbs.twimg.com/profile_images/765306239920332800/y_6BlU3q_400x400.jpg" 
                 twitterHandle="orangealexandre"
                 role="Just the muscles"
-                description={<p>Web and smart contract development.</p>}
+                description={<p>Not so salty about GME</p>}
               />
             </Grid.Cell>
           </Grid>
         </Section>
-        <Section id="quite-queried-questions">
+        {/* <Section id="quite-queried-questions">
           <Section.Header><h1>Quite Queried Questions</h1></Section.Header>
           <Panel
             heading="Question 1"
@@ -181,7 +142,7 @@ const IndexPage = () => (
             heading="Question 2"
             body={<p>Answer 2</p>}
           />
-        </Section>
+        </Section> */}
       </Container>
     </Layout>
   </Web3Provider>
