@@ -9,11 +9,11 @@ const NavBar = styled.nav`
   right: 0;
   left: 0;
   z-index: 1030;
-  background: #bbbbbb;
   height: 27px;
 `
 
 NavBar.Wrapper = styled.div`
+  background: #bbbbbb;
   height: 100%;
 `
 

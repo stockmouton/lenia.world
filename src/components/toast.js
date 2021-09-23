@@ -11,7 +11,7 @@ const Wrapper = styled.div`
   margin: 0 auto;
 
   ${createMediaQuery(BREAKPOINTS.xl, `
-    top: 55px;
+    top: 60px;
     left: auto;
     right: 0;
     max-width: 500px;
