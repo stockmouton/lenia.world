@@ -8,6 +8,10 @@ As easy as typing: `yarn`
 ## Development
 
 Before starting development, it is recommended to:
+- install the latest dependencies:
+```
+yarn
+```
 - start a local network node (for smart contract interactions)
 ```
 yarn local-node

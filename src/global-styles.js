@@ -124,6 +124,10 @@ figure {
 ul {
   margin: 0;
 }
+
+article {
+  margin-top: 3rem;
+}
 `;
 
 export default GlobalStyles;
