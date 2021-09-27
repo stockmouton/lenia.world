@@ -18,7 +18,7 @@ yarn local-node
 ```
 - deploy the current smart contract version to the local node and export the artifacts file for the Frontend.
 ```
-yarn sm-deploy --export src/artifacts.json
+yarn sm-deploy
 ```
 - spin up a development web server (Gatsby)
 ```
