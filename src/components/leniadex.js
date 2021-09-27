@@ -4,13 +4,7 @@ import styled from "styled-components"
 import _max from "lodash/max"
 
 
-import creature_000 from "../fake/000-metadata.json"
-import creature_001 from "../fake/001-metadata.json"
-import creature_002 from "../fake/002-metadata.json"
-import creature_003 from "../fake/003-metadata.json"
-import creature_004 from "../fake/004-metadata.json"
-import creature_005 from "../fake/005-metadata.json"
-import creature_006 from "../fake/006-metadata.json"
+import all_metadata from "../fake/metadata.json"
 import BlackWhiteCreature from "../fake/blackwhite.mp4"
 import CarmineBlueCreature from "../fake/carmine-blue.mp4"
 import CarmineGreenCreature from "../fake/carmine-green.mp4"
@@ -84,15 +78,7 @@ function replaceVideoURL(data) {
 const LeniaDex = () => {
   const nodeRef = useRef(null);
 
-  var data = replaceVideoURL([
-    creature_000,
-    creature_001,
-    creature_002,
-    creature_003,
-    creature_004,
-    creature_005,
-    creature_006,
-  ])
+  var data = replaceVideoURL(all_metadata)
 
   // set the dimensions and margins of the graph
   const margin = {top: 0, right: 0, bottom: 40, left: 40}
@@ -152,6 +138,9 @@ const LeniaDex = () => {
       const tooltip = d3.select("#leniadex-tooltip")
       const mouseover = (event, d) =>
         tooltip
+          // .html(`
+          //     <iframe src="lenia?id=${d.tokenID}" width="256px" height="256px"></iframe>
+          // `)
           .html(`
               <video id="creature_vid" width="256" height="256" preload='auto' autoplay>
                   <source src="${d.image}" type="video/mp4">
