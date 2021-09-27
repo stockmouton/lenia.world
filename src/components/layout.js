@@ -27,7 +27,7 @@ const Layout = ({ children }) => {
         <NavBar.Wrapper>
           <NavBar.Brand href="#home">
             <StaticImage
-              src="../images/orbium.png"
+              src="../images/logo.png"
               width={27}
               quality={95}
               formats={["AUTO", "WEBP", "AVIF"]}

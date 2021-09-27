@@ -1,7 +1,7 @@
 import styled from "styled-components"
 import Link from "./link"
 import Button from "./button"
-import { createMediaQuery, BREAKPOINTS } from "../global-styles"
+import { createMediaQuery, BREAKPOINTS, COLORS } from "../global-styles"
 
 const NavBar = styled.nav`
   position: fixed;
@@ -18,7 +18,7 @@ NavBar.Wrapper = styled.div`
 `
 
 NavBar.Brand = styled(Link)`
-  background: #0e1a8e;
+  background: ${COLORS.BACKGROUND};
   color: #fefe54;
   display: block;
   float: left;
@@ -26,7 +26,7 @@ NavBar.Brand = styled(Link)`
 
   :hover {
     color: #fefe54;
-    background: #0e1a8e;
+    background: ${COLORS.BACKGROUND};
     text-decoration: none;
   }
 `
