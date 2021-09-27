@@ -48,7 +48,7 @@ const IndexPage = () => (
         <Section id="#niftty-gritty">
           <Section.Header><h1>N(i)FTty-gritty</h1></Section.Header>
           <ul>
-            <li>204 Lenia to mint</li>
+            <li>202 Lenia to mint</li>
             <li>You can only mint one Lenia per transaction</li>
             <li>Mint date: TBA</li>
             <li>Price: TBA</li>

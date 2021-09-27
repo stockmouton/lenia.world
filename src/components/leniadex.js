@@ -5,6 +5,12 @@ import _max from "lodash/max"
 
 
 import creature_000 from "../fake/000-metadata.json"
+import creature_001 from "../fake/001-metadata.json"
+import creature_002 from "../fake/002-metadata.json"
+import creature_003 from "../fake/003-metadata.json"
+import creature_004 from "../fake/004-metadata.json"
+import creature_005 from "../fake/005-metadata.json"
+import creature_006 from "../fake/006-metadata.json"
 import BlackWhiteCreature from "../fake/blackwhite.mp4"
 import CarmineBlueCreature from "../fake/carmine-blue.mp4"
 import CarmineGreenCreature from "../fake/carmine-green.mp4"
@@ -16,9 +22,19 @@ import SalviaCreature from "../fake/salvia.mp4"
 import WhiteBlackCreature from "../fake/whiteblack.mp4"
 
 
-const Wrapper = styled.div`
-  width: 100%;
-  height: 500px;
+const StyledSVG = styled.svg`
+  display: block;
+  margin: auto;
+`
+
+const StyledTooltip = styled.div`
+    opacity: 0;
+    background-color: white
+    border: solid;
+    border-width: 1px;
+    border-radius: 5px;
+    padding: 10px;
+    position: fixed;
 `
 
 function getValue(attributes, key) {
@@ -28,35 +44,36 @@ function getValue(attributes, key) {
     }
   }
 }
-function setValue(attributes, key, value) {
-  for (let i = 0; i < attributes.length; i++) {
-    if (attributes[i]['trait_type'] == key) {
-      return attributes[i]['value'] = value
-      break
-    }
-  }
-}
+// function setValue(attributes, key, value) {
+//   for (let i = 0; i < attributes.length; i++) {
+//     if (attributes[i]['trait_type'] == key) {
+//       return attributes[i]['value'] = value
+//       break
+//     }
+//   }
+// }
 function replaceVideoURL(data) {
   return data.map(
     (d) => {
+      console.log(d.image);
       if (d.image == 'blackwhite.mp4'){
-        d.image= BlackWhiteCreature
+        d.image = BlackWhiteCreature
       } else if (d.image == 'carmine-blue.mp4'){
-        d.image= CarmineBlueCreature
+        d.image = CarmineBlueCreature
       } else if (d.image == 'carmine-green.mp4'){
-        d.image= CarmineGreenCreature
+        d.image = CarmineGreenCreature
       } else if (d.image == 'cinnamon.mp4'){
-        d.image= CinnamonCreature
+        d.image = CinnamonCreature
       } else if (d.image == 'golden.mp4'){
-        d.image= GoldenCreature
+        d.image = GoldenCreature
       } else if (d.image == 'msdos.mp4'){
-        d.image= MSDosCreature
+        d.image = MSDosCreature
       } else if (d.image == 'rainbow.mp4'){
-        d.image= RainbowCreature
+        d.image = RainbowCreature
       } else if (d.image == 'salvia.mp4'){
-        d.image= SalviaCreature
+        d.image = SalviaCreature
       } else if (d.image == 'whiteblack.mp4'){
-        d.image= WhiteBlackCreature
+        d.image = WhiteBlackCreature
       } 
       return d
     }
@@ -67,119 +84,103 @@ function replaceVideoURL(data) {
 const LeniaDex = () => {
   const nodeRef = useRef(null);
 
+  var data = replaceVideoURL([
+    creature_000,
+    creature_001,
+    creature_002,
+    creature_003,
+    creature_004,
+    creature_005,
+    creature_006,
+  ])
+
   // set the dimensions and margins of the graph
-  const margin = { top: 10, right: 30, bottom: 30, left: 60 }
-  const width = 400;
-  const height = 400;
-  const k = height / width
+  const margin = {top: 0, right: 0, bottom: 40, left: 40}
+  const svgViewWidth = 400
+  const svgViewHeight = 400
+  // Thw viewbox defines the coordinate system visible
+  // Remeber that the SVG y axis goes downward
+  const viewbox = `0, 0, ${svgViewWidth}, ${svgViewHeight}`
+
+  const width = svgViewWidth - margin.left - margin.right
+  const height = svgViewHeight - margin.top - margin.bottom;
+
+
   const blue = "#ffffff"
   const key1 = "Robustness"
-  const max_key1 = 1.
+  const max_key1 = Math.ceil(10 * d3.max(data, (d) => getValue(d.attributes, key1))) / 10
   const key2 = "Spread"
-  const max_key2 = 10.
-
-  var data = replaceVideoURL([creature_000])
+  const max_key2 = Math.ceil(10 * d3.max(data, (d) => getValue(d.attributes, key2))) / 10
 
   useEffect(() => {
     if (nodeRef.current) {
+      
       const svg = d3.select(nodeRef.current)
-        .append("svg")
-        .attr("viewBox", [
-          0, 0, width, height
-        ])
-        .style("width", "100%")
-        .style("height", "100%")
-        .style("display", "block")
-        .style("margin", "auto")
-
-      const tooltip = d3.select(nodeRef.current)
-        .append("div")
-        .style("opacity", 0)
-        .attr("class", "tooltip")
-        .style("background-color", "white")
-        .style("border", "solid")
-        .style("border-width", "1px")
-        .style("border-radius", "5px")
-        .style("padding", "10px")
-
+        .append("g")
+          .attr("transform",
+          `translate(${margin.left}, ${margin.top}, ${margin.right}, ${margin.bottom})`);
+      
       // Add X axis
-      const x = d3.scaleLinear()
+      const scaleX = d3.scaleLinear()
         .domain([0, max_key1])
-        .range([0, width]);
-
-      // Add Y axis
-      const y = d3.scaleLinear()
-        .domain([0, max_key2])
-        .range([height, 0]);
-
-      // const z = d3.scaleOrdinal()
-      //     .domain(data.map(d => d[2]))
-      //     .range(d3.schemeSpectral[4])
-
-      const mouseover = function (event, d) {
-        tooltip
-          .html(`
-          <video id="creature_vid" width="256" height="256" preload='auto' autoplay>
-              <source src="${BlackWhiteCreature}" type="video/mp4">
-              Your browser does not support the video tag.
-          </video>
-      `)
-          .style("z-index", 1080)
-          .style("opacity", 1)
-
-        // document.getElementById("creature_vid").playbackRate = 3.0;
-      }
-
-      const mousemove = function (event, d) {
-        tooltip
-          .style("left", (event.x + 20) + "px") // It is important to put the +90: other wise the tooltip is exactly where the point is an it creates a weird effect
-          .style("top", (event.y) / 2 + "px")
-      }
-
-      // A function that change this tooltip when the leaves a point: just need to set opacity to 0 again
-      const mouseleave = function (event, d) {
-        tooltip
-          .style("opacity", 0)
-          .style("z-index", -1)
-      }
-
-      const onclick = function (event, d) {
-        if (currentSelected !== null) {
-          currentSelected.style.stroke = "none"
-        }
-        this.style.stroke = "#000000"
-        currentSelected = this
-      }
-
-      const dotsGroup = svg.append("g")
-        .append("g");
-
+        .range([margin.left, width]);
+      const xAxis = d3.axisTop(scaleX).ticks(4);
       const gx = svg.append("g")
+        .call(xAxis)
+        .attr("transform", `translate(0, ${height})`)
       svg.append("text")
         .attr("transform",
-          "translate(" + (width / 2) + " ," +
-          (height - margin.top - 20) + ")")
+          `translate(${margin.left + width / 2}, ${margin.top + height + 20})`)
         .style("text-anchor", "middle")
         .text(key1);
+
+      // Add Y axis
+      const scaleY = d3.scaleLinear()
+        .domain([0, max_key2])
+        .range([height, 0]);
+      const yAxis = d3.axisRight(scaleY).ticks(4);  // Print axis numbers on the left
       const gy = svg.append("g")
-      // text label for the y axis
+        .call(yAxis)
+        .attr("transform", `translate(${margin.left}, 0)`)
       svg.append("text")
-        .attr("transform", "rotate(-90)")
-        .attr("y", margin.left / 2)
-        .attr("x", -height / 2)
+        .attr("transform", `rotate(-90) translate(${ -height / 2}, ${0})`)
         .attr("dy", "1em")
         .style("text-anchor", "middle")
         .text(key2);
 
+      
+      const tooltip = d3.select("#leniadex-tooltip")
+      const mouseover = (event, d) =>
+        tooltip
+          .html(`
+              <video id="creature_vid" width="256" height="256" preload='auto' autoplay>
+                  <source src="${d.image}" type="video/mp4">
+                  Your browser does not support the video tag.
+              </video>
+          `)
+          .style("z-index", 1080)
+          .style("opacity", 1)
+
+      const mousemove = (event, d) =>
+        tooltip
+          .style("left", `${event.x + 20}px`)
+          .style("top", `${event.y / 2}px`)
+
+      const mouseleave = (event, d) =>
+        tooltip
+          .style("opacity", 0)
+          .style("z-index", -1)
 
       // Add dots
+      const dotsGroup = svg.append("g")
+        .append("g");
       dotsGroup.selectAll("dot")
         .data(data)
         .enter()
         .append("circle")
-        .attr("cx", function (d) { return x(getValue(d.attributes, 'Robustness')); })
-        .attr("cy", function (d) { return y(getValue(d.attributes, 'Spread')); })
-        .attr("r", 1)
+        .attr("cx", function (d) { return scaleX(getValue(d.attributes, 'Robustness')); })
+        .attr("cy", function (d) { return scaleY(getValue(d.attributes, 'Spread')); })
+        .attr("r", 2)
         .style("fill", blue)
         // .style("fill", d => z(d.k[0].b))
         .style("opacity", 0.5)
@@ -188,32 +189,14 @@ const LeniaDex = () => {
         .on("mouseover", mouseover)
         .on("mousemove", mousemove)
         .on("mouseleave", mouseleave)
-        .on("click", onclick)
-
-      const xAxis = (g, x) => g
-        .attr("transform", `translate(0,${height})`)
-        .call(d3.axisTop(x).ticks(12))
-        .call(g => g.select(".domain").attr("display", "none"))
-      const yAxis = (g, y) => g
-        .call(d3.axisRight(y).ticks(12 * k))
-        .call(g => g.select(".domain").attr("display", "none"))
-
-      const zoomed = function ({ transform }) {
-        const zx = transform.rescaleX(x).interpolate(d3.interpolateRound);
-        const zy = transform.rescaleY(y).interpolate(d3.interpolateRound);
-        dotsGroup.attr("transform", transform);
-        gx.call(xAxis, zx);
-        gy.call(yAxis, zy);
-      }
-      const zoom = d3.zoom()
-        .scaleExtent([1., 100])
-        .on("zoom", zoomed);
-      svg.call(zoom).call(zoom.transform, d3.zoomIdentity);
     }
   }, [])
 
   return (
-    <div ref={nodeRef} />
+    <>
+      <StyledSVG ref={nodeRef} width="75%" class="leniadex" viewBox={viewbox}></StyledSVG>
+      <StyledTooltip id="leniadex-tooltip"></StyledTooltip>
+    </>
   )
 }
 
