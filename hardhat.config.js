@@ -94,9 +94,6 @@ task("set-engine", "Set the engine in the smart contract", async (taskArgs, hre)
   console.log(engine);
 })
 
-// You need to export an object to set up your config
-// Go to https://hardhat.org/config/ to learn more
-
 /**
  * @type import('hardhat/config').HardhatUserConfig
  */
@@ -118,8 +115,10 @@ module.exports = {
     },
   },
   gasReporter: {
-    enabled: process.env.REPORT_GAS !== undefined,
+    enabled: (process.env.REPORT_GAS) ? true : false,
     currency: "USD",
+    gasPrice: 10,
+    coinmarketcap: process.env.COINMARKETCAP
   },
   etherscan: {
     apiKey: process.env.ETHERSCAN_API_KEY,
