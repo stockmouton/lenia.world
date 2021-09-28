@@ -98,6 +98,7 @@ h2 {
 
 h3 {
   color: #fe54fe;
+  margin-bottom: 0.8rem;
 }
 
 p {
