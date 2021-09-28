@@ -13,12 +13,16 @@ import Profile from "../components/profile"
 import {Web3Provider} from "../components/web3-provider";
 import MintButton from "../components/mint-button";
 import Link from "../components/link";
+import LeniaDex from "../components/leniadex";
 
-const IndexPage = () => (
+const StagingPage = () => (
   <Web3Provider>
     <Layout>
       <Seo title="Home" />
       <HeroBackground />
+      <Sidebar>
+          <NavMenu />
+      </Sidebar>
       <Container>
         <Jumbotron>
           <h1>Enter the Leniaverse...</h1>
@@ -65,6 +69,10 @@ const IndexPage = () => (
           </article>
           
         </Section>
+        <Section id="leniadex">
+          <Section.Header><h1>Leniadex</h1></Section.Header>
+          <LeniaDex />
+        </Section>
         <Section id="but-why-though">
           <Section.Header><h1>But Why Though?</h1></Section.Header>
           <article>
@@ -107,9 +115,20 @@ const IndexPage = () => (
             </Grid.Cell>
           </Grid>
         </Section>
+        {/* <Section id="quite-queried-questions">
+          <Section.Header><h1>Quite Queried Questions</h1></Section.Header>
+          <Panel
+            heading="Question 1"
+            body={<p>Answer 1</p>}
+          />
+          <Panel
+            heading="Question 2"
+            body={<p>Answer 2</p>}
+          />
+        </Section> */}
       </Container>
     </Layout>
   </Web3Provider>
 )
 
-export default IndexPage
+export default StagingPage

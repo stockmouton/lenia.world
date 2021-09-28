@@ -36,7 +36,7 @@ const StyledButton = styled(Button)`
 `
 
 const MintButton = () => {
-  const { web3Provider, account, chainId } = useWeb3()
+  const { web3Provider, account } = useWeb3()
   const [totalLeniaSupply, setTotalLeniaSupply] = useState(0)
   const [totalLeniaMinted, setTotalLeniaMinted] = useState(0)
   const [contract, setContract] = useState(null)
@@ -89,7 +89,7 @@ const MintButton = () => {
   }
 
   const getButtonContent = () => ({
-    [BUTTON_STATUSES.ALPHA]: 'Minting day to be announced!',
+    [BUTTON_STATUSES.ALPHA]: 'Minting day TBA!',
     [BUTTON_STATUSES.READY]: 'Mint one lenia',
     [BUTTON_STATUSES.LOADING]: 'Processing transaction...',
   }[buttonStatus])

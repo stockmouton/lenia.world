@@ -4,7 +4,7 @@ import Fixedsys500cWoff from "./fonts/Fixedsys500c.woff";
 import Fixedsys500cTtf from "./fonts/Fixedsys500c.ttf";
 
 const COLORS = {
-  BACKGROUND: '#0c0786'
+  BACKGROUND: '#0e1b8c'
 }
 
 const fontSizeBase = 18
