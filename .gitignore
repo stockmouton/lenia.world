@@ -28,6 +28,8 @@ trash
 .rvmrc
 .trashes
 *~
+tmp/
+coverage*
 
 # Gatsby related
 .cache/

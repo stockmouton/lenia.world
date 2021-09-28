@@ -49,7 +49,6 @@ function getValue(attributes, key) {
 function replaceVideoURL(data) {
   return data.map(
     (d) => {
-      console.log(d.image);
       if (d.image == 'blackwhite.mp4'){
         d.image = BlackWhiteCreature
       } else if (d.image == 'carmine-blue.mp4'){

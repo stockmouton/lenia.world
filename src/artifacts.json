@@ -3,7 +3,7 @@
   "chainId": "1337",
   "contracts": {
     "Lenia": {
-      "address": "0xC3549920b94a795D75E6C003944943D552C46F97",
+      "address": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
       "abi": [
         {
           "inputs": [],

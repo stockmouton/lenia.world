@@ -316,7 +316,6 @@
         for (let index = 0; index < attributes.length; index++) {
             const attribute = attributes[index];
             if(attribute["trait_type"] === 'Colormap') {
-                console.log(attribute)
                 colorName = attribute["value"]
             }
         }

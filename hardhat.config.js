@@ -66,14 +66,14 @@ task("set-fake-metadata", "Add metadata to the contract", async (taskArgs, hre) 
     delete element["config"]["cells"]
     
     console.log(`adding metadata id ${index}`)
-    await lenia.setMetadata(index, JSON.stringify(element))
-    await lenia.setCells(index, cells)
+    const setMetadataTx = await lenia.setMetadata(index, JSON.stringify(element))
+    await setMetadataTx.wait()
+    const setCellsTx = await lenia.setCells(index, cells)
+    await setCellsTx.wait()
   }
 
   let metadatum = await lenia.getMetadata(0)
-  console.log(metadatum)
   let cells = await lenia.getCells(0)
-  console.log(cells)
 })
 
 task("set-engine", "Set the engine in the smart contract", async (taskArgs, hre) => {
@@ -88,10 +88,15 @@ task("set-engine", "Set the engine in the smart contract", async (taskArgs, hre)
   
   const engineCode = fs.readFileSync('./src/engine.js', 'utf-8')
   const result = UglifyJS.minify([engineCode]);
-  await lenia.setEngine(result.code)
+  const setEngineTx = await lenia.setEngine(result.code)
+  await setEngineTx.wait()
 
-  let engine = await lenia.getEngine();
-  console.log(engine);
+  const contractEngine = await lenia.getEngine();
+  if (contractEngine.length) {
+    console.log('Rendering engine successfully set in the smart contract')
+  } else {
+    throw new Error('Something went wrong, rendering engine has not be set')
+  }
 })
 
 /**
@@ -102,7 +107,6 @@ module.exports = {
   networks: {
     hardhat: {
       chainId: 1337,
-      initialBaseFeePerGas: 0, // workaround from https://github.com/sc-forks/solidity-coverage/issues/652#issuecomment-896330136 . Remove when that issue is closed.
       // accounts: process.env.PRIVATE_KEY !== undefined ? [{'privateKey': process.env.PRIVATE_KEY, 'balance': '10000'}] : [],
     },
     goerli: {
@@ -114,10 +118,11 @@ module.exports = {
       accounts: process.env.RINKEBY_PRIVATE_KEY !== undefined ? [process.env.RINKEBY_PRIVATE_KEY] : [],
     },
   },
+  plugins: ["solidity-coverage"],
   gasReporter: {
     enabled: (process.env.REPORT_GAS) ? true : false,
     currency: "USD",
-    gasPrice: 10,
+    gasPrice: 50,
     coinmarketcap: process.env.COINMARKETCAP
   },
   etherscan: {

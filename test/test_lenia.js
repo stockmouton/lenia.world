@@ -29,7 +29,7 @@ describe("Lenia", function () {
       const engineCode = fs.readFileSync('./src/engine.js', 'utf-8')
       const result = UglifyJS.minify([engineCode]);
       
-      const setEngineTx = await hardhatLenia.setEngine(result.code)
+      const setEngineTx = await hardhatLenia.setEngine(result.code.substring(0, 14000))
       await setEngineTx.wait()
 
       const contractEngine = await hardhatLenia.getEngine();
@@ -78,6 +78,25 @@ describe("Lenia", function () {
       hasSaleStarted = await hardhatLenia.hasSaleStarted()
 
       expect(hasSaleStarted).to.equal(true);
+    });
+
+    it("Should mint", async function () {
+      const setSaleStartTx = await hardhatLenia.flipHasSaleStarted();
+      await setSaleStartTx.wait();
+
+      let hasSaleStarted = await hardhatLenia.hasSaleStarted()
+      expect(hasSaleStarted).to.equal(true);
+
+      let contractPrice = await hardhatLenia.getPrice()
+
+      const mintTx = await hardhatLenia.mint({ 
+          value: contractPrice
+      })
+      await mintTx.wait()
+
+      const contractTotalSupply = await hardhatLenia.totalSupply()
+
+      expect(contractTotalSupply).to.equal(1);
     });
   })
 });

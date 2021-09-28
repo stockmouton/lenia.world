@@ -11,7 +11,6 @@ const Engine = ({ lenia_id }) => {
     useEffect(async () => {
         const contract = web3Provider ? new web3Provider.eth.Contract(artifacts.contracts.Lenia.abi, artifacts.contracts.Lenia.address) : null
         
-        console.log(contract)
         if (contract) {
             setContract(contract)
 
