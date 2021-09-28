@@ -8,7 +8,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract Lenia is ERC721, ERC721Enumerable, Ownable {
 
-    uint256 public constant MAX_SUPPLY = 210;
+    uint256 public constant MAX_SUPPLY = 202;
     uint256 private _price = 0.08 ether;
     uint256 private _reserved = 21;
 
@@ -16,6 +16,10 @@ contract Lenia is ERC721, ERC721Enumerable, Ownable {
 
     bool private _hasSaleStarted;
     string public baseURI;
+
+    string private engine;
+    mapping(uint256 => string) private metadata;
+    mapping(uint256 => string) private cells;
 
     constructor() ERC721("Lenia", "LENIA") {
         _hasSaleStarted = false;
@@ -33,6 +37,31 @@ contract Lenia is ERC721, ERC721Enumerable, Ownable {
 
         _safeMint(msg.sender, supply);
     }
+
+    function getMetadata(uint256 id) public view onlyOwner returns(string memory) {
+        return metadata[id];
+    }
+
+    function setMetadata(uint256 id, string memory jsonMetadata) public onlyOwner {
+        metadata[id] = jsonMetadata;
+    }
+    
+    function getCells(uint256 id) public view onlyOwner returns(string memory) {
+        return cells[id];
+    }
+
+    function setCells(uint256 id, string memory currentCells) public onlyOwner {
+        cells[id] = currentCells;
+    }
+
+    function setEngine(string memory engineInput) public onlyOwner {
+        engine = engineInput;
+    }
+
+    function getEngine() public view onlyOwner returns(string memory) {
+        return engine;
+    }
+
 
     function flipHasSaleStarted() external onlyOwner {
         _hasSaleStarted = !_hasSaleStarted;

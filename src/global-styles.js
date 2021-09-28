@@ -103,6 +103,11 @@ h2 {
 
 h3 {
   color: #fe54fe;
+  margin-bottom: 0.8rem;
+}
+
+b {
+  color: #f1f1f1;
 }
 
 p {

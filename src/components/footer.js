@@ -6,6 +6,7 @@ import Link from "./link"
 
 const StyledFooter = styled.footer`
   margin: 1rem;
+  text-align: center;
 `
 
 const SocialMedia = styled.div`

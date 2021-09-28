@@ -28,6 +28,8 @@ trash
 .rvmrc
 .trashes
 *~
+tmp/
+coverage*
 
 # Gatsby related
 .cache/
@@ -37,3 +39,4 @@ public
 artifacts/
 cache/
 src/artifacts.json
+deployments/localhost/
