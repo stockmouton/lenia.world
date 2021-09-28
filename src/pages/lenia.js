@@ -1,36 +1,24 @@
-import React, { useRef, useEffect } from "react"
+import React from "react"
 import queryString from 'query-string'
-import { init, run } from "../engine";
 
-import all_lenias from "../fake/metadata.json"
+import {Web3Provider} from "../components/web3-provider";
+import Layout from "../components/layout"
+import Engine from "../components/engine"
 
-const Engine = ({ location }) => {
+const LeniaPage = ({ location }) => {
     const data = queryString.parse(location.search)
-    const lenia_id = data['id']
-
-    let lenia_metadata
-    if (lenia_id < all_lenias.length) {
-        lenia_metadata = all_lenias[lenia_id]
-    } else {
-        lenia_metadata = all_lenias[0]
+    let lenia_id = parseInt(data['id'], 10)
+    if (isNaN(lenia_id)) {
+        lenia_id = 0;
     }
 
-    const nodeRef = useRef(null);
-    useEffect(() => {
-        if (nodeRef.current) {
-            init(lenia_metadata);
-            run();
-        }
-    })
-
     return (
-        <div ref={nodeRef}>
-            <canvas id="CANVAS_CELLS"></canvas>
-            <canvas id="CANVAS_FIELD"></canvas>
-            <canvas id="CANVAS_POTENTIAL"></canvas>
-            <canvas id="CANVAS_HIDDEN" style={{'display': 'none'}}></canvas>
-        </div>
+        <Web3Provider>
+            <Layout>
+                <Engine lenia_id={lenia_id} />
+            </Layout>
+        </Web3Provider>
     )
 }
 
-export default Engine
+export default LeniaPage

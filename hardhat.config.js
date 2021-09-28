@@ -8,6 +8,9 @@ require("@nomiclabs/hardhat-waffle")
 require("hardhat-gas-reporter")
 require("solidity-coverage")
 
+const UglifyJS = require("uglify-js");
+const fs = require('fs');
+
 // This is a sample Hardhat task. To learn how to create your own go to
 // https://hardhat.org/guides/create-task.html
 task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
@@ -43,6 +46,52 @@ task("start-sale", "Start Lenia sale", async (taskArgs, hre) => {
   } else {
     throw new Error('Something went wrong, sale couldn\'t be started')
   }
+})
+
+task("set-fake-metadata", "Add metadata to the contract", async (taskArgs, hre) => {
+  if (hre.hardhatArguments.network == null) {
+    throw new Error('Please add the missing --network <localhost|rinkeby|goerli> argument')
+  }
+
+  const LeniaContract = await hre.ethers.getContractFactory("Lenia")
+  const LeniaDeployment = await hre.deployments.get('Lenia')
+
+  const lenia = LeniaContract.attach(LeniaDeployment.address)
+  
+  const metadata = require('./src/fake/metadata.json')
+  for (let index = 0; index < metadata.length; index++) {
+    let element = metadata[index];
+
+    const cells = element["config"]["cells"]
+    delete element["config"]["cells"]
+    
+    console.log(`adding metadata id ${index}`)
+    await lenia.setMetadata(index, JSON.stringify(element))
+    await lenia.setCells(index, cells)
+  }
+
+  let metadatum = await lenia.getMetadata(0)
+  console.log(metadatum)
+  let cells = await lenia.getCells(0)
+  console.log(cells)
+})
+
+task("set-engine", "Set the engine in the smart contract", async (taskArgs, hre) => {
+  if (hre.hardhatArguments.network == null) {
+    throw new Error('Please add the missing --network <localhost|rinkeby|goerli> argument')
+  }
+
+  const LeniaContract = await hre.ethers.getContractFactory("Lenia")
+  const LeniaDeployment = await hre.deployments.get('Lenia')
+
+  const lenia = LeniaContract.attach(LeniaDeployment.address)
+  
+  const engineCode = fs.readFileSync('./src/engine.js', 'utf-8')
+  const result = UglifyJS.minify([engineCode]);
+  await lenia.setEngine(result.code)
+
+  let engine = await lenia.getEngine();
+  console.log(engine);
 })
 
 // You need to export an object to set up your config
