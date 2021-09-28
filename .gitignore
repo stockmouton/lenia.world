@@ -37,3 +37,4 @@ public
 artifacts/
 cache/
 src/artifacts.json
+deployments/localhost/
