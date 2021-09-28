@@ -107,7 +107,7 @@ const IndexPage = () => (
                 pictureSrc="https://pbs.twimg.com/profile_images/1115639997183426564/NC2UpU3A_400x400.png"
                 twitterHandle="morgangiraud"
                 role="Big Brain Energy"
-                description={<p>Nothing matters in the end.</p>}
+                description={<p>ML amateur and crypto enthusiast. Tends to be lost in math.</p>}
               />
             </Grid.Cell>
             <Grid.Cell>
