@@ -29,7 +29,7 @@ const IndexPage = () => (
           <h1>Enter the Leniaverse...</h1>
           <Lead>
             <p>
-              After months of exploring the Leniaverse, 200 unique life-forms have been discovered and ready to be unleashed on the Ethereum blockchain. Their name: <b>Lenia</b>.
+              After months of exploring the Leniaverse, 202 unique life-forms have been discovered and ready to be unleashed on the Ethereum blockchain. Their name: <b>Lenia</b>.
             </p>
             <p>
               Join us on our big adventure in this uncharted part of the metaverse where Artifical Intelligence meet Art & Emerging Life.
@@ -50,7 +50,7 @@ const IndexPage = () => (
 
           <article>
           <ul>
-            <li><b>Total number of Lenia:</b> 200</li>
+            <li><b>Total number of Lenia:</b> 202</li>
             <li><b>Price per Lenia:</b> TBA</li>
             <li><b>Mint date:</b> TBA</li>
             <li><b>Premint pass:</b> 50 (12 hours window to mint before the public sale starts)</li>
@@ -63,7 +63,7 @@ const IndexPage = () => (
             <h2>Membership Perks</h2>
             <ul>
               <li>Lenia is an evolutive collection. Future Lenia will be derived from <b>Genesis Lenia</b> that will provide benefits for their owners.</li>
-              <li>Every Lenia gives you <b>membership</b> to the project <Link href="#dao">DAO</Link>.</li>
+              <li>Every Lenia gives you <b>membership</b> to the <Link href="#dao">DAO</Link>.</li>
               <li>Support AI ecosystem and research. <Link href="https://chakazul.github.io/lenia.html" target="_blank">Bert Chan</Link> has been working on Lenia since 2015 and created the <Link href="https://openlenia.github.io/" target="_blank">Open Science Lenia project</Link> to push the research further. By collecting Lenia, you support this initiative.</li>
               <li>We ♥ Science: access exclusive channels on Discord to talk about AI, Crypto, Maths and more!</li>
             </ul>
@@ -78,7 +78,7 @@ const IndexPage = () => (
             <p>We are Machine Learning and Crypto enthusiasts and we believe that beyond the inherent hype, the future will be shaped by those 2 technologies.</p>
             <p>It just happens that the beautiful subject of artificial life is a perfect medium to provide a visual support for NFTs, which are also perfect to foster a community and empower more research!</p>
             <p>Moreover, Lenia are not just nice and complex mathematical animations: they are as well a research subject in the field of artificial life.</p>
-            <p>Many questions are still unanswered in this field and this project aim to help researchers answer one of the hard questions: how one can automatically and efficiently discovers those mathematical creatures?</p>
+            <p>Many questions are still unanswered in this field and this project aims to help researchers answer one of the hard questions: how one can automatically and efficiently discovers those mathematical creatures?</p>
             <p>The answers lies in the field of Artificial Intelligence and requires the work of many to bear fruits! This is why we participates in the <Link href="https://openlenia.github.io/">Open Science Lenia initiative</Link> by opensourcing AI tools to search for Lenia!</p>
           </article>
 
