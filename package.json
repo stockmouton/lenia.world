@@ -22,11 +22,13 @@
     "lodash": "^4.17.21",
     "process": "^0.11.10",
     "prop-types": "^15.7.2",
+    "query-string": "^7.0.1",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
     "react-helmet": "^6.1.0",
     "sanitize.css": "^12.0.1",
     "styled-components": "^5.3.0",
+    "uglify-js": "^3.14.2",
     "web3": "^1.5.2",
     "web3modal": "^1.9.4"
   },
@@ -43,6 +45,7 @@
     "hardhat": "^2.6.1",
     "hardhat-deploy": "^0.9.1",
     "hardhat-gas-reporter": "^1.0.4",
+    "ndb": "^1.1.5",
     "prettier": "2.3.2",
     "solidity-coverage": "^0.7.17",
     "webpack": "^5.51.1"
@@ -64,7 +67,10 @@
     "sm-test": "hardhat test",
     "sm-deploy": "hardhat deploy --network ${NETWORK:-localhost} --export src/artifacts.json",
     "sm-export": "hardhat export --network ${NETWORK:-localhost} --export src/artifacts.json",
-    "sm-start-sale": "hardhat start-sale --network ${NETWORK:-localhost}"
+    "sm-start-sale": "hardhat start-sale --network ${NETWORK:-localhost}",
+    "sm-set-fake-metadata": "hardhat set-fake-metadata --network ${NETWORK:-localhost}",
+    "sm-set-engine": "hardhat set-engine --network ${NETWORK:-localhost}",
+    "debug": "ndb"
   },
   "repository": {
     "type": "git",
