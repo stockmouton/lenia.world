@@ -101,6 +101,10 @@ h3 {
   margin-bottom: 0.8rem;
 }
 
+b {
+  color: #f1f1f1;
+}
+
 p {
   margin: 0 0 1rem 0;
 }
