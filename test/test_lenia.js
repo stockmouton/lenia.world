@@ -36,8 +36,7 @@ describe("Lenia", function () {
     it("should set the engine", async function () {
       const engineCode = fs.readFileSync('./src/engine.js', 'utf-8')
       const result = UglifyJS.minify([engineCode]);
-      
-      const setEngineTx = await hardhatLenia.setEngine(result.code.substring(0, 14000))
+      const setEngineTx = await hardhatLenia.setEngine(result.code)
       const receipt = await setEngineTx.wait()
 
       const contractEngine = await hardhatLenia.getEngine();

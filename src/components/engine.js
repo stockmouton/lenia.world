@@ -18,22 +18,27 @@ const Engine = ({ lenia_id }) => {
             if (lenia_id > totalLeniaMinted) {
                 lenia_id = 0;
             }
-            const lenia_metadata_json = await contract.methods.getMetadata(lenia_id).call({ from: account })
-            const lenia_cells = await contract.methods.getCells(lenia_id).call({ from: account })
-            const lenia_metadata = JSON.parse(lenia_metadata_json)
-            lenia_metadata["config"]["cells"] = lenia_cells
+            // const lenia_metadata_json = await contract.methods.getMetadata(lenia_id).call({ from: account })
+            // const lenia_cells = await contract.methods.getCells(lenia_id).call({ from: account })
+            // const lenia_metadata = JSON.parse(lenia_metadata_json)
+            // lenia_metadata["config"]["cells"] = lenia_cells
 
             if ( !('leniaEngine' in window) ) {
                 const engine = await contract.methods.getEngine().call({ from: account })
                 var script = document.createElement('script');
                 script.innerHTML = engine
                 document.body.appendChild(script);
-                if (nodeRef.current) {
-                    window.leniaEngine.init(lenia_metadata);
-                    window.leniaEngine.run();
-                }
+            }
+        } else {
+            const all_metadata = require('../fake/metadata.json')
+            require('../engine')
+            const lenia_metadata = all_metadata[0]
+            if (nodeRef.current) {
+                window.leniaEngine.init(lenia_metadata);
+                window.leniaEngine.run();
             }
         }
+        
     }, [web3Provider, account])
 
     return (
