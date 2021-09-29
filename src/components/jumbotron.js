@@ -8,7 +8,7 @@ const Jumbotron = styled.div`
   text-align: center;
 
   h1 {
-    font-size: 2.8rem;
+    font-size: 2.6rem;
     line-height: 1;
   }
 

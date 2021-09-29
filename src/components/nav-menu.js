@@ -17,15 +17,12 @@ const NavMenu = () => (
     <Menu.Item>
       <Menu.Link href="#but-why-though">But Why Though</Menu.Link>
     </Menu.Item>
-    {/* <Menu.Item>
-      <Menu.Link href="#the-folks-we-care-about">The folks we care about</Menu.Link>
-    </Menu.Item> */}
     <Menu.Item>
       <Menu.Link href="#family-portrait">Family Portrait</Menu.Link>
     </Menu.Item>
-    {/* <Menu.Item>
+    <Menu.Item>
       <Menu.Link href="#quite-queried-questions">Quite Queried Questions</Menu.Link>
-    </Menu.Item> */}
+    </Menu.Item>
   </StyledMenu>
 )
 

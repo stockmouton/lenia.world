@@ -110,7 +110,7 @@ const IndexPage = () => (
                 pictureSrc="https://pbs.twimg.com/profile_images/765306239920332800/y_6BlU3q_400x400.jpg"
                 twitterHandle="orangealexandre"
                 role="Just the muscles"
-                description={<p>Not so salty about GME.</p>}
+                description={<p>Full-stack developer, humble yield farmer, sprinkles some Solidity in his daily life</p>}
               />
             </Grid.Cell>
             <Grid.Cell>

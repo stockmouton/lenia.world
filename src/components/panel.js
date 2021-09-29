@@ -5,7 +5,7 @@ const Panel = styled.article`
   background-color: #bbbbbb;
   border-color: #dddddd;
   color: #000000;
-  margin-bottom: 1rem;
+  margin: 0 0 1rem 0;
 `
 
 const Heading = styled.header`
@@ -14,6 +14,7 @@ const Heading = styled.header`
   border-bottom: 0;
   color: #ffffff;
   cursor: pointer;
+  padding: 0.5rem 0;
 `
 
 const Body = styled.div`

@@ -24,6 +24,7 @@ NavBar.Brand = styled(Link)`
   display: block;
   float: left;
   padding: 0 10px;
+  height: 100%;
 
   :hover {
     color: #fefe54;
