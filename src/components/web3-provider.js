@@ -70,7 +70,7 @@ export const Web3Provider = ({ children }) => {
     if (web3Provider == null) return;
 
     try {
-      const accounts = await web3Provider.eth.requestAccounts()
+      const accounts = await web3Provider.eth.getAccounts()
       if (accounts.length == 0) throw new Error('There is no existing account present.')
       setAccount(accounts[0])
     } catch (error) {
