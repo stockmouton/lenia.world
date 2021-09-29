@@ -18,7 +18,7 @@ export const Web3Provider = ({ children }) => {
       const newChainId = await web3Provider.eth.getChainId()
 
       if (newChainId !== allowedChainId) {
-        setError(new Error(`The website is in early alpha: please switch to ${chainDisplayName}`))
+        setError(new Error(`Please switch to ${chainDisplayName}`))
         switchChainConnection()
         return
       }
@@ -41,7 +41,7 @@ export const Web3Provider = ({ children }) => {
         setChainId(newChainId)
         if (newChainId === allowedChainId) return;
 
-        setError(new Error(`The website is in early alpha: please switch to ${chainDisplayName}`))
+        setError(new Error(`Please switch to ${chainDisplayName}`))
         switchChainConnection()
       })
     } catch(error) {
@@ -70,7 +70,7 @@ export const Web3Provider = ({ children }) => {
     if (web3Provider == null) return;
 
     try {
-      const accounts = await web3Provider.eth.requestAccounts()
+      const accounts = await web3Provider.eth.getAccounts()
       if (accounts.length == 0) throw new Error('There is no existing account present.')
       setAccount(accounts[0])
     } catch (error) {

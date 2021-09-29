@@ -28,8 +28,7 @@ const WalletConnectorButton = () => {
           walletconnect: {
             package: WalletConnectProvider,
             options: {
-              // TODO: create our own Infura key
-              infuraId: "8043bb2cf99347b1bfadfb233c5325c0",
+              infuraId: "9aa3d95b3bc440fa88ea12eaa4456161",
             }
           },
         }
