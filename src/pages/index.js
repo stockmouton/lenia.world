@@ -27,10 +27,10 @@ const IndexPage = () => {
             <h1>Enter the Leniaverse...</h1>
             <Lead>
               <p>
-                After months of exploring the Leniaverse, 202 unique life-forms have been discovered and ready to be unleashed on the Ethereum blockchain. Their name: <b>Lenia</b>.
+                After months of exploring the Leniaverse, 202 unique life-forms have been discovered and are ready to be unleashed on the Ethereum blockchain. Their name: <b>Lenia</b>.
               </p>
               <p>
-                Join us on our big adventure in this uncharted part of the metaverse where Artifical Intelligence meet Art & Emerging Life.
+                Join us on our big adventure in this uncharted part of the metaverse where Artificial Intelligence meets Art & Emerging Life.
               </p>
             </Lead>
             <MintButton />
@@ -40,7 +40,7 @@ const IndexPage = () => {
             <article>
               <h2>What is Lenia?</h2>
               <ul>
-                <li>Lenia are pure mathematical creatures and a subject of active research in the field of Articifial Life.</li>
+                <li>Lenia are pure mathematical creatures and a subject of active research in the field of Artificial Life.</li>
                 <li>They are also gorgeous and give some kind of meditative vibes.</li>
                 <li>Open Source: everything we do is open! Check our <Link href="https://github.com/stockmouton/lenia.stockmouton.com">Github</Link>!</li>
               </ul>
@@ -63,7 +63,7 @@ const IndexPage = () => {
                 <li>Lenia is an evolutive collection. Future Lenia will be derived from <b>Genesis Lenia</b> that will provide benefits for their owners.</li>
                 <li>Every Lenia gives you <b>membership</b> to the <Link href="#dao">DAO</Link>.</li>
                 <li>Support AI ecosystem and research. <Link href="https://chakazul.github.io/lenia.html" target="_blank">Bert Chan</Link> has been working on Lenia since 2015 and created the <Link href="https://openlenia.github.io/" target="_blank">Open Science Lenia project</Link> to push the research further. By collecting Lenia, you support this initiative.</li>
-                <li>We ♥ Science: access exclusive channels on Discord to talk about AI, Crypto, Maths and more!</li>
+                <li>We ♥ Science: access exclusive channels on Discord to talk about AI, Crypto, Math, and more!</li>
               </ul>
             </article>
           </Section>
@@ -76,28 +76,28 @@ const IndexPage = () => {
           <Section id="why-though">
             <Section.Header><h1>Why Though?</h1></Section.Header>
             <article>
-              <h2>The Lenia Origins</h2>
+              <h2>Lenia Origins</h2>
               <p>We are Machine Learning and Crypto enthusiasts and we believe that beyond the inherent hype, the future will be shaped by those 2 technologies.</p>
-              <p>It just happens that the beautiful subject of artificial life is a perfect medium to provide a visual support for NFTs, which are also perfect to foster a community and empower more research!</p>
-              <p>Moreover, Lenia are not just nice and complex mathematical animations: they are as well a research subject in the field of artificial life.</p>
-              <p>Many questions are still unanswered in this field and this project aims to help researchers answer one of the hard questions: how one can automatically and efficiently discovers those mathematical creatures?</p>
-              <p>The answers lies in the field of Artificial Intelligence and requires the work of many to bear fruits! This is why we participates in the <Link href="https://openlenia.github.io/">Open Science Lenia initiative</Link> by opensourcing AI tools to search for Lenia!</p>
+              <p>It just happens that the beautiful subject of artificial life is a perfect medium to provide visual support for NFTs, which are also perfect to foster a community and empower more research!</p>
+              <p>Lenia are not just nice and complex mathematical animations: they are as well a research subject in the field of artificial life.</p>
+              <p>Many questions are still unanswered in this field and this project aims to help researchers answer one of the hard questions: how one can automatically and efficiently discover those mathematical creatures?</p>
+              <p>The answer lies in the field of Artificial Intelligence and requires the work of many to bear fruits! This is why we participate in the <Link href="https://openlenia.github.io/">Open Science Lenia initiative</Link> by open-sourcing AI tools to search for Lenia!</p>
             </article>
 
             <article>
               <h2 id="dao">DAO</h2>
               <p>We aim to build a community-run DAO for all our projects.</p>
-              <p>This collection is only the first step. You can expect us to make the project live on the long term by developing more AI x Crypto work, which will bring more value to the <Link href="#dao">DAO</Link>.</p>
-              <p>The DAO gets income from:
-              <ul>
-                <li><b>50% of primary sales</b></li>
-                <li><b>2.5% of secondary sales</b> (7.5% total)</li>
-              </ul>
+              <p>This collection is only the first step. You can expect us to make the project live in the long term by developing more AI x Crypto work, which will bring more value to the <Link href="#dao">DAO</Link>.</p>
+              <p>
+                The DAO gets income from:
+                <ul>
+                  <li><b>50% of primary sales</b></li>
+                  <li><b>2.5% of secondary sales</b> (7.5% total)</li>
+                </ul>
 
-              <p>All further decisions will be proposed and decided by the DAO after the primary sale is complete.</p>
-
+                <p>All further decisions will be proposed and decided by the DAO after the primary sale is complete.</p>
               </p>
-              <p>Its vision, goals and future projects are intended to be defined by the DAO itself, as long as it keeps aligned with its values. Come discuss in our <Link href="https://discord.gg/4TFNnCkJta">Discord</Link> for more information.</p>
+              <p>Its vision, goals, and future projects are intended to be defined by the DAO itself, as long as it keeps aligned with its values. Come discuss in our <Link href="https://discord.gg/4TFNnCkJta">Discord</Link> for more information.</p>
             </article>
           </Section>
           <Section id="family-portrait">
