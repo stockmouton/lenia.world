@@ -1,10 +1,35 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+
+// @title Main contrct for the Lenia collection
+
+/**********************************************
+ *                        .                   *
+ *                          ,,                *
+ *                      ......*#*             *
+ *                 .......    ..*%%,          *
+ *          .,,****,..             ,#(.       *
+ *         .,**((((*,.               .*(.     *
+ *          .**((**,,,,,,,             .*,    *
+ *        .......,,**(((((((*.          .,,   *
+ *       ...      ,*((##%&&&&@&(,        .,.  *
+ *       ..        ,((#&&@@@@@@@@&(*.  ..,,.  *
+ *    ,. ..          ,#&@@@@@@@@@@@%#(*,,,,.  *
+ *      ((,.           *%@@@@&%%%&&%#(((*,,.  *
+ *        (&*            *%@@@&&%%##(((**,.   *
+ *          (&(           .*(#%%##(((**,,.    *
+ *            .((,         .,*(((((**,..      *
+ *               .,*,,.....,,,,*,,,..         *
+ *                    ..........              *
+**********************************************/
+
+pragma solidity ^0.8.6;
 
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+
+import { LeniaDescriptor } from "./libs/LeniaDescriptor.sol";
 
 contract Lenia is ERC721, ERC721Enumerable, Ownable {
 
@@ -18,8 +43,7 @@ contract Lenia is ERC721, ERC721Enumerable, Ownable {
     string public baseURI;
 
     string private engine;
-    mapping(uint256 => string) private metadata;
-    mapping(uint256 => string) private cells;
+    mapping(uint256 => LeniaDescriptor.LeniaURIParams) private metadata;
 
     constructor() ERC721("Lenia", "LENIA") {
         _hasSaleStarted = false;
@@ -39,22 +63,35 @@ contract Lenia is ERC721, ERC721Enumerable, Ownable {
     }
 
     function getMetadata(uint256 id) public view onlyOwner returns(string memory) {
-        return metadata[id];
+        return LeniaDescriptor.constructTokenURI(metadata[id]);
     }
 
-    function setMetadata(uint256 id, string memory jsonMetadata) public onlyOwner {
-        metadata[id] = jsonMetadata;
-    }
-    
-    function getCells(uint256 id) public view onlyOwner returns(string memory) {
-        return cells[id];
+    function setMetadata(
+        uint256 id, 
+        string memory name, 
+        string memory imageURL,
+        string memory description,
+        string memory m,
+        string memory s,
+        string memory cells
+    ) 
+        public 
+        onlyOwner 
+    {
+        // LeniaDescriptor.LeniaAttribute[] memory leniaAttributes;
+        LeniaDescriptor.LeniaURIParams memory params = LeniaDescriptor.LeniaURIParams({
+            name: name,
+            imageURL: imageURL,
+            description: description,
+            m: m,
+            s: s,
+            cells: cells
+            // leniaAttributes: leniaAttributes
+        });
+        metadata[id] = params;
     }
 
-    function setCells(uint256 id, string memory currentCells) public onlyOwner {
-        cells[id] = currentCells;
-    }
-
-    function setEngine(string memory engineInput) public onlyOwner {
+    function setEngine(string calldata engineInput) public onlyOwner {
         engine = engineInput;
     }
 

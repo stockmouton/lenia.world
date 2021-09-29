@@ -10,8 +10,16 @@ describe("Lenia", function () {
   let addr1;
 
   beforeEach(async function () {
-    Lenia = await ethers.getContractFactory("Lenia");
     [owner, addr1] = await ethers.getSigners();
+
+    LeniaDescriptor = await ethers.getContractFactory("LeniaDescriptor");
+    const leniaDescriptorLibrary = await LeniaDescriptor.deploy();
+
+    Lenia = await ethers.getContractFactory("Lenia", {
+      libraries: {
+        LeniaDescriptor: leniaDescriptorLibrary.address
+      }
+    });
 
     hardhatLenia = await Lenia.deploy();
   });
@@ -30,41 +38,37 @@ describe("Lenia", function () {
       const result = UglifyJS.minify([engineCode]);
       
       const setEngineTx = await hardhatLenia.setEngine(result.code.substring(0, 14000))
-      await setEngineTx.wait()
+      const receipt = await setEngineTx.wait()
 
       const contractEngine = await hardhatLenia.getEngine();
       
       expect(contractEngine.length > 0).to.equal(true);
     })
     
-    it("should set metadata", async function () {
-      const metadata = require('../src/fake/metadata.json')
-      index = 6
-      let element = metadata[index];
-      delete element["config"]["cells"]
-        
-      const setMetadataTx = await hardhatLenia.setMetadata(index, JSON.stringify(element))
-      await setMetadataTx.wait()
-
-      const contractMetadataJson = await hardhatLenia.getMetadata(index)
-      const contractMetadata = JSON.parse(contractMetadataJson)
-
-      expect(contractMetadata["tokenID"]).to.equal(index)
-    })
-
-    it("should set cells", async function () {
+    it("should set and get metadata", async function () {
       const metadata = require('../src/fake/metadata.json')
       index = 0
       let element = metadata[index];
-      const cells = element["config"]["cells"]
         
-      const setCellsTx = await hardhatLenia.setCells(index, cells)
-      await setCellsTx.wait()
+      const setMetadataTx = await hardhatLenia.setMetadata(
+        index, 
+        "Lenia",
+        "image.mp4",
+        element.description,
+        element.config.kernels_params[0].m.toFixed(10),
+        element.config.kernels_params[0].s.toFixed(10),
+        ""// element.config.cells
+      )
+      const receipt = await setMetadataTx.wait()
 
-      const contractCells = await hardhatLenia.getCells(index)
-      const shape = contractCells.split("::")[1]
+      const encodedContractMetadata = await hardhatLenia.getMetadata(index)
+      const contractMetadataJSON = Buffer.from(
+        encodedContractMetadata.replace('data:application/json;base64,', ''), 
+        'base64'
+      ).toString('ascii')
+      const contractMetadata = JSON.parse(contractMetadataJSON)
 
-      expect(shape).to.equal("1;21;20")
+      expect(contractMetadata.config.kernels_params[0].m).to.equal(element.config.kernels_params[0].m)
     })
   })
 
@@ -74,7 +78,7 @@ describe("Lenia", function () {
       expect(hasSaleStarted).to.equal(false);
 
       const setSaleStartTx = await hardhatLenia.flipHasSaleStarted();
-      await setSaleStartTx.wait();
+      const receipt = await setSaleStartTx.wait();
       hasSaleStarted = await hardhatLenia.hasSaleStarted()
 
       expect(hasSaleStarted).to.equal(true);
@@ -82,7 +86,7 @@ describe("Lenia", function () {
 
     it("Should mint", async function () {
       const setSaleStartTx = await hardhatLenia.flipHasSaleStarted();
-      await setSaleStartTx.wait();
+      const saleReceipt = await setSaleStartTx.wait();
 
       let hasSaleStarted = await hardhatLenia.hasSaleStarted()
       expect(hasSaleStarted).to.equal(true);
@@ -92,7 +96,7 @@ describe("Lenia", function () {
       const mintTx = await hardhatLenia.mint({ 
           value: contractPrice
       })
-      await mintTx.wait()
+      const mintReceipt = await mintTx.wait()
 
       const contractTotalSupply = await hardhatLenia.totalSupply()
 

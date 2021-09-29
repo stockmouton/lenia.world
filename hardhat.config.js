@@ -103,7 +103,15 @@ task("set-engine", "Set the engine in the smart contract", async (taskArgs, hre)
  * @type import('hardhat/config').HardhatUserConfig
  */
 module.exports = {
-  solidity: "0.8.4",
+  solidity: {
+    version: "0.8.6",
+    settings: {
+      optimizer: {
+        enabled: true,
+        runs: 10_000,
+      },
+    },
+  },
   networks: {
     hardhat: {
       chainId: 1337,

@@ -3,7 +3,7 @@
   "chainId": "4",
   "contracts": {
     "Lenia": {
-      "address": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+      "address": "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512",
       "abi": [
         {
           "inputs": [],
@@ -206,25 +206,6 @@
               "internalType": "address",
               "name": "",
               "type": "address"
-            }
-          ],
-          "stateMutability": "view",
-          "type": "function"
-        },
-        {
-          "inputs": [
-            {
-              "internalType": "uint256",
-              "name": "id",
-              "type": "uint256"
-            }
-          ],
-          "name": "getCells",
-          "outputs": [
-            {
-              "internalType": "string",
-              "name": "",
-              "type": "string"
             }
           ],
           "stateMutability": "view",
@@ -469,24 +450,6 @@
         {
           "inputs": [
             {
-              "internalType": "uint256",
-              "name": "id",
-              "type": "uint256"
-            },
-            {
-              "internalType": "string",
-              "name": "currentCells",
-              "type": "string"
-            }
-          ],
-          "name": "setCells",
-          "outputs": [],
-          "stateMutability": "nonpayable",
-          "type": "function"
-        },
-        {
-          "inputs": [
-            {
               "internalType": "string",
               "name": "engineInput",
               "type": "string"
@@ -506,7 +469,32 @@
             },
             {
               "internalType": "string",
-              "name": "jsonMetadata",
+              "name": "name",
+              "type": "string"
+            },
+            {
+              "internalType": "string",
+              "name": "imageURL",
+              "type": "string"
+            },
+            {
+              "internalType": "string",
+              "name": "description",
+              "type": "string"
+            },
+            {
+              "internalType": "string",
+              "name": "m",
+              "type": "string"
+            },
+            {
+              "internalType": "string",
+              "name": "s",
+              "type": "string"
+            },
+            {
+              "internalType": "string",
+              "name": "cells",
               "type": "string"
             }
           ],
@@ -701,6 +689,226 @@
           "name": "transferOwnership",
           "outputs": [],
           "stateMutability": "nonpayable",
+          "type": "function"
+        }
+      ]
+    },
+    "LeniaDescriptor": {
+      "address": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+      "abi": [
+        {
+          "inputs": [],
+          "name": "EXTERNAL_LINK",
+          "outputs": [
+            {
+              "internalType": "string",
+              "name": "",
+              "type": "string"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "components": [
+                {
+                  "internalType": "string",
+                  "name": "name",
+                  "type": "string"
+                },
+                {
+                  "internalType": "string",
+                  "name": "imageURL",
+                  "type": "string"
+                },
+                {
+                  "internalType": "string",
+                  "name": "description",
+                  "type": "string"
+                },
+                {
+                  "internalType": "string",
+                  "name": "m",
+                  "type": "string"
+                },
+                {
+                  "internalType": "string",
+                  "name": "s",
+                  "type": "string"
+                },
+                {
+                  "internalType": "string",
+                  "name": "cells",
+                  "type": "string"
+                }
+              ],
+              "internalType": "struct LeniaDescriptor.LeniaURIParams",
+              "name": "params",
+              "type": "tuple"
+            }
+          ],
+          "name": "constructTokenURI",
+          "outputs": [
+            {
+              "internalType": "string",
+              "name": "",
+              "type": "string"
+            }
+          ],
+          "stateMutability": "pure",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "components": [
+                {
+                  "internalType": "string",
+                  "name": "value",
+                  "type": "string"
+                },
+                {
+                  "internalType": "string",
+                  "name": "numericalValue",
+                  "type": "string"
+                },
+                {
+                  "internalType": "string",
+                  "name": "traitType",
+                  "type": "string"
+                }
+              ],
+              "internalType": "struct LeniaDescriptor.LeniaAttribute",
+              "name": "attr",
+              "type": "tuple"
+            }
+          ],
+          "name": "getAttributeJSON",
+          "outputs": [
+            {
+              "internalType": "string",
+              "name": "json",
+              "type": "string"
+            }
+          ],
+          "stateMutability": "pure",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "components": [
+                {
+                  "internalType": "string",
+                  "name": "name",
+                  "type": "string"
+                },
+                {
+                  "internalType": "string",
+                  "name": "imageURL",
+                  "type": "string"
+                },
+                {
+                  "internalType": "string",
+                  "name": "description",
+                  "type": "string"
+                },
+                {
+                  "internalType": "string",
+                  "name": "m",
+                  "type": "string"
+                },
+                {
+                  "internalType": "string",
+                  "name": "s",
+                  "type": "string"
+                },
+                {
+                  "internalType": "string",
+                  "name": "cells",
+                  "type": "string"
+                }
+              ],
+              "internalType": "struct LeniaDescriptor.LeniaURIParams",
+              "name": "params",
+              "type": "tuple"
+            }
+          ],
+          "name": "getConfigJSON",
+          "outputs": [
+            {
+              "internalType": "string",
+              "name": "json",
+              "type": "string"
+            }
+          ],
+          "stateMutability": "pure",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "components": [
+                {
+                  "internalType": "string",
+                  "name": "name",
+                  "type": "string"
+                },
+                {
+                  "internalType": "string",
+                  "name": "imageURL",
+                  "type": "string"
+                },
+                {
+                  "internalType": "string",
+                  "name": "description",
+                  "type": "string"
+                },
+                {
+                  "internalType": "string",
+                  "name": "m",
+                  "type": "string"
+                },
+                {
+                  "internalType": "string",
+                  "name": "s",
+                  "type": "string"
+                },
+                {
+                  "internalType": "string",
+                  "name": "cells",
+                  "type": "string"
+                }
+              ],
+              "internalType": "struct LeniaDescriptor.LeniaURIParams",
+              "name": "params",
+              "type": "tuple"
+            }
+          ],
+          "name": "getKernelParamsJSON",
+          "outputs": [
+            {
+              "internalType": "string",
+              "name": "json",
+              "type": "string"
+            }
+          ],
+          "stateMutability": "pure",
+          "type": "function"
+        },
+        {
+          "inputs": [],
+          "name": "getWorldParamsJSON",
+          "outputs": [
+            {
+              "internalType": "string",
+              "name": "json",
+              "type": "string"
+            }
+          ],
+          "stateMutability": "pure",
           "type": "function"
         }
       ]
