@@ -15,6 +15,8 @@ import Panel from "../components/panel";
 import LeniaDex from "../components/leniadex"
 import { useQueryParam, BooleanParam } from "use-query-params";
 
+import bbaImg from "../images/6743original.png"
+
 const IndexPage = () => {
   const [isStaging] = useQueryParam("staging", BooleanParam)
   return (
@@ -124,7 +126,7 @@ const IndexPage = () => {
               <Grid.Cell>
                 <Profile
                   name="BBA"
-                  pictureSrc="https://pbs.twimg.com/profile_images/1438171620930199552/kCY1Ikha_400x400.jpg"
+                  pictureSrc={bbaImg}
                   twitterHandle="ape6743"
                   role="Apefluencer"
                   description={<p>Metaverse famous apefluencer, jack of all trades, master of none.</p>}
