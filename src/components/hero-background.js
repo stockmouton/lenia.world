@@ -4,6 +4,13 @@ import BEAST_800_1600 from "../images/beast-800-1600.mp4"
 import BEAST_1000_1000 from "../images/beast-1000-1000.mp4"
 import BEAST_1920_1080 from "../images/beast-1920-1080.mp4"
 import {useWindowResize, useThrottledFn} from "beautiful-react-hooks"
+import { useEffect } from "react"
+
+const Video = ({src}) => (
+  <video width="100%" preload='auto' loop autoPlay muted playsInline={true}>
+    <source src={src} type="video/mp4" />
+  </video>
+)
 
 const StyledBackground = styled.div`
   position: fixed;
@@ -17,27 +24,35 @@ const StyledBackground = styled.div`
 `
 
 const HeroBackground = () => {
-  const [width, setWidth] = useState(window.innerWidth);
-  const [height, setHeight] = useState(window.innerHeight);
+  const isBrowser = typeof window !== 'undefined'
+  const [width, setWidth] = useState(isBrowser ? window.innerWidth : 0);
+  const [height, setHeight] = useState(isBrowser ? window.innerHeight : 0);
   
   useWindowResize(useThrottledFn(event => {
     setWidth(window.innerWidth);
     setHeight(window.innerHeight);
   }))
 
-  const getVideoSrc = () => {
+  useEffect(() => {
+    if (isBrowser) {
+      setWidth(window.innerWidth);
+      setHeight(window.innerHeight);
+    }
+  }, [])
+
+  const getVideoElement = () => {
+    if (width === 0 || height === 0) return <></>
+
     const aspectRatio = width / height
 
-    if (aspectRatio < 4/5) return BEAST_800_1600
-    if (aspectRatio < 5/4) return BEAST_1000_1000
-    return BEAST_1920_1080
+    if (aspectRatio < 4/5) return <Video src={BEAST_800_1600} />
+    if (aspectRatio < 5/4) return <Video src={BEAST_1000_1000} />
+    return <Video src={BEAST_1920_1080} />
   }
 
   return (
     <StyledBackground>
-      <video width="100%" preload='auto' loop autoPlay muted playsInline="true">
-        <source src={getVideoSrc()} type="video/mp4" />
-      </video>
+      {getVideoElement()}
     </StyledBackground>
   )
 }
