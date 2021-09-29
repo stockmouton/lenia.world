@@ -3,6 +3,10 @@ import Fixedsys500cWoff2 from "./fonts/Fixedsys500c.woff2";
 import Fixedsys500cWoff from "./fonts/Fixedsys500c.woff";
 import Fixedsys500cTtf from "./fonts/Fixedsys500c.ttf";
 
+const COLORS = {
+  BACKGROUND: '#0e1b8c'
+}
+
 const fontSizeBase = 18
 const fontSizeBaseMobile = 16
 const spaceWidth = fontSizeBase / 2
@@ -55,6 +59,7 @@ export {
   createMediaQueries,
   createMediaQuery,
   BREAKPOINTS,
+  COLORS,
 }
 
 const GlobalStyles = createGlobalStyle`
@@ -67,7 +72,7 @@ const GlobalStyles = createGlobalStyle`
 }
 
 body {
-  background-color: #0e1a8e;
+  background-color: ${COLORS.BACKGROUND};
   color: #bbbbbb;
   font-family: 'DOS', Monaco, Menlo, Consolas, "Courier New", monospace;
   font-size: ${fontSizeBaseMobile}px;

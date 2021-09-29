@@ -7,15 +7,25 @@ import 'sanitize.css';
 import GlobalStyles, {createMediaQuery, BREAKPOINTS} from "../global-styles";
 import NavBar from "./navbar";
 import WalletConnectorButton from "./wallet-connector-button";
-import Link from "./link";
 import Footer from "./footer";
-import {networkName} from '../utils/wallet'
+import { EtherscanLogo, DiscordLogo, GithubLogo, OpenseaLogo, TwitterLogo } from "./brand-logo"
 
+/**
+ * If re-adding the sidebar is necessary, add:
+ * ${createMediaQuery(BREAKPOINTS.xl, 'margin-left: 300px')}
+ * ${createMediaQuery(BREAKPOINTS.xxl, 'margin-left: 0')}
+ */
 const Main = styled.main`
   margin-top: 30px;
+`
 
-  ${createMediaQuery(BREAKPOINTS.xl, 'margin-left: 300px')}
-  ${createMediaQuery(BREAKPOINTS.xxl, 'margin-left: 0')}
+const BrandLogo = styled.span`
+  ${createMediaQuery(BREAKPOINTS.md, 'display: none')}
+`
+
+const BrandName = styled.span`
+  display: none;
+  ${createMediaQuery(BREAKPOINTS.md, 'display: inline')}
 `
 
 const Layout = ({ children }) => {
@@ -23,11 +33,10 @@ const Layout = ({ children }) => {
     <>
       <GlobalStyles />
       <NavBar>
-        {process.env.STAGING && <NavBar.Banner>This website is in early alpha: please use the {networkName} network for testing purposes and use at your own caution!</NavBar.Banner>}
         <NavBar.Wrapper>
           <NavBar.Brand href="#home">
             <StaticImage
-              src="../images/orbium.png"
+              src="../images/logo.png"
               width={27}
               quality={95}
               formats={["AUTO", "WEBP", "AVIF"]}
@@ -36,24 +45,39 @@ const Layout = ({ children }) => {
             {' '} Lenia
           </NavBar.Brand>
           <NavBar.List>
-            <NavBar.Item.UnderXl>
+            <NavBar.Item.UnderSm>
               <MenuButton />
-            </NavBar.Item.UnderXl>
-            <NavBar.Item.AboveMd>
-              <NavBar.Link href="https://twitter.com/lenia_nft">Twitter</NavBar.Link>
-            </NavBar.Item.AboveMd>
-            <NavBar.Item.AboveMd>
-              <NavBar.Link href="https://discord.gg/4TFNnCkJta">Discord</NavBar.Link>
-            </NavBar.Item.AboveMd>
-            {/* <NavBar.Item.AboveMd>
-              <NavBar.Link>Etherscan</NavBar.Link>
-            </NavBar.Item.AboveMd>
-            <NavBar.Item.AboveMd>
-              <NavBar.Link>OpenSea</NavBar.Link>
-            </NavBar.Item.AboveMd> */}
-            <NavBar.Item.AboveMd>
-              <NavBar.Link href="https://github.com/stockmouton/lenia.stockmouton.com">Github</NavBar.Link>
-            </NavBar.Item.AboveMd>
+            </NavBar.Item.UnderSm>
+            <NavBar.Item.AboveSm>
+              <NavBar.Link href="https://twitter.com/lenia_nft">
+                <BrandLogo><TwitterLogo height={18} /></BrandLogo>
+                <BrandName>Twitter</BrandName>
+              </NavBar.Link>
+            </NavBar.Item.AboveSm>
+            <NavBar.Item.AboveSm>
+              <NavBar.Link href="https://discord.gg/4TFNnCkJta">
+                <BrandLogo><DiscordLogo height={18} /></BrandLogo>
+                <BrandName>Discord</BrandName>
+              </NavBar.Link>
+            </NavBar.Item.AboveSm>
+            {/* <NavBar.Item.AboveSm>
+              <NavBar.Link>
+                <BrandLogo><OpenseaLogo height={18} /></BrandLogo>
+                <BrandName>Opensea</BrandName>
+              </NavBar.Link>
+            </NavBar.Item.AboveSm>
+            <NavBar.Item.AboveSm>
+              <NavBar.Link>
+                <BrandLogo><EtherscanLogo height={18} /></BrandLogo>
+                <BrandName>Etherscan</BrandName>
+              </NavBar.Link>
+            </NavBar.Item.AboveSm> */}
+            <NavBar.Item.AboveSm>
+              <NavBar.Link href="https://github.com/stockmouton/lenia.stockmouton.com">
+                <BrandLogo><GithubLogo height={18} /></BrandLogo>
+                <BrandName>Github</BrandName>
+              </NavBar.Link>
+            </NavBar.Item.AboveSm>
             <NavBar.Item>
               <WalletConnectorButton />
             </NavBar.Item>
@@ -62,11 +86,7 @@ const Layout = ({ children }) => {
       </NavBar>
         
       <Main id="home">{children}</Main>
-      <Footer>
-        © {new Date().getFullYear()}, Built with all the love and care in the world by
-        {` `}
-        <Link href="https://stockmouton.com">Stockmouton</Link>
-      </Footer>
+      <Footer />
     </>
   )
 }

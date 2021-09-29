@@ -1,7 +1,8 @@
+import React from "react"
 import styled from "styled-components"
 import Link from "./link"
 import Button from "./button"
-import { createMediaQuery, BREAKPOINTS } from "../global-styles"
+import { createMediaQuery, BREAKPOINTS, COLORS } from "../global-styles"
 
 const NavBar = styled.nav`
   position: fixed;
@@ -18,15 +19,16 @@ NavBar.Wrapper = styled.div`
 `
 
 NavBar.Brand = styled(Link)`
-  background: #0e1a8e;
+  background: ${COLORS.BACKGROUND};
   color: #fefe54;
   display: block;
   float: left;
   padding: 0 10px;
+  height: 100%;
 
   :hover {
     color: #fefe54;
-    background: #0e1a8e;
+    background: ${COLORS.BACKGROUND};
     text-decoration: none;
   }
 `
@@ -48,27 +50,33 @@ NavBar.Item = styled.li`
   list-style: none;
   height: 100%;
 `
-NavBar.Item.UnderXl = styled(NavBar.Item)`
-  ${createMediaQuery(BREAKPOINTS.xl, 'display: none;')}
+NavBar.Item.UnderSm = styled(NavBar.Item)`
+  ${createMediaQuery(BREAKPOINTS.sm, 'display: none;')}
 `
 
-NavBar.Item.AboveMd = styled(NavBar.Item)`
+NavBar.Item.AboveSm = styled(NavBar.Item)`
   display: none;
 
-  ${createMediaQuery(BREAKPOINTS.md, 'display: block;')}
+  ${createMediaQuery(BREAKPOINTS.sm, 'display: block;')}
 `
 
-NavBar.Link = styled(Link)`
+const LinkElement = styled.a`
   color: #000000;
+  text-decoration: none;
   padding: 0 10px;
   display: block;
   height: 100%;
 
-  :hover, :focus {
+  :hover {
     color: #bbbbbb;
     background: #000000;
   }
-`
+
+  :hover, :focus, :active {
+    outline: 0;
+  }
+` 
+NavBar.Link = props => (props.href?.startsWith('#') ? <LinkElement {...props} /> : <LinkElement target="_blank" rel="noopener noreferrer" {...props} />)
 
 NavBar.Button = styled(Button)`
   background: #000000;

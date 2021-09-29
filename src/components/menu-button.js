@@ -9,11 +9,8 @@ const StyledButton = styled(NavBar.Button)`
   color: #000000;
   background: #bbbbbb;
 
-  :before {
+  :before, :after {
     content: none;
-  }
-  :after {
-    content: " ▼";
   }
   :hover, :focus {
     color: #bbbbbb;

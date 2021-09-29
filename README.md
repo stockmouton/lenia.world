@@ -2,9 +2,6 @@
 
 Welcome to our opensourced website! Feel free to have fun looking at our code and don't hesitate to do a pull request if you feel like something deserve to be changed!
 
-## Install
-As easy as typing: `yarn`
-
 ## Development
 
 ### Deps
@@ -19,7 +16,7 @@ Before starting the web server, we need to compile and deploy the smart contract
 ### Smart contract
 - start a local network node (for smart contract interactions)
 ```
-yarn sm-local-node
+yarn local-node
 ```
 
 - deploy the current smart contract version to the local node and export the artifacts file for the Frontend.
@@ -37,7 +34,7 @@ yarn test
 ```
 yarn develop
 ```
-Got check the website at the URL provided by Gatsby
+You can access the freshly baked website at http://localhost:8000 (for the production build) or http://localhost:8000/?staging=1 (for the staging build)
 
 ### Notes
 If you have a problem with Gatsby cache, clean it:
@@ -58,7 +55,7 @@ PRIVATE_KEY=xxxxxx # Your mainnet wallet private key
 ALCHEMY_API_KEY=xxxxxxx
 ```
 
-hen you can deploy the smart contract to a remote network (we use Rinkeby as a testnet): 
+Then you can deploy the smart contract to a remote network (we use Rinkeby as a testnet): 
 ```
 NETWORK=<rinkeby|mainnet> yarn sm-deploy
 ```
@@ -82,3 +79,9 @@ yarn sm-start-sale # Local node
 
 NETWORK=rinkeby yarn sm-start-sale # Testnet
 ```
+
+## How to test on a mobile phone
+
+We recommend to use Charles to proxy network requests, here is a good [tutorial](https://community.tealiumiq.com/t5/Tealium-for-Android/Setting-up-Charles-to-Proxy-your-Android-Device/ta-p/5121) to set it up.
+
+To access localhost:8000 for example, you would need to access the following URL: http://localhost.charlesproxy.com:8000

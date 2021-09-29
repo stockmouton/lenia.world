@@ -1,7 +1,7 @@
 module.exports = {
   siteMetadata: {
-    title: `Lenia - A NFT collection of artificial life-forms`,
-    description: `Enter the metaverse of Lenia, a collection of 210 artificial life-forms discovered via evolutionary computation. They live as unique digital collectibles (NFT) on the Ethereum blockchain.`,
+    title: `Lenia - Artificial Life NFT collection`,
+    description: `Lenia are a collection of 202 unique life-forms discovered via evolutionary computation. They live as unique digital collectibles (NFT) on the Ethereum blockchain.`,
     author: `@lenia_nft`,
     siteUrl: `https://lenia.world/`,
   },
@@ -18,6 +18,7 @@ module.exports = {
     },
     `gatsby-transformer-sharp`,
     `gatsby-plugin-sharp`,
+    `gatsby-plugin-use-query-params`,
     {
       resolve: `gatsby-plugin-manifest`,
       options: {
@@ -27,7 +28,7 @@ module.exports = {
         background_color: `#663399`,
         theme_color: `#663399`,
         display: `minimal-ui`,
-        icon: `src/images/orbium.png`, // This path is relative to the root of the site.
+        icon: `src/images/logo.png`, // This path is relative to the root of the site.
       },
     },
     {
