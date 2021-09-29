@@ -1,21 +1,16 @@
 import React from "react"
-import queryString from 'query-string'
+import { useQueryParam, NumberParam } from "use-query-params";
 
 import {Web3Provider} from "../components/web3-provider";
 import Layout from "../components/layout"
 import Engine from "../components/engine"
 
-const LeniaPage = ({ location }) => {
-    const data = queryString.parse(location.search)
-    let lenia_id = parseInt(data['id'], 10)
-    if (isNaN(lenia_id)) {
-        lenia_id = 0;
-    }
-
+const LeniaPage = () => {
+    const [id] = useQueryParam("id", NumberParam);
     return (
         <Web3Provider>
             <Layout>
-                <Engine lenia_id={lenia_id} />
+                <Engine lenia_id={id || 0} />
             </Layout>
         </Web3Provider>
     )

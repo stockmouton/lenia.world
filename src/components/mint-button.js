@@ -5,9 +5,10 @@ import {useWeb3} from "./web3-provider"
 import Toast from './toast'
 import styled from "styled-components"
 import { createMediaQuery, BREAKPOINTS } from "../global-styles"
+import { useQueryParam, BooleanParam } from "use-query-params";
 
 const BUTTON_STATUSES = {
-  ALPHA: 'ALPHA',
+  DISABLED: 'DISABLED',
   READY: 'READY',
   LOADING: 'LOADING',
 }
@@ -41,10 +42,14 @@ const MintButton = () => {
   const [totalLeniaMinted, setTotalLeniaMinted] = useState(0)
   const [contract, setContract] = useState(null)
   const [mintingTransactionStatus, setMintingTransactionStatus] = useState(MINTING_TRANSACTION_STATUSES.READY)
-  const [buttonStatus, setButtonStatus] = useState(BUTTON_STATUSES.ALPHA)
+  const [buttonStatus, setButtonStatus] = useState(BUTTON_STATUSES.DISABLED)
   const [error, setError] = useState(null)
+  const [isStaging] = useQueryParam("staging", BooleanParam)
 
   useEffect(async () => {
+    // TODO: Remove this when smart contract is deployed on mainnet
+    if (!isStaging) return
+
     const contract = web3Provider ? new web3Provider.eth.Contract(artifacts.contracts.Lenia.abi, artifacts.contracts.Lenia.address) : null
 
     if (contract) {
@@ -53,7 +58,7 @@ const MintButton = () => {
         const hasSaleStarted = await contract.methods.hasSaleStarted().call({ from: account })
         const totalLeniaSupply = await contract.methods.MAX_SUPPLY().call({ from: account })
         const totalLeniaMinted = await contract.methods.totalSupply().call({ from: account })
-        setButtonStatus(hasSaleStarted ? BUTTON_STATUSES.READY : BUTTON_STATUSES.ALPHA)
+        setButtonStatus(hasSaleStarted ? BUTTON_STATUSES.READY : BUTTON_STATUSES.DISABLED)
         setTotalLeniaSupply(totalLeniaSupply)
         setTotalLeniaMinted(totalLeniaMinted)
       } catch (error) {
@@ -89,14 +94,14 @@ const MintButton = () => {
   }
 
   const getButtonContent = () => ({
-    [BUTTON_STATUSES.ALPHA]: 'Minting day TBA!',
+    [BUTTON_STATUSES.DISABLED]: 'Minting day TBA!',
     [BUTTON_STATUSES.READY]: 'Mint one lenia',
     [BUTTON_STATUSES.LOADING]: 'Processing transaction...',
   }[buttonStatus])
 
   return (
     <>
-      <StyledButton onClick={handleClick} disabled={[BUTTON_STATUSES.ALPHA, BUTTON_STATUSES.LOADING].includes(buttonStatus)}>{getButtonContent()}</StyledButton>
+      <StyledButton onClick={handleClick} disabled={[BUTTON_STATUSES.DISABLED, BUTTON_STATUSES.LOADING].includes(buttonStatus)}>{getButtonContent()}</StyledButton>
       {Boolean(totalLeniaSupply) && <LeniaSupplyContent>{totalLeniaMinted}/{totalLeniaSupply} lenia minted</LeniaSupplyContent>}
       {mintingTransactionStatus == MINTING_TRANSACTION_STATUSES.ERROR && <Toast type="error" onClose={handleToastClose}>{error.message}</Toast>}
       {mintingTransactionStatus == MINTING_TRANSACTION_STATUSES.SUCCESS && <Toast onClose={handleToastClose}>You successfully minted a lenia.</Toast>}

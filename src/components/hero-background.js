@@ -35,7 +35,7 @@ const HeroBackground = () => {
 
   return (
     <StyledBackground>
-      <video width="100%"  preload='auto' loop autoPlay muted webkit-playsinline="true">
+      <video width="100%" preload='auto' loop autoPlay muted playsInline="true">
         <source src={getVideoSrc()} type="video/mp4" />
       </video>
     </StyledBackground>

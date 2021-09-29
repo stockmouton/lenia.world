@@ -30,7 +30,11 @@ export const networkName = (() => {
 
 export const getDecimalFromHex = hexString => parseInt(hexString, 16)
 
-const RINKEBY_RPC_URL = 'https://rinkeby.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161/'
+const networkRpcUrl = (() => {
+  if (process.env.NODE_ENV === 'production' && process.env.STAGING) return 'https://rinkeby.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161/'
+  if (process.env.NODE_ENV === 'production') return 'https://mainnet.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161'
+  return 'http://localhost:8545'
+})()
 
 export const switchChainConnection = async () => {
   // Check if MetaMask is installed
@@ -51,7 +55,7 @@ export const switchChainConnection = async () => {
             params: [
               {
                 chainId: ETHEREUM_HEX_CHAIN_IDS[allowedChainId],
-                rpcUrl: RINKEBY_RPC_URL,
+                rpcUrl: networkRpcUrl,
               },
             ],
           });

@@ -182,7 +182,7 @@ const LeniaDex = () => {
 
   return (
     <>
-      <StyledSVG ref={nodeRef} width="75%" class="leniadex" viewBox={viewbox}></StyledSVG>
+      <StyledSVG ref={nodeRef} width="75%" className="leniadex" viewBox={viewbox}></StyledSVG>
       <StyledTooltip id="leniadex-tooltip"></StyledTooltip>
     </>
   )
