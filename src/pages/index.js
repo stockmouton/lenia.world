@@ -88,7 +88,7 @@ const IndexPage = () => {
 
             <article>
               <h2 id="dao">DAO</h2>
-              <p>We aim to build a community-run DAO for all our projects.</p>
+              <p>We aim at building a community-run DAO for all our projects.</p>
               <p>This collection is only the first step. You can expect us to make the project live in the long term by developing more AI x Crypto work, which will bring more value to the <Link href="#dao">DAO</Link>.</p>
               <p>
                 The DAO gets income from:
