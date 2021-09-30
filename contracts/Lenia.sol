@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-// @title Main contrct for the Lenia collection
+// @title Main contract for the Lenia collection
 
 /**********************************************
  *                        .                   *
@@ -103,7 +103,7 @@ contract Lenia is ERC721, ERC721Enumerable, Ownable {
         engine = engineInput;
     }
 
-    function getEngine() public view onlyOwner returns(string memory) {
+    function getEngine() public view returns(string memory) {
         return engine;
     }
 

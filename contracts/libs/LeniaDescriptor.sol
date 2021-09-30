@@ -26,7 +26,6 @@ pragma solidity ^0.8.6;
 
 library LeniaDescriptor {
     string public constant EXTERNAL_LINK = "https://lenia.world";
-    // string public constant NB_ATTRIBUTES = 9;
 
     struct LeniaAttribute {
         string value;
