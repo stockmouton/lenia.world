@@ -24,10 +24,9 @@
 
 pragma solidity ^0.8.6;
 
-import { Base64 } from "base64-sol/base64.sol";
-
 library LeniaDescriptor {
     string public constant EXTERNAL_LINK = "https://lenia.world";
+    // string public constant NB_ATTRIBUTES = 9;
 
     struct LeniaAttribute {
         string value;
@@ -42,7 +41,7 @@ library LeniaDescriptor {
         string m;
         string s;
         string cells;
-        // LeniaAttribute[] leniaAttributes;
+        LeniaAttribute[] leniaAttributes;
     }
 
     /**
@@ -56,56 +55,62 @@ library LeniaDescriptor {
         // prettier-ignore
         return string(
             abi.encodePacked(
-                'data:application/json;base64,',
-                Base64.encode(
-                    bytes(
-                        abi.encodePacked(
-                            '{',
-                                '"name":"', params.name, '",',
-                                '"description":"', params.description, '",',
-                                '"external_link":"', EXTERNAL_LINK, '",',
-                                '"image":"', params.imageURL, '",',
-                                // '"attributes":', getAttributesJSON(params), ',',
-                                '"config": ', getConfigJSON(params),
-                            '}'
-                        )
+                "data:application/json,",
+                bytes(
+                    abi.encodePacked(
+                        '{'
+                            '"name":"', params.name, '",',
+                            '"description":"', params.description, '",',
+                            '"external_link":"', EXTERNAL_LINK, '",',
+                            '"image":"', params.imageURL, '",',
+                            '"attributes":', getAttributesJSON(params), ',',
+                            '"config": ', getConfigJSON(params),
+                        '}'
                     )
                 )
             )
         );
     }
 
-    // /**
-    //  * @notice Get the Lenia attributes
-    //  */
-    // function getAttributesJSON(LeniaURIParams memory params)
-    //     public
-    //     pure
-    //     returns (string memory json)
-    // {
-    //     string memory output;
-    //     for (uint256 index = 0; index < params.leniaAttributes.length; index++) {
-    //         output = string(abi.encodePacked(
-    //             output, 
-    //             getAttributeJSON(params.leniaAttributes[index])
-    //         ));
-    //     }
+    /**
+     * @notice Get the Lenia attributes
+     */
+    function getAttributesJSON(LeniaURIParams memory params)
+        public
+        pure
+        returns (string memory json)
+    {
+        string memory output;
+        for (uint256 index = 0; index < params.leniaAttributes.length; index++) {
+            if (bytes(output).length == 0) {
+                output = string(abi.encodePacked(
+                    "[", getAttributeJSON(params.leniaAttributes[index])
+                ));
+            } else {
+                output = string(abi.encodePacked(
+                    output, ",",
+                    getAttributeJSON(params.leniaAttributes[index])
+                ));
+            }
+            
+        }
+        output = string(abi.encodePacked(output, "]"));
 
-    //     return output;
-    // }
+        return output;
+    }
 
     /**
      * @notice Get one Lenia attribute
      */
     function getAttributeJSON(LeniaAttribute memory attr)
-        public
+        private
         pure
         returns (string memory json)
     {
         return string(abi.encodePacked(
             '{',
-                '"value":', attr.value, ',',
-                '"trait_type":', attr.traitType, ',',
+                '"value":"', attr.value, '",',
+                '"trait_type":"', attr.traitType, '",',
                 '"numerical_value": "', attr.numericalValue, '"',
             '}'
         ));
@@ -115,7 +120,7 @@ library LeniaDescriptor {
      * @notice Get the Lenia configuration
      */
     function getConfigJSON(LeniaURIParams memory params)
-        public
+        private
         pure
         returns (string memory json)
     {
@@ -132,20 +137,18 @@ library LeniaDescriptor {
      * @notice Get the Lenia world_params
      */
     function getWorldParamsJSON()
-        public
+        private
         pure
         returns (string memory json)
     {
-        return string(
-            '{"R": 13, "T": 10, "nb_channels": 1, "nb_dims": 2, "scale": 1}'
-        );
+        return '{"R": 13, "T": 10, "nb_channels": 1, "nb_dims": 2, "scale": 1}';
     }
 
     /**
      * @notice Get the Lenia kernels_params
      */
     function getKernelParamsJSON(LeniaURIParams memory params)
-        public
+        private
         pure
         returns (string memory json)
     {

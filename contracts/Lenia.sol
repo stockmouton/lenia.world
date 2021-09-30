@@ -34,8 +34,8 @@ import { LeniaDescriptor } from "./libs/LeniaDescriptor.sol";
 contract Lenia is ERC721, ERC721Enumerable, Ownable {
 
     uint256 public constant MAX_SUPPLY = 202;
-    uint256 private _price = 0.08 ether;
-    uint256 private _reserved = 21;
+    uint256 private _price = 0.1 ether;
+    uint256 private _reserved = 11;
 
     uint256 public startingIndex;
 
@@ -43,7 +43,7 @@ contract Lenia is ERC721, ERC721Enumerable, Ownable {
     string public baseURI;
 
     string private engine;
-    mapping(uint256 => LeniaDescriptor.LeniaURIParams) private metadata;
+    LeniaDescriptor.LeniaURIParams[MAX_SUPPLY] private metadata;
 
     constructor() ERC721("Lenia", "LENIA") {
         _hasSaleStarted = false;
@@ -63,32 +63,40 @@ contract Lenia is ERC721, ERC721Enumerable, Ownable {
     }
 
     function getMetadata(uint256 id) public view onlyOwner returns(string memory) {
+        require(id < MAX_SUPPLY, "id out of bounds");
+
         return LeniaDescriptor.constructTokenURI(metadata[id]);
     }
 
     function setMetadata(
-        uint256 id, 
-        string memory name, 
+        uint256 id,
+        string memory name,
         string memory imageURL,
         string memory description,
         string memory m,
         string memory s,
-        string memory cells
-    ) 
-        public 
-        onlyOwner 
+        string memory cells,
+        LeniaDescriptor.LeniaAttribute[] memory attributes
+    )
+        public
+        onlyOwner
     {
-        // LeniaDescriptor.LeniaAttribute[] memory leniaAttributes;
-        LeniaDescriptor.LeniaURIParams memory params = LeniaDescriptor.LeniaURIParams({
-            name: name,
-            imageURL: imageURL,
-            description: description,
-            m: m,
-            s: s,
-            cells: cells
-            // leniaAttributes: leniaAttributes
-        });
-        metadata[id] = params;
+        LeniaDescriptor.LeniaURIParams storage params = metadata[id];
+        params.name = name;
+        params.imageURL = imageURL;
+        params.description = description;
+        params.m = m;
+        params.s = s;
+        params.cells = cells;
+        for (uint256 i = 0; i < attributes.length; i++) {
+            params.leniaAttributes.push();
+            LeniaDescriptor.LeniaAttribute storage storageAttr = params.leniaAttributes[i];
+
+            LeniaDescriptor.LeniaAttribute memory currentAttr = attributes[i];
+            storageAttr.value = currentAttr.value;
+            storageAttr.numericalValue = currentAttr.numericalValue;
+            storageAttr.traitType = currentAttr.traitType;
+        }
     }
 
     function setEngine(string calldata engineInput) public onlyOwner {

@@ -48,25 +48,34 @@ describe("Lenia", function () {
       const metadata = require('../src/fake/metadata.json')
       index = 0
       let element = metadata[index];
+      let name = "Lenia";
+      let imageURL = "image.mp4";
+      let smLeniaAttributes = []
+      for (let i = 0; i < element.attributes.length; i++) {
+        const attr = element.attributes[i];
+        smLeniaAttributes.push({
+          'value': attr.value,
+          'numericalValue': attr.numerical_value ? attr.numerical_value : 0,
+          'traitType': attr.trait_type,
+        })
         
+      }
       const setMetadataTx = await hardhatLenia.setMetadata(
         index, 
-        "Lenia",
-        "image.mp4",
+        name,
+        imageURL,
         element.description,
         element.config.kernels_params[0].m.toFixed(10),
         element.config.kernels_params[0].s.toFixed(10),
-        ""// element.config.cells
+        element.config.cells,
+        smLeniaAttributes
       )
       const receipt = await setMetadataTx.wait()
 
       const encodedContractMetadata = await hardhatLenia.getMetadata(index)
-      const contractMetadataJSON = Buffer.from(
-        encodedContractMetadata.replace('data:application/json;base64,', ''), 
-        'base64'
-      ).toString('ascii')
+      const contractMetadataJSON = encodedContractMetadata.replace('data:application/json,', '');
       const contractMetadata = JSON.parse(contractMetadataJSON)
-
+      expect(contractMetadata.name).to.equal(name)
       expect(contractMetadata.config.kernels_params[0].m).to.equal(element.config.kernels_params[0].m)
     })
   })

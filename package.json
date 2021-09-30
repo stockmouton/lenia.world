@@ -9,7 +9,6 @@
     "@walletconnect/web3-provider": "^1.6.5",
     "babel-plugin-styled-components": "^1.13.2",
     "beautiful-react-hooks": "^1.0.1",
-    "base64-sol": "^1.0.1",
     "buffer": "^6.0.3",
     "d3": "^7.0.3",
     "ethers": "^5.4.6",
