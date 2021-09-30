@@ -42,6 +42,7 @@ contract Lenia is ERC721, ERC721Enumerable, Ownable {
     bool private _hasSaleStarted;
     string public baseURI;
 
+    bytes private gzipCells;
     string private engine;
     LeniaDescriptor.LeniaURIParams[MAX_SUPPLY] private metadata;
 
@@ -68,6 +69,14 @@ contract Lenia is ERC721, ERC721Enumerable, Ownable {
         return LeniaDescriptor.constructTokenURI(metadata[id]);
     }
 
+    function setCells(bytes memory gzipCellsInput) public onlyOwner {
+        gzipCells = gzipCellsInput;
+    }
+
+    function getCells() public view returns(bytes memory) {
+        return gzipCells;
+    }
+
     function setMetadata(
         uint256 id,
         string memory name,
@@ -75,7 +84,6 @@ contract Lenia is ERC721, ERC721Enumerable, Ownable {
         string memory description,
         string memory m,
         string memory s,
-        string memory cells,
         LeniaDescriptor.LeniaAttribute[] memory attributes
     )
         public
@@ -87,7 +95,6 @@ contract Lenia is ERC721, ERC721Enumerable, Ownable {
         params.description = description;
         params.m = m;
         params.s = s;
-        params.cells = cells;
         for (uint256 i = 0; i < attributes.length; i++) {
             params.leniaAttributes.push();
             LeniaDescriptor.LeniaAttribute storage storageAttr = params.leniaAttributes[i];

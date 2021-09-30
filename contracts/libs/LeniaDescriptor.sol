@@ -39,7 +39,6 @@ library LeniaDescriptor {
         string description;
         string m;
         string s;
-        string cells;
         LeniaAttribute[] leniaAttributes;
     }
 
@@ -126,8 +125,7 @@ library LeniaDescriptor {
         return string(abi.encodePacked(
             '{',
                 '"kernels_params":', getKernelParamsJSON(params), ',',
-                '"world_params":', getWorldParamsJSON(), ',',
-                '"cells": "', params.cells, '"',
+                '"world_params":', getWorldParamsJSON(),
             '}'
         ));
     }

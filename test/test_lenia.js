@@ -44,6 +44,31 @@ describe("Lenia", function () {
       expect(contractEngine.length > 0).to.equal(true);
     })
     
+    it("should set and get cells", async function () {
+      const {gzip, ungzip} = require('node-gzip');
+
+      let metadata = require('../src/fake/metadata.json')
+      let allCells = []
+      for (let i = 0; i < metadata.length; i++) {
+          const element = metadata[i];
+          allCells.push(element.config.cells);
+      }
+      const gzipCells = await gzip(allCells.join("%%"));
+
+      const setMetadataTx = await hardhatLenia.setCells(gzipCells)
+      const receipt = await setMetadataTx.wait()
+      
+      const contractGzipCellsHex = await hardhatLenia.getCells()
+      const contractGzipCell = Buffer.from(ethers.utils.arrayify(contractGzipCellsHex))
+      const contractCells = await ungzip(contractGzipCell);
+      const contractAllCells = contractCells.toString('utf-8').split('%%')
+      
+      expect(contractAllCells.length).to.equal(allCells.length)
+      expect(contractAllCells[0]).to.equal(allCells[0])
+      expect(contractAllCells[-1]).to.equal(allCells[-1])
+    })
+  
+
     it("should set and get metadata", async function () {
       const metadata = require('../src/fake/metadata.json')
       index = 0
@@ -67,7 +92,6 @@ describe("Lenia", function () {
         element.description,
         element.config.kernels_params[0].m.toFixed(10),
         element.config.kernels_params[0].s.toFixed(10),
-        element.config.cells,
         smLeniaAttributes
       )
       const receipt = await setMetadataTx.wait()
