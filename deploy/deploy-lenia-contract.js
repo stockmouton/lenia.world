@@ -4,9 +4,17 @@ const deployLeniaContract = async hre => {
 
   const {deployer} = await getNamedAccounts()
 
+  const leniaDescriptorLibrary = await deploy("LeniaDescriptor", {
+    from: deployer,
+    log: true, 
+  });
+
   await deploy('Lenia', {
     from: deployer,
-    log: true,
+    log: true, 
+    libraries: {
+      LeniaDescriptor: leniaDescriptorLibrary.address
+    }
   })
 }
 

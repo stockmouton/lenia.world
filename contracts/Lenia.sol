@@ -1,16 +1,41 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+
+// @title Main contract for the Lenia collection
+
+/**********************************************
+ *                        .                   *
+ *                          ,,                *
+ *                      ......*#*             *
+ *                 .......    ..*%%,          *
+ *          .,,****,..             ,#(.       *
+ *         .,**((((*,.               .*(.     *
+ *          .**((**,,,,,,,             .*,    *
+ *        .......,,**(((((((*.          .,,   *
+ *       ...      ,*((##%&&&&@&(,        .,.  *
+ *       ..        ,((#&&@@@@@@@@&(*.  ..,,.  *
+ *    ,. ..          ,#&@@@@@@@@@@@%#(*,,,,.  *
+ *      ((,.           *%@@@@&%%%&&%#(((*,,.  *
+ *        (&*            *%@@@&&%%##(((**,.   *
+ *          (&(           .*(#%%##(((**,,.    *
+ *            .((,         .,*(((((**,..      *
+ *               .,*,,.....,,,,*,,,..         *
+ *                    ..........              *
+**********************************************/
+
+pragma solidity ^0.8.6;
 
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
+import { LeniaDescriptor } from "./libs/LeniaDescriptor.sol";
+
 contract Lenia is ERC721, ERC721Enumerable, Ownable {
 
     uint256 public constant MAX_SUPPLY = 202;
-    uint256 private _price = 0.08 ether;
-    uint256 private _reserved = 21;
+    uint256 private _price = 0.1 ether;
+    uint256 private _reserved = 11;
 
     uint256 public startingIndex;
 
@@ -18,8 +43,7 @@ contract Lenia is ERC721, ERC721Enumerable, Ownable {
     string public baseURI;
 
     string private engine;
-    mapping(uint256 => string) private metadata;
-    mapping(uint256 => string) private cells;
+    LeniaDescriptor.LeniaURIParams[MAX_SUPPLY] private metadata;
 
     constructor() ERC721("Lenia", "LENIA") {
         _hasSaleStarted = false;
@@ -39,26 +63,47 @@ contract Lenia is ERC721, ERC721Enumerable, Ownable {
     }
 
     function getMetadata(uint256 id) public view onlyOwner returns(string memory) {
-        return metadata[id];
+        require(id < MAX_SUPPLY, "id out of bounds");
+
+        return LeniaDescriptor.constructTokenURI(metadata[id]);
     }
 
-    function setMetadata(uint256 id, string memory jsonMetadata) public onlyOwner {
-        metadata[id] = jsonMetadata;
-    }
-    
-    function getCells(uint256 id) public view onlyOwner returns(string memory) {
-        return cells[id];
+    function setMetadata(
+        uint256 id,
+        string memory name,
+        string memory imageURL,
+        string memory description,
+        string memory m,
+        string memory s,
+        string memory cells,
+        LeniaDescriptor.LeniaAttribute[] memory attributes
+    )
+        public
+        onlyOwner
+    {
+        LeniaDescriptor.LeniaURIParams storage params = metadata[id];
+        params.name = name;
+        params.imageURL = imageURL;
+        params.description = description;
+        params.m = m;
+        params.s = s;
+        params.cells = cells;
+        for (uint256 i = 0; i < attributes.length; i++) {
+            params.leniaAttributes.push();
+            LeniaDescriptor.LeniaAttribute storage storageAttr = params.leniaAttributes[i];
+
+            LeniaDescriptor.LeniaAttribute memory currentAttr = attributes[i];
+            storageAttr.value = currentAttr.value;
+            storageAttr.numericalValue = currentAttr.numericalValue;
+            storageAttr.traitType = currentAttr.traitType;
+        }
     }
 
-    function setCells(uint256 id, string memory currentCells) public onlyOwner {
-        cells[id] = currentCells;
-    }
-
-    function setEngine(string memory engineInput) public onlyOwner {
+    function setEngine(string calldata engineInput) public onlyOwner {
         engine = engineInput;
     }
 
-    function getEngine() public view onlyOwner returns(string memory) {
+    function getEngine() public view returns(string memory) {
         return engine;
     }
 
