@@ -85,3 +85,16 @@ NETWORK=rinkeby yarn sm-start-sale # Testnet
 We recommend to use Charles to proxy network requests, here is a good [tutorial](https://community.tealiumiq.com/t5/Tealium-for-Android/Setting-up-Charles-to-Proxy-your-Android-Device/ta-p/5121) to set it up.
 
 To access localhost:8000 for example, you would need to access the following URL: http://localhost.charlesproxy.com:8000
+
+
+## Utils
+### Gas estimation
+First, create an account on coinmarketcap and get your key, then define it in your `.env.development` file:
+```
+COINMARKETCAP=a317005e-ee9f-4e2a-89df-69ea7ac3dd45
+```
+
+Now you can estimate gas for the smart-contract by running the following command:
+```
+yarn sm-estimate-gas
+```

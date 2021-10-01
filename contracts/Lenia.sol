@@ -79,9 +79,8 @@ contract Lenia is ERC721, ERC721Enumerable, Ownable {
 
     function setMetadata(
         uint256 id,
-        string memory name,
+        string memory paddedId,
         string memory imageURL,
-        string memory description,
         string memory m,
         string memory s,
         LeniaDescriptor.LeniaAttribute[] memory attributes
@@ -90,13 +89,15 @@ contract Lenia is ERC721, ERC721Enumerable, Ownable {
         onlyOwner
     {
         LeniaDescriptor.LeniaURIParams storage params = metadata[id];
-        params.name = name;
+        params.paddedId = paddedId;
         params.imageURL = imageURL;
-        params.description = description;
         params.m = m;
         params.s = s;
+        uint256 attrLengths = params.leniaAttributes.length;
         for (uint256 i = 0; i < attributes.length; i++) {
-            params.leniaAttributes.push();
+            if (i >= attrLengths) {
+                params.leniaAttributes.push();
+            }
             LeniaDescriptor.LeniaAttribute storage storageAttr = params.leniaAttributes[i];
 
             LeniaDescriptor.LeniaAttribute memory currentAttr = attributes[i];

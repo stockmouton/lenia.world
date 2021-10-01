@@ -68,6 +68,7 @@
     "local-node": "hardhat node",
     "sm-compile": "hardhat compile",
     "sm-test": "hardhat test",
+    "sm-estimate-gas": "REPORT_GAS=true hardhat test",
     "sm-coverage": "hardhat coverage",
     "sm-deploy": "hardhat deploy --network ${NETWORK:-localhost} --export src/artifacts.json",
     "sm-export": "hardhat export --network ${NETWORK:-localhost} --export src/artifacts.json",
