@@ -35,24 +35,27 @@ library LeniaDescriptor {
         string numericalValue;
     }
 
-    struct LeniaURIParams {
-        string paddedId;
-        string imageURL;
+    struct LeniaParams {
         string m;
         string s;
+    }
+
+    struct LeniaMetadata {
+        string paddedID;
+        string imageURL;
         LeniaAttribute[] leniaAttributes;
     }
 
     /**
      * @notice Construct an ERC721 token URI.
      */
-    function constructTokenURI(LeniaURIParams memory params)
+    function constructTokenURI(LeniaMetadata memory metadata, LeniaParams memory leniaParams)
         public
         pure
         returns (string memory)
     {
         bytes memory nameField = abi.encodePacked(
-            '"name":"', NAME_PREFIX, params.paddedId, '"'
+            '"name":"', NAME_PREFIX, metadata.paddedID, '"'
         );
         bytes memory descField = abi.encodePacked(
             '"description":"', DESCRIPTION, '"'
@@ -61,13 +64,13 @@ library LeniaDescriptor {
             '"external_link":"', EXTERNAL_LINK, '"'
         );
         bytes memory imgField = abi.encodePacked(
-            '"image":"', params.imageURL, '"'
+            '"image":"', metadata.imageURL, '"'
         );
         bytes memory attrField = abi.encodePacked(
-            '"attributes":', getAttributesJSON(params)
+            '"attributes":', getAttributesJSON(metadata)
         );
         bytes memory configField = abi.encodePacked(
-            '"config": ', getConfigJSON(params)
+            '"config": ', getConfigJSON(leniaParams)
         );
 
         // prettier-ignore
@@ -91,22 +94,22 @@ library LeniaDescriptor {
     /**
      * @notice Get the Lenia attributes
      */
-    function getAttributesJSON(LeniaURIParams memory params)
+    function getAttributesJSON(LeniaMetadata memory metadata)
         private
         pure
         returns (string memory json)
     {
         string memory output = "[";
-        for (uint256 index = 0; index < params.leniaAttributes.length; index++) {
+        for (uint256 index = 0; index < metadata.leniaAttributes.length; index++) {
             if (bytes(output).length == 1) {
                 output = string(abi.encodePacked(
                     output,
-                    getAttributeJSON(params.leniaAttributes[index])
+                    getAttributeJSON(metadata.leniaAttributes[index])
                 ));
             } else {
                 output = string(abi.encodePacked(
                     output, ",",
-                    getAttributeJSON(params.leniaAttributes[index])
+                    getAttributeJSON(metadata.leniaAttributes[index])
                 ));
             }
 
@@ -179,7 +182,7 @@ library LeniaDescriptor {
         returns (string memory)
     {
         string[10] memory colormaps = [
-            "blackwhite", "carmine_blue", "carmine_green", "cinnamon", "golden", "msdos", "rainbow", "rainbow_transparent", "salvia", "whiteblack"
+            "blackwhite", "carmine-blue", "carmine-green", "cinnamon", "golden", "msdos", "rainbow", "rainbow_transparent", "salvia", "whiteblack"
         ];
 
         return colormaps[index];
@@ -308,21 +311,21 @@ library LeniaDescriptor {
     /**
      * @notice Get the Lenia configuration
      */
-    function getConfigJSON(LeniaURIParams memory params)
+    function getConfigJSON(LeniaParams memory leniaParams)
         private
         pure
         returns (string memory json)
     {
         return string(abi.encodePacked(
             "{",
-                '"kernels_params":', getKernelParamsJSON(params), ',',
-                '"world_params":', getWorldParamsJSON(),
+                '"kernels_params":', getKernelParamsJSON(leniaParams), ',',
+                '"world_metadata":', getWorldParamsJSON(),
             "}"
         ));
     }
 
     /**
-     * @notice Get the Lenia world_params
+     * @notice Get the Lenia world_metadata
      */
     function getWorldParamsJSON()
         private
@@ -333,9 +336,9 @@ library LeniaDescriptor {
     }
 
     /**
-     * @notice Get the Lenia kernels_params
+     * @notice Get the Lenia kernels_metadata
      */
-    function getKernelParamsJSON(LeniaURIParams memory params)
+    function getKernelParamsJSON(LeniaParams memory leniaParams)
         private
         pure
         returns (string memory json)
@@ -343,9 +346,9 @@ library LeniaDescriptor {
         return string(abi.encodePacked(
             "[",
                 '{"b": "1", "c_in": 0, "c_out": 0, "gf_id": 0, "h": 1, "k_id": 0,',
-                '"m": ', params.m, ',',
+                '"m": ', leniaParams.m, ',',
                 '"q": 4, "r": 1,',
-                '"s": ', params.s, '}',
+                '"s": ', leniaParams.s, '}',
             "]"
         ));
     }

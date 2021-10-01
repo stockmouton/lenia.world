@@ -69,7 +69,24 @@ describe("Lenia", function () {
       expect(contractAllCells[0]).to.equal(allCells[0])
       expect(contractAllCells[-1]).to.equal(allCells[-1])
     })
-  
+    
+    it("should set and get lenia parameters", async function () {
+      const metadata = require('../src/fake/metadata.json')
+      
+      const index = 0;
+      let element = metadata[index];
+
+      const setLeniaParamsTx = await hardhatLenia.setLeniaParams(
+        index,
+        element.config.kernels_params[0].m.toFixed(9),
+        element.config.kernels_params[0].s.toFixed(9),
+      )
+      const receipt = await setLeniaParamsTx.wait()
+
+      const contractParams = await hardhatLenia.getLeniaParams(index)
+      expect(contractParams.m).to.equal(element.config.kernels_params[0].m.toFixed(9))
+      expect(contractParams.s).to.equal(element.config.kernels_params[0].s.toFixed(9))
+    })
 
     it("should set and get metadata", async function () {
       const metadata = require('../src/fake/metadata.json')
@@ -78,7 +95,6 @@ describe("Lenia", function () {
       const paddedID = index.toString().padStart(3, '0')
       let element = metadata[index];
 
-      let name = "Lenia #" + paddedID;
       let imageURL = "image.mp4";
       let smLeniaAttributes = []
       for (let i = 0; i < element.attributes.length; i++) {
@@ -94,16 +110,12 @@ describe("Lenia", function () {
         index, 
         paddedID,
         imageURL,
-        element.config.kernels_params[0].m.toFixed(9),
-        element.config.kernels_params[0].s.toFixed(9),
         smLeniaAttributes
       )
       const receipt = await setMetadataTx.wait()
 
-      const encodedContractMetadata = await hardhatLenia.getMetadata(index)
-      const contractMetadata = decodeContractMetdata(encodedContractMetadata)
-      expect(contractMetadata.name).to.equal(name)
-      expect(contractMetadata.config.kernels_params[0].m).to.equal(element.config.kernels_params[0].m)
+      const contractMetadata = await hardhatLenia.getMetadata(index)
+      expect(contractMetadata.paddedID).to.equal(paddedID)
     })
   })
 

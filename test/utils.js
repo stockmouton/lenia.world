@@ -2,7 +2,7 @@ const traitTypeAttrsMap = [
  'colormap', 'family', 'ki', 'aura', 'weight', 'robustness', 'avoidance', 'velocity', 'spread'
 ]
 const attrsMap = [
-    [ "blackwhite", "carmine_blue", "carmine_green", "cinnamon", "golden", "msdos", "rainbow", "rainbow_transparent", "salvia", "whiteblack" ],
+    [ "blackwhite", "carmine-blue", "carmine-green", "cinnamon", "golden", "msdos", "rainbow", "rainbow_transparent", "salvia", "whiteblack" ],
     [ "genesis", "aquarium", "terrarium", "aerium", "ignis", "maelstrom", "amphibium", "pulsium", "etherium", "nexus", "oscillium", "kaleidium" ],
     [ "kiai", "kiroku", "kihaku", "hibiki" ],
     [ "etheric", "mental", "astral", "celestial", "spiritual" ],
