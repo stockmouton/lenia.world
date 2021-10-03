@@ -42,9 +42,10 @@ contract Lenia is ERC721, ERC721Enumerable, Ownable {
     bool private _hasSaleStarted;
     string public baseURI;
 
-    bytes private gzipCells;
     string private engine;
-    LeniaDescriptor.LeniaURIParams[MAX_SUPPLY] private metadata;
+    bytes private gzipCells;
+    LeniaDescriptor.LeniaParams[MAX_SUPPLY] private leniaParams;
+    LeniaDescriptor.LeniaMetadata[MAX_SUPPLY] private metadata;
 
     constructor() ERC721("Lenia", "LENIA") {
         _hasSaleStarted = false;
@@ -63,10 +64,12 @@ contract Lenia is ERC721, ERC721Enumerable, Ownable {
         _safeMint(msg.sender, supply);
     }
 
-    function getMetadata(uint256 id) public view onlyOwner returns(string memory) {
-        require(id < MAX_SUPPLY, "id out of bounds");
+    function setEngine(string calldata engineInput) public onlyOwner {
+        engine = engineInput;
+    }
 
-        return LeniaDescriptor.constructTokenURI(metadata[id]);
+    function getEngine() public view returns(string memory) {
+        return engine;
     }
 
     function setCells(bytes memory gzipCellsInput) public onlyOwner {
@@ -77,26 +80,43 @@ contract Lenia is ERC721, ERC721Enumerable, Ownable {
         return gzipCells;
     }
 
+    function setLeniaParams(
+        uint256 id,
+        string memory m,
+        string memory s
+    )
+        public
+        onlyOwner
+    {
+        LeniaDescriptor.LeniaParams storage params = leniaParams[id];
+        params.m = m;
+        params.s = s;
+    }
+
+    function getLeniaParams(uint256 id) public view onlyOwner returns(LeniaDescriptor.LeniaParams memory) {
+        require(id < MAX_SUPPLY, "id out of bounds");
+
+        return leniaParams[id];
+    }
+
+
     function setMetadata(
         uint256 id,
-        string memory name,
+        string memory paddedID,
         string memory imageURL,
-        string memory description,
-        string memory m,
-        string memory s,
         LeniaDescriptor.LeniaAttribute[] memory attributes
     )
         public
         onlyOwner
     {
-        LeniaDescriptor.LeniaURIParams storage params = metadata[id];
-        params.name = name;
+        LeniaDescriptor.LeniaMetadata storage params = metadata[id];
+        params.paddedID = paddedID;
         params.imageURL = imageURL;
-        params.description = description;
-        params.m = m;
-        params.s = s;
+        uint256 attrLengths = params.leniaAttributes.length;
         for (uint256 i = 0; i < attributes.length; i++) {
-            params.leniaAttributes.push();
+            if (i >= attrLengths) {
+                params.leniaAttributes.push();
+            }
             LeniaDescriptor.LeniaAttribute storage storageAttr = params.leniaAttributes[i];
 
             LeniaDescriptor.LeniaAttribute memory currentAttr = attributes[i];
@@ -106,13 +126,19 @@ contract Lenia is ERC721, ERC721Enumerable, Ownable {
         }
     }
 
-    function setEngine(string calldata engineInput) public onlyOwner {
-        engine = engineInput;
+    function getMetadata(uint256 id) public view onlyOwner returns(LeniaDescriptor.LeniaMetadata memory) {
+        require(id < MAX_SUPPLY, "id out of bounds");
+
+        return metadata[id];
+    }
+    
+    function getTokenURI(uint256 id) public view onlyOwner returns(string memory) {
+        require(id < MAX_SUPPLY, "id out of bounds");
+
+        return LeniaDescriptor.constructTokenURI(metadata[id], leniaParams[id]);
     }
 
-    function getEngine() public view returns(string memory) {
-        return engine;
-    }
+
 
 
     function flipHasSaleStarted() external onlyOwner {

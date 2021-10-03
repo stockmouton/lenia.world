@@ -3,6 +3,8 @@ const { ethers } = require("hardhat");
 const UglifyJS = require("uglify-js");
 const fs = require('fs');
 
+const { decodeContractMetdata, attrsMap, traitTypeAttrsMap } = require('./utils')
+
 describe("Lenia", function () {
   let Lenia;
   let hardhatLenia;
@@ -55,52 +57,65 @@ describe("Lenia", function () {
       }
       const gzipCells = await gzip(allCells.join("%%"));
 
-      const setMetadataTx = await hardhatLenia.setCells(gzipCells)
-      const receipt = await setMetadataTx.wait()
+      const setCellsTx = await hardhatLenia.setCells(gzipCells)
+      const receipt = await setCellsTx.wait()
       
       const contractGzipCellsHex = await hardhatLenia.getCells()
       const contractGzipCell = Buffer.from(ethers.utils.arrayify(contractGzipCellsHex))
       const contractCells = await ungzip(contractGzipCell);
       const contractAllCells = contractCells.toString('utf-8').split('%%')
-      
+
       expect(contractAllCells.length).to.equal(allCells.length)
       expect(contractAllCells[0]).to.equal(allCells[0])
       expect(contractAllCells[-1]).to.equal(allCells[-1])
     })
-  
+    
+    it("should set and get lenia parameters", async function () {
+      const metadata = require('../src/fake/metadata.json')
+      
+      const index = 0;
+      let element = metadata[index];
+
+      const setLeniaParamsTx = await hardhatLenia.setLeniaParams(
+        index,
+        element.config.kernels_params[0].m.toFixed(9),
+        element.config.kernels_params[0].s.toFixed(9),
+      )
+      const receipt = await setLeniaParamsTx.wait()
+
+      const contractParams = await hardhatLenia.getLeniaParams(index)
+      expect(contractParams.m).to.equal(element.config.kernels_params[0].m.toFixed(9))
+      expect(contractParams.s).to.equal(element.config.kernels_params[0].s.toFixed(9))
+    })
 
     it("should set and get metadata", async function () {
       const metadata = require('../src/fake/metadata.json')
-      index = 0
+      
+      const index = 0;
+      const paddedID = index.toString().padStart(3, '0')
       let element = metadata[index];
-      let name = "Lenia";
+
       let imageURL = "image.mp4";
       let smLeniaAttributes = []
       for (let i = 0; i < element.attributes.length; i++) {
         const attr = element.attributes[i];
+        const traitTypeIndex = traitTypeAttrsMap.indexOf(attr.trait_type.toLowerCase())
         smLeniaAttributes.push({
-          'value': attr.value,
-          'numericalValue': attr.numerical_value ? attr.numerical_value : 0,
-          'traitType': attr.trait_type,
+          'traitType': traitTypeIndex,
+          'value': attrsMap[traitTypeIndex].indexOf(attr.value.toLowerCase()),
+          'numericalValue': attr.numerical_value ? attr.numerical_value.toFixed(9) : traitTypeIndex.toFixed(1),
         })
-        
       }
       const setMetadataTx = await hardhatLenia.setMetadata(
         index, 
-        name,
+        paddedID,
         imageURL,
-        element.description,
-        element.config.kernels_params[0].m.toFixed(10),
-        element.config.kernels_params[0].s.toFixed(10),
         smLeniaAttributes
       )
       const receipt = await setMetadataTx.wait()
 
-      const encodedContractMetadata = await hardhatLenia.getMetadata(index)
-      const contractMetadataJSON = encodedContractMetadata.replace('data:application/json,', '');
-      const contractMetadata = JSON.parse(contractMetadataJSON)
-      expect(contractMetadata.name).to.equal(name)
-      expect(contractMetadata.config.kernels_params[0].m).to.equal(element.config.kernels_params[0].m)
+      const contractMetadata = await hardhatLenia.getMetadata(index)
+      expect(contractMetadata.paddedID).to.equal(paddedID)
     })
   })
 
