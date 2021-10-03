@@ -147,7 +147,7 @@ const IndexPage = () => {
             <Section.Header><h1>Quite Asked Questions</h1></Section.Header>
             <Panel
               heading="What are Lenia?"
-              body={<p>Lenia are pure mathematical creatures and a subject of active research in the field of Articifial Life.</p>}
+              body={<p>Lenia are pure mathematical creatures and a subject of active research in the field of Artificial Life.</p>}
             />
             <Panel
               heading="When is launch date?"
