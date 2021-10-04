@@ -7,6 +7,7 @@
   "dependencies": {
     "@openzeppelin/contracts": "^4.3.1",
     "@walletconnect/web3-provider": "^1.6.5",
+    "axios": "^0.22.0",
     "babel-plugin-styled-components": "^1.13.2",
     "beautiful-react-hooks": "^1.0.1",
     "buffer": "^6.0.3",
@@ -71,6 +72,7 @@
     "sm-coverage": "hardhat coverage",
     "sm-deploy": "hardhat deploy --network ${NETWORK:-localhost} --export src/artifacts.json",
     "sm-export": "hardhat export --network ${NETWORK:-localhost} --export src/artifacts.json",
+    "sm-set-baseuri": "hardhat set-baseuri --network ${NETWORK:-localhost}",
     "sm-start-sale": "hardhat start-sale --network ${NETWORK:-localhost}",
     "sm-set-engine": "hardhat set-engine --network ${NETWORK:-localhost}",
     "sm-set-cells": "hardhat set-cells --network ${NETWORK:-localhost}",

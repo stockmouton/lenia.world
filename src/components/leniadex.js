@@ -1,20 +1,11 @@
-import React, { useRef, useEffect } from "react"
+import React, { useRef, useEffect, useState } from "react"
 import * as d3 from 'd3'
 import styled from "styled-components"
 import _max from "lodash/max"
+const axios = require('axios');
 
-
-import all_metadata from "../fake/metadata.json"
-import BlackWhiteCreature from "../fake/blackwhite.mp4"
-import CarmineBlueCreature from "../fake/carmine-blue.mp4"
-import CarmineGreenCreature from "../fake/carmine-green.mp4"
-import CinnamonCreature from "../fake/cinnamon.mp4"
-import GoldenCreature from "../fake/golden.mp4"
-import MSDosCreature from "../fake/msdos.mp4"
-import RainbowCreature from "../fake/rainbow.mp4"
-import SalviaCreature from "../fake/salvia.mp4"
-import WhiteBlackCreature from "../fake/whiteblack.mp4"
-
+import artifacts from '../artifacts.json'
+import { useWeb3 } from "./web3-provider"
 
 const StyledSVG = styled.svg`
   display: block;
@@ -46,38 +37,15 @@ function getValue(attributes, key) {
 //     }
 //   }
 // }
-function replaceVideoURL(data) {
-  return data.map(
-    (d) => {
-      if (d.image == 'blackwhite.mp4'){
-        d.image = BlackWhiteCreature
-      } else if (d.image == 'carmine-blue.mp4'){
-        d.image = CarmineBlueCreature
-      } else if (d.image == 'carmine-green.mp4'){
-        d.image = CarmineGreenCreature
-      } else if (d.image == 'cinnamon.mp4'){
-        d.image = CinnamonCreature
-      } else if (d.image == 'golden.mp4'){
-        d.image = GoldenCreature
-      } else if (d.image == 'msdos.mp4'){
-        d.image = MSDosCreature
-      } else if (d.image == 'rainbow.mp4'){
-        d.image = RainbowCreature
-      } else if (d.image == 'salvia.mp4'){
-        d.image = SalviaCreature
-      } else if (d.image == 'whiteblack.mp4'){
-        d.image = WhiteBlackCreature
-      } 
-      return d
-    }
 
-  )
-}
 
 const LeniaDex = () => {
+  const { web3Provider, account } = useWeb3()
+  const [contract, setContract] = useState(null)
+
   const nodeRef = useRef(null);
 
-  var data = replaceVideoURL(all_metadata)
+  // var data = replaceVideoURL(all_metadata)
 
   // set the dimensions and margins of the graph
   const margin = {top: 0, right: 0, bottom: 40, left: 40}
@@ -89,18 +57,33 @@ const LeniaDex = () => {
 
   const width = svgViewWidth - margin.left - margin.right
   const height = svgViewHeight - margin.top - margin.bottom;
-
-
   const blue = "#ffffff"
   const key1 = "Robustness"
-  const max_key1 = Math.ceil(10 * d3.max(data, (d) => getValue(d.attributes, key1))) / 10
   const key2 = "Spread"
-  const max_key2 = Math.ceil(10 * d3.max(data, (d) => getValue(d.attributes, key2))) / 10
+  let baseURI;
 
-  useEffect(() => {
+  useEffect(async () => {
     if (nodeRef.current) {
-      
-      const svg = d3.select(nodeRef.current)
+      const contract = web3Provider ? new web3Provider.eth.Contract(artifacts.contracts.Lenia.abi, artifacts.contracts.Lenia.address) : null
+        
+        const all_metadata = [];
+        if (contract) {
+            setContract(contract)
+
+            baseURI = await contract.methods.baseURI().call()
+            const totalLeniaMinted = await contract.methods.totalSupply().call({ from: account })
+            for (let index = 0; index < totalLeniaMinted; index++) {
+              const tokenMetadataURI = await contract.methods.tokenURI(index).call({ from: account })
+              const response = await axios.get(tokenMetadataURI);
+              const tokenMetadata = response.data
+              all_metadata.push(tokenMetadata)
+            }
+        }
+        
+        const max_key1 = Math.ceil(10 * d3.max(all_metadata, (d) => getValue(d.attributes, key1))) / 10
+        const max_key2 = Math.ceil(10 * d3.max(all_metadata, (d) => getValue(d.attributes, key2))) / 10
+
+        const svg = d3.select(nodeRef.current)
         .append("g")
           .attr("transform",
           `translate(${margin.left}, ${margin.top}, ${margin.right}, ${margin.bottom})`);
@@ -142,7 +125,7 @@ const LeniaDex = () => {
           // `)
           .html(`
               <video id="creature_vid" width="256" height="256" preload='auto' autoplay>
-                  <source src="${d.image}" type="video/mp4">
+                  <source src="${baseURI}${d.animation_url}" type="video/mp4">
                   Your browser does not support the video tag.
               </video>
           `)
@@ -163,7 +146,7 @@ const LeniaDex = () => {
       const dotsGroup = svg.append("g")
         .append("g");
       dotsGroup.selectAll("dot")
-        .data(data)
+        .data(all_metadata)
         .enter()
         .append("circle")
         .attr("cx", function (d) { return scaleX(getValue(d.attributes, 'Robustness')); })
@@ -178,7 +161,7 @@ const LeniaDex = () => {
         .on("mousemove", mousemove)
         .on("mouseleave", mouseleave)
     }
-  }, [])
+  }, [web3Provider, account])
 
   return (
     <>
