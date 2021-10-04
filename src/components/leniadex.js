@@ -125,7 +125,7 @@ const LeniaDex = () => {
           // `)
           .html(`
               <video id="creature_vid" width="256" height="256" preload='auto' autoplay>
-                  <source src="${baseURI}${d.animation_url}" type="video/mp4">
+                  <source src="${d.animation_url}" type="video/mp4">
                   Your browser does not support the video tag.
               </video>
           `)

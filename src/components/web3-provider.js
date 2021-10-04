@@ -1,6 +1,6 @@
 import React, { createContext, useState, useEffect, useContext } from 'react'
 import Toast from './toast'
-import { allowedChainId, chainDisplayName, getDecimalFromHex, switchChainConnection} from '../utils/wallet'
+import { allowedChainIds, chainDisplayName, getDecimalFromHex, switchChainConnection} from '../utils/wallet'
 
 const Web3 = typeof window !== 'undefined' ? require('web3') : null;
 const web3Context = createContext(null)
@@ -17,7 +17,7 @@ export const Web3Provider = ({ children }) => {
       const web3Provider = new Web3(provider)
       const newChainId = await web3Provider.eth.getChainId()
 
-      if (newChainId !== allowedChainId) {
+      if (!allowedChainIds.includes(newChainId)) {
         setError(new Error(`Please switch to ${chainDisplayName}`))
         switchChainConnection()
         return
@@ -39,7 +39,7 @@ export const Web3Provider = ({ children }) => {
       provider.on("chainChanged", hexChainId => {
         const newChainId = getDecimalFromHex(hexChainId)
         setChainId(newChainId)
-        if (newChainId === allowedChainId) return;
+        if (allowedChainIds.includes(newChainId)) return;
 
         setError(new Error(`Please switch to ${chainDisplayName}`))
         switchChainConnection()

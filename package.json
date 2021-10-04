@@ -59,13 +59,13 @@
     "stockmouton"
   ],
   "scripts": {
-    "build": "STAGING=${STAGING} gatsby build",
+    "build": "gatsby build",
     "format": "prettier --write \"deploy/**/*.{js,jsx,ts,tsx,json,md}\" \"src/**/*.{js,jsx,ts,tsx,json,md}\" \"test/**/*.{js,jsx,ts,tsx,json,md}\"",
     "develop": "gatsby develop",
     "serve": "gatsby serve",
     "clean": "gatsby clean",
     "test": "yarn sm-test",
-    "deploy": "STAGING=${STAGING} gatsby build && gh-pages -d public -b prod",
+    "deploy": "gatsby build && gh-pages -d public -b prod",
     "local-node": "hardhat node",
     "sm-compile": "hardhat compile",
     "sm-test": "hardhat test",
