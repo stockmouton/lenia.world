@@ -174,7 +174,7 @@ library LeniaDescriptor {
     }
 
     /**
-     * @notice Get the trait type
+     * @notice Get the colormap type
      */
      function getColormap(uint16 index)
         private
@@ -196,11 +196,11 @@ library LeniaDescriptor {
         pure
         returns (string memory)
     {
-        string[12] memory familys = [
+        string[12] memory families = [
             "genesis", "aquarium", "terrarium", "aerium", "ignis", "maelstrom", "amphibium", "pulsium", "etherium", "nexus", "oscillium", "kaleidium"
         ];
 
-        return familys[index];
+        return families[index];
     }
 
     /**
@@ -302,7 +302,7 @@ library LeniaDescriptor {
         returns (string memory)
     {
         string[5] memory spreads = [
-            "demie", "standard", "magnum", "joeroboam", "balthazar"
+            "demie", "standard", "magnum", "jeroboam", "balthazar"
         ];
 
         return spreads[index];

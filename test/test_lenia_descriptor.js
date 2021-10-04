@@ -1,28 +1,14 @@
 const { expect } = require("chai");
 const { ethers } = require("hardhat");
 
-const { decodeContractMetdata, attrsMap, traitTypeAttrsMap } = require('./utils')
+const { decodeContractMetdata, attrsMap, traitTypeAttrsMap, deployLeniaContract } = require('./utils')
 
 describe("LeniaDescriptor", function () {
-    let Lenia;
     let hardhatLenia;
-    let owner;
-    let addr1;
 
     beforeEach(async function () {
-        [owner, addr1] = await ethers.getSigners();
-
-        LeniaDescriptor = await ethers.getContractFactory("LeniaDescriptor");
-        const leniaDescriptorLibrary = await LeniaDescriptor.deploy();
-
-        Lenia = await ethers.getContractFactory("Lenia", {
-        libraries: {
-            LeniaDescriptor: leniaDescriptorLibrary.address
-        }
-        });
-
-        hardhatLenia = await Lenia.deploy();
-    });
+        hardhatLenia = await deployLeniaContract(ethers)
+    })
 
     describe("constructTokenURI", function () {
         if (!process.env.REPORT_GAS) {
