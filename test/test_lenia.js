@@ -46,76 +46,89 @@ describe("Lenia", function () {
       expect(contractEngine.length > 0).to.equal(true);
     })
     
-    it("should set and get cells", async function () {
+    it("should set and get cells per cells", async function () {
       const {gzip, ungzip} = require('node-gzip');
 
-      let metadata = require('../src/fake/metadata.json')
-      let allCells = []
-      for (let i = 0; i < metadata.length; i++) {
+      // let metadata = require('../src/fake/metadata.json')
+      let metadata = require('../tmp/data/all_metadata.json')
+      const max_length = 5 // metadata.length
+      for (let i = 0; i < max_length; i++) {
           const element = metadata[i];
-          allCells.push(element.config.cells);
+          const gzipCells = await gzip(element.config.cells);
+
+          const setCellsTx = await hardhatLenia.setCells(i, gzipCells)
+          const receipt = await setCellsTx.wait()
       }
-      const gzipCells = await gzip(allCells.join("%%"));
 
-      const setCellsTx = await hardhatLenia.setCells(gzipCells)
-      const receipt = await setCellsTx.wait()
-      
-      const contractGzipCellsHex = await hardhatLenia.getCells()
-      const contractGzipCell = Buffer.from(ethers.utils.arrayify(contractGzipCellsHex))
-      const contractCells = await ungzip(contractGzipCell);
-      const contractAllCells = contractCells.toString('utf-8').split('%%')
+      for (let index = 0; index < max_length; index++) {
+        const element = metadata[index];
+        
+        const contractGzipCellsHex = await hardhatLenia.getCells(index)
+        const contractGzipCell = Buffer.from(ethers.utils.arrayify(contractGzipCellsHex))
+        const contractCellsBuffer = await ungzip(contractGzipCell);
+        const contractCells = contractCellsBuffer.toString('utf-8')
 
-      expect(contractAllCells.length).to.equal(allCells.length)
-      expect(contractAllCells[0]).to.equal(allCells[0])
-      expect(contractAllCells[-1]).to.equal(allCells[-1])
+        expect(contractCells).to.equal(element.config.cells)
+      }
     })
     
     it("should set and get lenia parameters", async function () {
       const metadata = require('../src/fake/metadata.json')
       
-      const index = 0;
-      let element = metadata[index];
+      const max_length = 5 // metadata.length
+      for (let index = 0; index < max_length; index++) {
+        let element = metadata[index];
+        const setLeniaParamsTx = await hardhatLenia.setLeniaParams(
+          index,
+          element.config.kernels_params[0].m.toFixed(9),
+          element.config.kernels_params[0].s.toFixed(9),
+        )
+        const receipt = await setLeniaParamsTx.wait()
+      }
 
-      const setLeniaParamsTx = await hardhatLenia.setLeniaParams(
-        index,
-        element.config.kernels_params[0].m.toFixed(9),
-        element.config.kernels_params[0].s.toFixed(9),
-      )
-      const receipt = await setLeniaParamsTx.wait()
-
-      const contractParams = await hardhatLenia.getLeniaParams(index)
-      expect(contractParams.m).to.equal(element.config.kernels_params[0].m.toFixed(9))
-      expect(contractParams.s).to.equal(element.config.kernels_params[0].s.toFixed(9))
+      for (let index = 0; index < max_length; index++) {
+        const element = metadata[index];
+        const contractParams = await hardhatLenia.getLeniaParams(index)
+        expect(contractParams.m).to.equal(element.config.kernels_params[0].m.toFixed(9))
+        expect(contractParams.s).to.equal(element.config.kernels_params[0].s.toFixed(9))
+      }
+      
     })
 
     it("should set and get metadata", async function () {
       const metadata = require('../src/fake/metadata.json')
       
-      const index = 0;
-      const paddedID = index.toString().padStart(3, '0')
-      let element = metadata[index];
+      const max_length = 5 // metadata.length
+      for (let index = 0; index < max_length; index++) {
+        let element = metadata[index];        
+        const paddedID = index.toString().padStart(3, '0')
 
-      let imageURL = "image.mp4";
-      let smLeniaAttributes = []
-      for (let i = 0; i < element.attributes.length; i++) {
-        const attr = element.attributes[i];
-        const traitTypeIndex = traitTypeAttrsMap.indexOf(attr.trait_type.toLowerCase())
-        smLeniaAttributes.push({
-          'traitType': traitTypeIndex,
-          'value': attrsMap[traitTypeIndex].indexOf(attr.value.toLowerCase()),
-          'numericalValue': attr.numerical_value ? attr.numerical_value.toFixed(9) : traitTypeIndex.toFixed(1),
-        })
+        let imageURL = "image.mp4";
+        let smLeniaAttributes = []
+        for (let i = 0; i < element.attributes.length; i++) {
+          const attr = element.attributes[i];
+          const traitTypeIndex = traitTypeAttrsMap.indexOf(attr.trait_type.toLowerCase())
+          smLeniaAttributes.push({
+            'traitType': traitTypeIndex,
+            'value': attrsMap[traitTypeIndex].indexOf(attr.value.toLowerCase()),
+            'numericalValue': attr.numerical_value ? attr.numerical_value.toFixed(9) : traitTypeIndex.toFixed(1),
+          })
+        }
+        const setMetadataTx = await hardhatLenia.setMetadata(
+          index, 
+          paddedID,
+          imageURL,
+          smLeniaAttributes
+        )
+        const receipt = await setMetadataTx.wait()
       }
-      const setMetadataTx = await hardhatLenia.setMetadata(
-        index, 
-        paddedID,
-        imageURL,
-        smLeniaAttributes
-      )
-      const receipt = await setMetadataTx.wait()
 
-      const contractMetadata = await hardhatLenia.getMetadata(index)
-      expect(contractMetadata.paddedID).to.equal(paddedID)
+      for (let index = 0; index < max_length; index++) {        
+        const contractMetadata = await hardhatLenia.getMetadata(index)
+        const paddedID = index.toString().padStart(3, '0')
+
+        expect(contractMetadata.paddedID).to.equal(paddedID)
+      }
     })
   })
 

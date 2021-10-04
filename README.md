@@ -65,7 +65,7 @@ Now that the smart contract is deployed, we can finally deploy the website.
 ### Web
 For deploying the website to Github Page, just type:
 ```
-STAGING=true yarn deploy # When the smart contract is still deployed to testnet
+yarn deploy # When the smart contract is still deployed to testnet
 
 yarn deploy # When the smart contract is deployed to mainnet
 ```

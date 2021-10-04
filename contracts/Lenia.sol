@@ -37,13 +37,12 @@ contract Lenia is ERC721, ERC721Enumerable, Ownable {
     uint256 private _price = 0.1 ether;
     uint256 private _reserved = 11;
 
-    uint256 public startingIndex;
-
     bool private _hasSaleStarted;
+    bool private switchToOnChain = false;
     string public baseURI;
 
     string private engine;
-    bytes private gzipCells;
+    bytes[MAX_SUPPLY] private cells;
     LeniaDescriptor.LeniaParams[MAX_SUPPLY] private leniaParams;
     LeniaDescriptor.LeniaMetadata[MAX_SUPPLY] private metadata;
 
@@ -72,12 +71,12 @@ contract Lenia is ERC721, ERC721Enumerable, Ownable {
         return engine;
     }
 
-    function setCells(bytes memory gzipCellsInput) public onlyOwner {
-        gzipCells = gzipCellsInput;
+    function setCells(uint256 id, bytes memory cellsInput) public onlyOwner {
+        cells[id] = cellsInput;
     }
 
-    function getCells() public view returns(bytes memory) {
-        return gzipCells;
+    function getCells(uint256 id) public view returns(bytes memory) {
+        return cells[id];
     }
 
     function setLeniaParams(
@@ -132,13 +131,15 @@ contract Lenia is ERC721, ERC721Enumerable, Ownable {
         return metadata[id];
     }
     
-    function getTokenURI(uint256 id) public view onlyOwner returns(string memory) {
-        require(id < MAX_SUPPLY, "id out of bounds");
+    function tokenURI(uint256 tokenId) public view virtual override(ERC721) returns (string memory) {
+        if (switchToOnChain) {
+            return LeniaDescriptor.constructTokenURI(metadata[tokenId], leniaParams[tokenId]);
+        } else {
+            string memory tokenURIstr = super.tokenURI(tokenId);
 
-        return LeniaDescriptor.constructTokenURI(metadata[id], leniaParams[id]);
+            return bytes(tokenURIstr).length > 0 ? string(abi.encodePacked(tokenURIstr, ".json")) : "";
+        }
     }
-
-
 
 
     function flipHasSaleStarted() external onlyOwner {

@@ -89,8 +89,8 @@ const MintButton = () => {
   }
 
   const handleToastClose = () => {
-    setError(null)
     setMintingTransactionStatus(MINTING_TRANSACTION_STATUSES.READY)
+    setError(null)
   }
 
   const getButtonContent = () => ({
@@ -103,7 +103,7 @@ const MintButton = () => {
     <>
       <StyledButton onClick={handleClick} disabled={[BUTTON_STATUSES.DISABLED, BUTTON_STATUSES.LOADING].includes(buttonStatus)}>{getButtonContent()}</StyledButton>
       {Boolean(totalLeniaSupply) && <LeniaSupplyContent>{totalLeniaMinted}/{totalLeniaSupply} lenia minted</LeniaSupplyContent>}
-      {mintingTransactionStatus == MINTING_TRANSACTION_STATUSES.ERROR && <Toast type="error" onClose={handleToastClose}>{error.message}</Toast>}
+      {mintingTransactionStatus == MINTING_TRANSACTION_STATUSES.ERROR && error && <Toast type="error" onClose={handleToastClose}>{error?.message}</Toast>}
       {mintingTransactionStatus == MINTING_TRANSACTION_STATUSES.SUCCESS && <Toast onClose={handleToastClose}>You successfully minted a lenia.</Toast>}
     </>
   )

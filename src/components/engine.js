@@ -30,7 +30,7 @@ const Engine = ({ lenia_id }) => {
                 document.body.appendChild(script);
             }
         } else {
-            const all_metadata = require('../fake/metadata.json')
+            const all_metadata = require('../../static/metadata/all_metadata.json')
             require('../engine')
             const lenia_metadata = all_metadata[0]
             if (nodeRef.current) {
