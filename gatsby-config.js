@@ -3,7 +3,7 @@ module.exports = {
     title: `Lenia - Artificial Life NFT collection`,
     description: `Lenia are a collection of 202 unique life-forms discovered via evolutionary computation. They live as unique digital collectibles (NFT) on the Ethereum blockchain.`,
     author: `@lenia_nft`,
-    siteUrl: `https://lenia.world/`,
+    siteUrl: `https://lenia.world`,
   },
   plugins: [
     `gatsby-plugin-react-helmet`,

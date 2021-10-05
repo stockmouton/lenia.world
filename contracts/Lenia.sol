@@ -26,41 +26,30 @@ pragma solidity ^0.8.6;
 
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
-import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/finance/PaymentSplitter.sol";
 
 import { LeniaDescriptor } from "./libs/LeniaDescriptor.sol";
 
-contract Lenia is ERC721, ERC721Enumerable, Ownable {
+contract Lenia is ERC721, ERC721Enumerable, PaymentSplitter, Ownable {
 
     uint256 public constant MAX_SUPPLY = 202;
     uint256 private _price = 0.1 ether;
     uint256 private _reserved = 11;
 
-    bool private _hasSaleStarted;
-    bool private switchToOnChain = false;
-    string public baseURI;
+    mapping(address => bool) private _presaleList;
+    bool private _isPresaleActive = false;
+    bool private _isSaleActive = false;
+    
+    bool private _switchToOnChain = false;
+    string private __baseURI;
 
     string private engine;
     bytes[MAX_SUPPLY] private cells;
     LeniaDescriptor.LeniaParams[MAX_SUPPLY] private leniaParams;
     LeniaDescriptor.LeniaMetadata[MAX_SUPPLY] private metadata;
 
-    constructor() ERC721("Lenia", "LENIA") {
-        _hasSaleStarted = false;
-    }
-
-    modifier whenSaleStarted() {
-        require(_hasSaleStarted, "Primary sale hasn't started yet");
-        _;
-    }
-
-    function mint() external payable whenSaleStarted {
-        uint256 supply = totalSupply();
-        require(supply <= MAX_SUPPLY - _reserved, "Tokens are sold out!");
-        require( _price <= msg.value, "Inconsistent amount sent!");
-
-        _safeMint(msg.sender, supply);
+    constructor(address[] memory payees, uint256[] memory shares_) ERC721("Lenia", "LENIA") PaymentSplitter(payees, shares_) {
     }
 
     function setEngine(string calldata engineInput) public onlyOwner {
@@ -98,7 +87,6 @@ contract Lenia is ERC721, ERC721Enumerable, Ownable {
         return leniaParams[id];
     }
 
-
     function setMetadata(
         uint256 id,
         string memory paddedID,
@@ -131,8 +119,10 @@ contract Lenia is ERC721, ERC721Enumerable, Ownable {
         return metadata[id];
     }
     
+    // TODO: We need to decide if we want later to put the data onchain instead of pointing to a centralized
+    // storage for the metadata
     function tokenURI(uint256 tokenId) public view virtual override(ERC721) returns (string memory) {
-        if (switchToOnChain) {
+        if (_switchToOnChain) {
             return LeniaDescriptor.constructTokenURI(metadata[tokenId], leniaParams[tokenId]);
         } else {
             string memory tokenURIstr = super.tokenURI(tokenId);
@@ -141,29 +131,62 @@ contract Lenia is ERC721, ERC721Enumerable, Ownable {
         }
     }
 
-
-    function flipHasSaleStarted() external onlyOwner {
-        _hasSaleStarted = !_hasSaleStarted;
+    function isPresaleActive() public view returns(bool) {
+        return _isPresaleActive;
     }
 
-    function hasSaleStarted() public view returns(bool) {
-        return _hasSaleStarted;
+    function togglePresaleStatus() external onlyOwner {
+        _isPresaleActive = !_isPresaleActive;
+    }
+
+    function addPresaleList(
+        address[] calldata addresses
+    ) external onlyOwner {
+        for (uint8 i = 0; i < addresses.length; i++) {
+            _presaleList[addresses[i]] = true;
+        }
+    }
+
+    function presaleMint() external payable {
+        require(_isPresaleActive, "Presale is not active");
+
+        bool isSenderEligible = _presaleList[msg.sender];
+
+        require(isSenderEligible == true, "Not eligible for the presale");
+        uint256 supply = totalSupply();
+        require(supply <= MAX_SUPPLY - _reserved, "Tokens are sold out");
+        require(_price <= msg.value, "Insufficient funds");
+
+        _safeMint(msg.sender, supply);
+        _presaleList[msg.sender] = false;
+    }
+
+    function isSaleActive() public view returns(bool) {
+        return _isSaleActive;
+    }
+
+    function toggleSaleStatus() external onlyOwner {
+        _isSaleActive = !_isSaleActive;
+    }
+
+    function mint() external payable {
+        require(_isSaleActive, "Primary sale is not active");
+        uint256 supply = totalSupply();
+        require(supply < MAX_SUPPLY - _reserved, "Tokens are sold out");
+        require( _price <= msg.value, "Insufficient funds");
+
+        _safeMint(msg.sender, supply);
     }
 
     function setBaseURI(string memory uri) external onlyOwner {
-        baseURI = uri;
+        __baseURI = uri;
     }
 
     function _baseURI() internal view override(ERC721) returns(string memory) {
-        return baseURI;
+        return __baseURI;
     }
 
-    // Make it possible to change the price for the dutch auction
-    function setPrice(uint256 _newPrice) external onlyOwner {
-        _price = _newPrice;
-    }
-
-    function getPrice() public view returns (uint256){
+    function getPrice() public view returns (uint256) {
         return _price;
     }
 
@@ -182,7 +205,7 @@ contract Lenia is ERC721, ERC721Enumerable, Ownable {
     }
 
     function claimReserved(uint256 _number, address _receiver) external onlyOwner {
-        require(_number <= _reserved, "That would exceed the max reserved.");
+        require(_number <= _reserved, "Exceeds the max reserved");
 
         uint256 _tokenId = totalSupply();
         for (uint256 i; i < _number; i++) {
@@ -206,5 +229,9 @@ contract Lenia is ERC721, ERC721Enumerable, Ownable {
         returns (bool)
     {
         return super.supportsInterface(interfaceId);
+    }
+
+    function release(address payable account) public virtual override(PaymentSplitter) {
+        super.release(account);
     }
 }

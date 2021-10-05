@@ -15,7 +15,10 @@ import Panel from "../components/panel";
 import LeniaDex from "../components/leniadex"
 import { useQueryParam, BooleanParam } from "use-query-params";
 
-import bbaImg from "../images/6743original.png"
+import BBA_PICTURE from "../images/bba.png"
+import ALEX_PICTURE from "../images/alexorange.jpeg"
+import MORGAN_PICTURE from "../images/morgangiraud.png"
+import TOOMAIE_PICTURE from "../images/toomaie.jpeg"
 
 const IndexPage = () => {
   const [isStaging] = useQueryParam("staging", BooleanParam)
@@ -108,7 +111,7 @@ const IndexPage = () => {
               <Grid.Cell>
                 <Profile
                   name="Morgan Giraud"
-                  pictureSrc="https://pbs.twimg.com/profile_images/1115639997183426564/NC2UpU3A_400x400.png"
+                  pictureSrc={MORGAN_PICTURE}
                   twitterHandle="morgangiraud"
                   role="Big Brain Energy"
                   description={<p>ML amateur and crypto enthusiast. Tends to be lost in math.</p>}
@@ -117,7 +120,7 @@ const IndexPage = () => {
               <Grid.Cell>
               <Profile
                   name="Alex Orange"
-                  pictureSrc="https://pbs.twimg.com/profile_images/765306239920332800/y_6BlU3q_400x400.jpg"
+                  pictureSrc={ALEX_PICTURE}
                   twitterHandle="orangealexandre"
                   role="Just the muscles"
                   description={<p>Full-stack developer, humble yield farmer, sprinkles some Solidity in his daily life</p>}
@@ -126,7 +129,7 @@ const IndexPage = () => {
               <Grid.Cell>
                 <Profile
                   name="BBA"
-                  pictureSrc={bbaImg}
+                  pictureSrc={BBA_PICTURE}
                   twitterHandle="ape6743"
                   role="Apefluencer"
                   description={<p>Metaverse famous apefluencer, jack of all trades, master of none.</p>}
@@ -135,7 +138,7 @@ const IndexPage = () => {
               <Grid.Cell>
               <Profile
                   name="Toomaie"
-                  pictureSrc="https://pbs.twimg.com/profile_images/1440620975314255872/14oEM_B6_400x400.jpg"
+                  pictureSrc={TOOMAIE_PICTURE}
                   twitterHandle="toomaie"
                   role="Passing By"
                   description={<p>Generative Art &amp; Cellular Automata mad scientist. Speaking Solidity.</p>}
