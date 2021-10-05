@@ -26,14 +26,10 @@ describe("LeniaDescriptor", function () {
                 let animationURL = "video.mp4";
                 let smLeniaAttributes = []
 
-                await hardhatLenia.setLeniaKenelsParams(
+                await hardhatLenia.setLeniaParams(
                     index,
                     m.toFixed(9),
                     s.toFixed(9),
-                )
-
-                await hardhatLenia.setLeniaCells(
-                    index,
                     cells
                 )
 
@@ -73,14 +69,10 @@ describe("LeniaDescriptor", function () {
                     'traitType': traitTypeAttrsMap.indexOf(attrTraitType0),
                 }]
                 
-                await hardhatLenia.setLeniaKenelsParams(
+                await hardhatLenia.setLeniaParams(
                     index,
                     m.toFixed(9),
                     s.toFixed(9),
-                )
-
-                await hardhatLenia.setLeniaCells(
-                    index,
                     cells
                 )
 
@@ -121,14 +113,10 @@ describe("LeniaDescriptor", function () {
                     })
                 }
             
-                await hardhatLenia.setLeniaKenelsParams(
+                await hardhatLenia.setLeniaParams(
                     index,
                     m.toFixed(9),
                     s.toFixed(9),
-                )
-
-                await hardhatLenia.setLeniaCells(
-                    index,
                     cells
                 )
 

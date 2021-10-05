@@ -44,7 +44,7 @@ contract Lenia is ERC721, ERC721Enumerable, PaymentSplitter, Ownable {
     string private __baseURI;
 
     // Lenia on chain
-    string private engine;
+    bytes private engine;
     LeniaDescriptor.LeniaParams[MAX_SUPPLY] private leniaParams;
 
     // Metadata on chain?
@@ -53,29 +53,27 @@ contract Lenia is ERC721, ERC721Enumerable, PaymentSplitter, Ownable {
     constructor(address[] memory payees, uint256[] memory shares_) ERC721("Lenia", "LENIA") PaymentSplitter(payees, shares_) {
     }
 
-    function setEngine(string calldata engineInput) public onlyOwner {
+    function logEngine(bytes calldata cellsInput) external {}
+
+    function setEngine(bytes calldata engineInput) public onlyOwner {
         engine = engineInput;
     }
 
-    function getEngine() public view returns(string memory) {
+    function getEngine() public view returns(bytes memory) {
         return engine;
     }
 
-    function setLeniaCells(uint256 id, bytes memory cellsInput) public onlyOwner {
-        LeniaDescriptor.LeniaParams storage params = leniaParams[id];
-        params.cells = cellsInput;
-    }
+    function logLeniaParams(
+        string calldata m,
+        string calldata s,
+        bytes calldata cellsInput
+    ) external {}
 
-    function getLeniaCells(uint256 id) public view returns(bytes memory) {
-        require(id < MAX_SUPPLY, "id out of bounds");
-
-        return leniaParams[id].cells;
-    }
-
-    function setLeniaKenelsParams(
+    function setLeniaParams(
         uint256 id,
         string memory m,
-        string memory s
+        string memory s,
+        bytes memory cellsInput
     )
         public
         onlyOwner
@@ -83,6 +81,7 @@ contract Lenia is ERC721, ERC721Enumerable, PaymentSplitter, Ownable {
         LeniaDescriptor.LeniaParams storage params = leniaParams[id];
         params.m = m;
         params.s = s;
+        params.cells = cellsInput;
     }
 
     function getLeniaParams(uint256 id) public view onlyOwner returns(LeniaDescriptor.LeniaParams memory) {
