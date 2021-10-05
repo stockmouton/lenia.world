@@ -10,7 +10,9 @@ require("@nomiclabs/hardhat-waffle")
 require("hardhat-gas-reporter")
 require("solidity-coverage")
 
+const ethers = require("ethers")
 require('./tasks');
+const {generatePrivateKey} = require('./test/utils')
 
 /**
  * @type import('hardhat/config').HardhatUserConfig
@@ -28,7 +30,7 @@ module.exports = {
   networks: {
     hardhat: {
       chainId: 1337,
-      // accounts: process.env.PRIVATE_KEY !== undefined ? [{'privateKey': process.env.PRIVATE_KEY, 'balance': '10000'}] : [],
+      accounts: [...Array(210).keys()].map(() => ({'privateKey': generatePrivateKey(), 'balance': ethers.utils.parseEther("10000").toString()}))
     },
     goerli: {
       url: process.env.GOERLI_URL || "",

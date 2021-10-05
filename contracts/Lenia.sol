@@ -126,8 +126,6 @@ contract Lenia is ERC721, ERC721Enumerable, PaymentSplitter, Ownable {
         return metadata[id];
     }
     
-    // TODO: We need to decide if we want later to put the data onchain instead of pointing to a centralized
-    // storage for the metadata
     function tokenURI(uint256 tokenId) public view virtual override(ERC721) returns (string memory) {
         require(tokenId < MAX_SUPPLY, "id out of bounds");
 
@@ -182,7 +180,7 @@ contract Lenia is ERC721, ERC721Enumerable, PaymentSplitter, Ownable {
     }
 
     function mint() external payable {
-        require(_isSaleActive, "Primary sale is not active");
+        require(_isSaleActive, "Public sale is not active");
         uint256 supply = totalSupply();
         require(supply < MAX_SUPPLY - _reserved, "Tokens are sold out");
         require( _price <= msg.value, "Insufficient funds");

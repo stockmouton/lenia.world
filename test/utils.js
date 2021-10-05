@@ -1,3 +1,5 @@
+const crypto = require('crypto');
+
 exports.deployLeniaContract = async (ethers) => {
     [owner, ...otherAccounts] = await ethers.getSigners()
 
@@ -18,8 +20,12 @@ exports.deployLeniaContract = async (ethers) => {
         otherAddresses[1], // Team Member 2
         otherAddresses[2], // Team Member 3
     ]
-    const payeeShares = [450, 275, 275, 100]
+    const payeeShares = [450, 225, 225, 100]
     return Lenia.deploy(payeeAdresses, payeeShares)
+}
+
+exports.generatePrivateKey = () => {
+    return `0x${crypto.randomBytes(32).toString('hex')}`
 }
 
 exports.traitTypeAttrsMap = [
