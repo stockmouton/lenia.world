@@ -19,7 +19,7 @@ const Engine = ({ lenia_id }) => {
                 lenia_id = 0;
             }
             // const lenia_metadata_json = await contract.methods.getMetadata(lenia_id).call({ from: account })
-            // const lenia_cells = await contract.methods.getCells(lenia_id).call({ from: account })
+            // const lenia_cells = await contract.methods.getLeniaCells(lenia_id).call({ from: account })
             // const lenia_metadata = JSON.parse(lenia_metadata_json)
             // lenia_metadata["config"]["cells"] = lenia_cells
 

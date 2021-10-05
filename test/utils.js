@@ -29,18 +29,18 @@ exports.generatePrivateKey = () => {
 }
 
 exports.traitTypeAttrsMap = [
-    'colormap', 'family', 'ki', 'aura', 'weight', 'robustness', 'avoidance', 'velocity', 'spread'
+    'Colormap', 'Family', 'Ki', 'Aura', 'Weight', 'Robustness', 'Avoidance', 'Velocity', 'Spread'
 ]
 exports.attrsMap = [
-    ["blackwhite", "carmine-blue", "carmine-green", "cinnamon", "golden", "msdos", "rainbow", "rainbow_transparent", "salvia", "whiteblack"],
-    ["genesis", "aquarium", "terrarium", "aerium", "ignis", "maelstrom", "amphibium", "pulsium", "etherium", "nexus", "oscillium", "kaleidium"],
-    ["kiai", "kiroku", "kihaku", "hibiki"],
-    ["etheric", "mental", "astral", "celestial", "spiritual"],
-    ["fly", "feather", "welter", "cruiser", "heavy"],
-    ["aluminium", "iron", "steel", "tungsten", "vibranium"],
-    ["kawarimi", "shunshin", "raiton", "hiraishin", "kamui"],
-    ["immovable", "unrushed", "swift", "turbo", "flash"],
-    ["demie", "standard", "magnum", "jeroboam", "balthazar"],
+    ["Black White", "Carmine Blue", "Carmine Green", "Cinnamon", "Golden", "Msdos", "Rainbow", "Rainbow_transparent", "Salvia", "White Black"],
+    ["Genesis", "Aquarium", "Terrarium", "Aerium", "Ignis", "Maelstrom", "Amphibium", "Pulsium", "Etherium", "Nexus", "Oscillium", "Kaleidium"],
+    ["Kiai", "Kiroku", "Kihaku", "Hibiki"],
+    ["Etheric", "Mental", "Astral", "Celestial", "Spiritual"],
+    ["Fly", "Feather", "Welter", "Cruiser", "Heavy"],
+    ["Aluminium", "Iron", "Steel", "Tungsten", "Vibranium"],
+    ["Kawarimi", "Shunshin", "Raiton", "Hiraishin", "Kamui"],
+    ["Immovable", "Unrushed", "Swift", "Turbo", "Flash"],
+    ["Demie", "Standard", "Magnum", "Jeroboam", "Balthazar"],
 ]
 
 exports.decodeContractMetdata = function decodeContractMetdata(encodedContractMetadata) {

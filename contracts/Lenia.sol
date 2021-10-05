@@ -41,37 +41,39 @@ contract Lenia is ERC721, ERC721Enumerable, PaymentSplitter, Ownable {
     bool private _isPresaleActive = false;
     bool private _isSaleActive = false;
     
-    bool private _switchToOnChain = false;
     string private __baseURI;
 
-    string private engine;
-    bytes[MAX_SUPPLY] private cells;
+    // Lenia on chain
+    bytes private engine;
     LeniaDescriptor.LeniaParams[MAX_SUPPLY] private leniaParams;
+
+    // Metadata on chain?
     LeniaDescriptor.LeniaMetadata[MAX_SUPPLY] private metadata;
 
     constructor(address[] memory payees, uint256[] memory shares_) ERC721("Lenia", "LENIA") PaymentSplitter(payees, shares_) {
     }
 
-    function setEngine(string calldata engineInput) public onlyOwner {
+    function logEngine(bytes calldata cellsInput) external {}
+
+    function setEngine(bytes calldata engineInput) public onlyOwner {
         engine = engineInput;
     }
 
-    function getEngine() public view returns(string memory) {
+    function getEngine() public view returns(bytes memory) {
         return engine;
     }
 
-    function setCells(uint256 id, bytes memory cellsInput) public onlyOwner {
-        cells[id] = cellsInput;
-    }
-
-    function getCells(uint256 id) public view returns(bytes memory) {
-        return cells[id];
-    }
+    function logLeniaParams(
+        string calldata m,
+        string calldata s,
+        bytes calldata cellsInput
+    ) external {}
 
     function setLeniaParams(
         uint256 id,
         string memory m,
-        string memory s
+        string memory s,
+        bytes memory cellsInput
     )
         public
         onlyOwner
@@ -79,6 +81,7 @@ contract Lenia is ERC721, ERC721Enumerable, PaymentSplitter, Ownable {
         LeniaDescriptor.LeniaParams storage params = leniaParams[id];
         params.m = m;
         params.s = s;
+        params.cells = cellsInput;
     }
 
     function getLeniaParams(uint256 id) public view onlyOwner returns(LeniaDescriptor.LeniaParams memory) {
@@ -89,16 +92,18 @@ contract Lenia is ERC721, ERC721Enumerable, PaymentSplitter, Ownable {
 
     function setMetadata(
         uint256 id,
-        string memory paddedID,
+        string memory stringID,
         string memory imageURL,
+        string memory animationURL,
         LeniaDescriptor.LeniaAttribute[] memory attributes
     )
         public
         onlyOwner
     {
         LeniaDescriptor.LeniaMetadata storage params = metadata[id];
-        params.paddedID = paddedID;
+        params.stringID = stringID;
         params.imageURL = imageURL;
+        params.animationURL = animationURL;
         uint256 attrLengths = params.leniaAttributes.length;
         for (uint256 i = 0; i < attributes.length; i++) {
             if (i >= attrLengths) {
@@ -111,6 +116,8 @@ contract Lenia is ERC721, ERC721Enumerable, PaymentSplitter, Ownable {
             storageAttr.numericalValue = currentAttr.numericalValue;
             storageAttr.traitType = currentAttr.traitType;
         }
+
+        params.metadataReady = true;
     }
 
     function getMetadata(uint256 id) public view onlyOwner returns(LeniaDescriptor.LeniaMetadata memory) {
@@ -120,8 +127,13 @@ contract Lenia is ERC721, ERC721Enumerable, PaymentSplitter, Ownable {
     }
     
     function tokenURI(uint256 tokenId) public view virtual override(ERC721) returns (string memory) {
-        if (_switchToOnChain) {
-            return LeniaDescriptor.constructTokenURI(metadata[tokenId], leniaParams[tokenId]);
+        require(tokenId < MAX_SUPPLY, "id out of bounds");
+
+        LeniaDescriptor.LeniaParams storage currentLeniaParams = leniaParams[tokenId];
+        LeniaDescriptor.LeniaMetadata storage currentMetadata = metadata[tokenId];
+        
+        if (LeniaDescriptor.isReady(currentMetadata, currentLeniaParams)) {
+            return LeniaDescriptor.constructTokenURI(currentMetadata, currentLeniaParams);
         } else {
             string memory tokenURIstr = super.tokenURI(tokenId);
 

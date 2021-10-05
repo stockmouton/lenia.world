@@ -38,11 +38,14 @@ library LeniaDescriptor {
     struct LeniaParams {
         string m;
         string s;
+        bytes cells;
     }
 
     struct LeniaMetadata {
-        string paddedID;
+        bool metadataReady;
+        string stringID;
         string imageURL;
+        string animationURL;
         LeniaAttribute[] leniaAttributes;
     }
 
@@ -55,7 +58,7 @@ library LeniaDescriptor {
         returns (string memory)
     {
         bytes memory nameField = abi.encodePacked(
-            '"name":"', NAME_PREFIX, metadata.paddedID, '"'
+            '"name":"', NAME_PREFIX, metadata.stringID, '"'
         );
         bytes memory descField = abi.encodePacked(
             '"description":"', DESCRIPTION, '"'
@@ -65,6 +68,9 @@ library LeniaDescriptor {
         );
         bytes memory imgField = abi.encodePacked(
             '"image":"', metadata.imageURL, '"'
+        );
+        bytes memory animationField = abi.encodePacked(
+            '"animation_url":"', metadata.animationURL, '"'
         );
         bytes memory attrField = abi.encodePacked(
             '"attributes":', getAttributesJSON(metadata)
@@ -83,6 +89,7 @@ library LeniaDescriptor {
                         descField, ",",
                         extLinkField, ",",
                         imgField, ",",
+                        animationField, ",",
                         attrField, ",",
                         configField,
                     "}"
@@ -114,7 +121,18 @@ library LeniaDescriptor {
             }
 
         }
-        output = string(abi.encodePacked(output, "]"));
+        string memory v;
+        if (metadata.leniaAttributes.length > 0){
+            v = ',';
+        } else {
+            v = '';
+        }
+        output = string(abi.encodePacked(
+            output,
+            v,
+            '{"value": "oui", "trait_type":"On Chain"}',
+            "]"
+        ));
 
         return output;
     }
@@ -130,23 +148,23 @@ library LeniaDescriptor {
         string memory currentTraitType = getTraitType(attr.traitType);
         bytes32 currentTraitTypeHash = keccak256(bytes(currentTraitType));
         string memory currentValue;
-        if (currentTraitTypeHash == keccak256(bytes("colormap"))) {
+        if (currentTraitTypeHash == keccak256(bytes("Colormap"))) {
             currentValue = getColormap(attr.value);
-        } else if (currentTraitTypeHash == keccak256(bytes("family"))) {
+        } else if (currentTraitTypeHash == keccak256(bytes("Family"))) {
             currentValue = getFamily(attr.value);
-        } else if (currentTraitTypeHash == keccak256(bytes("ki"))) {
+        } else if (currentTraitTypeHash == keccak256(bytes("Ki"))) {
             currentValue = getKi(attr.value);
-        } else if (currentTraitTypeHash == keccak256(bytes("aura"))) {
+        } else if (currentTraitTypeHash == keccak256(bytes("Aura"))) {
             currentValue = getAura(attr.value);
-        } else if (currentTraitTypeHash == keccak256(bytes("weight"))) {
+        } else if (currentTraitTypeHash == keccak256(bytes("Weight"))) {
             currentValue = getWeight(attr.value);
-        } else if (currentTraitTypeHash == keccak256(bytes("robustness"))) {
+        } else if (currentTraitTypeHash == keccak256(bytes("Robustness"))) {
             currentValue = getRobustness(attr.value);
-        } else if (currentTraitTypeHash == keccak256(bytes("avoidance"))) {
+        } else if (currentTraitTypeHash == keccak256(bytes("Avoidance"))) {
             currentValue = getAvoidance(attr.value);
-        } else if (currentTraitTypeHash == keccak256(bytes("velocity"))) {
+        } else if (currentTraitTypeHash == keccak256(bytes("Velocity"))) {
             currentValue = getVelocity(attr.value);
-        } else if (currentTraitTypeHash == keccak256(bytes("spread"))) {
+        } else if (currentTraitTypeHash == keccak256(bytes("Spread"))) {
             currentValue = getSpread(attr.value);
         }
         return string(abi.encodePacked(
@@ -167,7 +185,7 @@ library LeniaDescriptor {
         returns (string memory)
     {
         string[9] memory traitTypes = [
-            "colormap", "family", "ki", "aura", "weight", "robustness", "avoidance", "velocity", "spread"
+            "Colormap", "Family", "Ki", "Aura", "Weight", "Robustness", "Avoidance", "Velocity", "Spread"
         ];
 
         return traitTypes[index];
@@ -182,7 +200,7 @@ library LeniaDescriptor {
         returns (string memory)
     {
         string[10] memory colormaps = [
-            "blackwhite", "carmine-blue", "carmine-green", "cinnamon", "golden", "msdos", "rainbow", "rainbow_transparent", "salvia", "whiteblack"
+            "Black White", "Carmine Blue", "Carmine Green", "Cinnamon", "Golden", "Msdos", "Rainbow", "Rainbow_transparent", "Salvia", "White Black"
         ];
 
         return colormaps[index];
@@ -197,7 +215,7 @@ library LeniaDescriptor {
         returns (string memory)
     {
         string[12] memory families = [
-            "genesis", "aquarium", "terrarium", "aerium", "ignis", "maelstrom", "amphibium", "pulsium", "etherium", "nexus", "oscillium", "kaleidium"
+            "Genesis", "Aquarium", "Terrarium", "Aerium", "Ignis", "Maelstrom", "Amphibium", "Pulsium", "Etherium", "Nexus", "Oscillium", "Kaleidium"
         ];
 
         return families[index];
@@ -212,7 +230,7 @@ library LeniaDescriptor {
         returns (string memory)
     {
         string[4] memory kis = [
-            "kiai", "kiroku", "kihaku", "hibiki"
+            "Kiai", "Kiroku", "Kihaku", "Hibiki"
         ];
 
         return kis[index];
@@ -227,7 +245,7 @@ library LeniaDescriptor {
         returns (string memory)
     {
         string[5] memory auras = [
-            "etheric", "mental", "astral", "celestial", "spiritual"
+            "Etheric", "Mental", "Astral", "Celestial", "Spiritual"
         ];
 
         return auras[index];
@@ -242,7 +260,7 @@ library LeniaDescriptor {
         returns (string memory)
     {
         string[5] memory weights = [
-            "fly", "feather", "welter", "cruiser", "heavy"
+            "Fly", "Feather", "Welter", "Cruiser", "Heavy"
         ];
 
         return weights[index];
@@ -257,7 +275,7 @@ library LeniaDescriptor {
         returns (string memory)
     {
         string[5] memory robustnesss = [
-            "aluminium", "iron", "steel", "tungsten", "vibranium"
+            "Aluminium", "Iron", "Steel", "Tungsten", "Vibranium"
         ];
 
         return robustnesss[index];
@@ -272,7 +290,7 @@ library LeniaDescriptor {
         returns (string memory)
     {
         string[5] memory avoidances = [
-            "kawarimi", "shunshin", "raiton", "hiraishin", "kamui"
+            "Kawarimi", "Shunshin", "Raiton", "Hiraishin", "Kamui"
         ];
 
         return avoidances[index];
@@ -287,7 +305,7 @@ library LeniaDescriptor {
         returns (string memory)
     {
         string[5] memory velocitys = [
-            "immovable", "unrushed", "swift", "turbo", "flash"
+            "Immovable", "Unrushed", "Swift", "Turbo", "Flash"
         ];
 
         return velocitys[index];
@@ -302,7 +320,7 @@ library LeniaDescriptor {
         returns (string memory)
     {
         string[5] memory spreads = [
-            "demie", "standard", "magnum", "jeroboam", "balthazar"
+            "Demie", "Standard", "Magnum", "Jeroboam", "Balthazar"
         ];
 
         return spreads[index];
@@ -316,16 +334,17 @@ library LeniaDescriptor {
         pure
         returns (string memory json)
     {
+        // We can't return cells here because cells are raw bytes which can't be easily converted to utf8 string
         return string(abi.encodePacked(
             "{",
                 '"kernels_params":', getKernelParamsJSON(leniaParams), ',',
-                '"world_metadata":', getWorldParamsJSON(),
+                '"world_params":', getWorldParamsJSON(),
             "}"
         ));
     }
 
     /**
-     * @notice Get the Lenia world_metadata
+     * @notice Get the Lenia world_params
      */
     function getWorldParamsJSON()
         private
@@ -351,5 +370,15 @@ library LeniaDescriptor {
                 '"s": ', leniaParams.s, '}',
             "]"
         ));
+    }
+
+    function isReady(LeniaMetadata memory metadata, LeniaParams memory leniaParams)
+        public
+        pure
+        returns (bool)
+    {
+        bool paramsReady = leniaParams.cells.length != 0 && bytes(leniaParams.m).length != 0 && bytes(leniaParams.s).length != 0;
+
+        return metadata.metadataReady && paramsReady;
     }
 }
