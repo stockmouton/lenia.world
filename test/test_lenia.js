@@ -1,10 +1,9 @@
 const { expect } = require("chai")
-const { ethers } = require("hardhat")
+const { ethers, provider } = require("hardhat")
 const UglifyJS = require("uglify-js")
 const fs = require('fs')
 
 const { attrsMap, traitTypeAttrsMap, deployLeniaContract } = require('./utils')
-const { max } = require("lodash")
 
 describe("Lenia", function () {
   let hardhatLenia
@@ -139,8 +138,7 @@ describe("Lenia", function () {
       let lastMintedSupply = 0
 
       // Add eligible addresses to the presale list
-      const addPresaleListTx = await hardhatLenia.addPresaleList(eligibleAddresses)
-      await addPresaleListTx.wait()
+      await hardhatLenia.addPresaleList(eligibleAddresses)
 
       // Start the presale
       await hardhatLenia.togglePresaleStatus()
@@ -164,7 +162,7 @@ describe("Lenia", function () {
           value: contractPrice
         })
 
-        await expect(failingMintTx).to.be.revertedWith('Not eligible for the presale')
+        expect(failingMintTx).to.be.revertedWith('Not eligible for the presale')
       }
 
       // Try to mint for each uneligible address and fail
@@ -174,8 +172,61 @@ describe("Lenia", function () {
           value: contractPrice
         })
 
-        await expect(failingMintTx).to.be.revertedWith('Not eligible for the presale')
+        expect(failingMintTx).to.be.revertedWith('Not eligible for the presale')
       }
+    })
+
+    it("should not mint when presale is not active", async function () {    
+      const contractPrice = await hardhatLenia.getPrice()
+      const mintTx = hardhatLenia.presaleMint({
+        value: contractPrice
+      })
+
+      expect(mintTx).to.be.revertedWith("Presale is not active")
+    })
+
+    it("should not mint when max public supply is reached", async function () {
+      const [_, ...otherAccounts] = await ethers.getSigners()
+      const maxSupply = await hardhatLenia.MAX_SUPPLY()
+      const reserved = await hardhatLenia.getReservedLeft()
+      const publicSupply = maxSupply - reserved
+      
+      const eligibleWallets = []
+
+      for (let i = 0; i <= publicSupply; i++) {
+        eligibleWallets.push(ethers.Wallet.createRandom())
+      }
+      const eligibleAddresses = otherAccounts.map(wallet => wallet.address)
+      await hardhatLenia.addPresaleList(eligibleAddresses)
+      await hardhatLenia.togglePresaleStatus()
+      
+      const contractPrice = await hardhatLenia.getPrice()
+      for (let i = 0; i < eligibleAddresses.length; i++) {
+        const mintTx = hardhatLenia.connect(otherAccounts[i]).presaleMint({
+          value: contractPrice
+        })
+        
+        if (i <= publicSupply) {
+          await mintTx
+          expect(await hardhatLenia.totalSupply()).to.equal(i + 1)
+        }
+        else expect(mintTx).to.be.revertedWith("Tokens are sold out")
+      }
+    })
+
+    it("should not mint when transaction value doesn\'t meet price", async function () {
+      await hardhatLenia.togglePresaleStatus()
+      
+      // Add eligible addresses to the presale list
+      const [owner] = await ethers.getSigners()
+      await hardhatLenia.addPresaleList([owner.address])
+
+      const contractPrice = await hardhatLenia.getPrice()
+      const mintTx = hardhatLenia.presaleMint({
+        value: contractPrice.sub(ethers.utils.parseEther("0.001"))
+      })
+
+      expect(mintTx).to.be.revertedWith("Insufficient funds")
     })
   })
 
@@ -193,6 +244,21 @@ describe("Lenia", function () {
   
       expect(await hardhatLenia.isSaleActive()).to.equal(false)
     })
+
+    it.only("should toggle the sale status only by the owner", async () => {
+      const [_, account] = await ethers.getSigners()
+      const toggleSaleTx = hardhatLenia.toggleSaleStatus()
+      expect(toggleSaleTx).to.be.revertedWith("Ownable: caller is not the owner")
+    })
+
+    it("should not mint when sale is not active", async function () {    
+      const contractPrice = await hardhatLenia.getPrice()
+      const mintTx = hardhatLenia.mint({
+        value: contractPrice
+      })
+
+      expect(mintTx).to.be.revertedWith("Public sale is not active")
+    })
   
     it("should mint for the sale", async function () {
       await hardhatLenia.toggleSaleStatus()
@@ -203,10 +269,12 @@ describe("Lenia", function () {
       })
 
       const totalSupply = await hardhatLenia.totalSupply()
+      const contractBalance = await hardhatLenia.provider.getBalance(hardhatLenia.address)
+      expect(ethers.utils.formatEther(contractBalance)).to.equal('0.1')
       expect(totalSupply).to.equal(1)
     })
 
-    it("should not mint when max supply is reached", async function () {
+    it("should not mint when max public supply is reached", async function () {
       await hardhatLenia.toggleSaleStatus()
 
       const maxSupply = await hardhatLenia.MAX_SUPPLY()
@@ -222,6 +290,69 @@ describe("Lenia", function () {
         if (i <= publicSupply) expect(totalSupply).to.equal(i)
         else expect(mintTx).to.be.revertedWith("Tokens are sold out")
       }
+    })
+
+    it("should not mint when transaction value doesn\'t meet price", async function () {
+      await hardhatLenia.toggleSaleStatus()
+    
+      const contractPrice = await hardhatLenia.getPrice()
+      const mintTx = hardhatLenia.mint({
+        value: contractPrice.sub(ethers.utils.parseEther("0.001"))
+      })
+
+      expect(mintTx).to.be.revertedWith("Insufficient funds")
+    })
+  })
+
+  describe("Payment Splitter", () => {
+    it("should send the money to the different shareholders", async function () {
+      const [owner, payee, ...otherAccounts] = await ethers.getSigners()
+      const minter = otherAccounts[10]
+      await hardhatLenia.toggleSaleStatus()
+      
+      
+      for (i = 0; i < 10; i++) {
+        const contractPrice = await hardhatLenia.getPrice()
+        await hardhatLenia.connect(minter).mint({
+          value: contractPrice
+        })
+      }
+
+      const contractBalance = await hardhatLenia.provider.getBalance(hardhatLenia.address)
+      const payeeBalance = await hardhatLenia.provider.getBalance(payee.address)
+      const shares = await hardhatLenia.shares(payee.address)
+      const totalShares = await hardhatLenia.totalShares()
+
+      await hardhatLenia.release(payee.address)
+      const newPayeeBalance = await hardhatLenia.provider.getBalance(payee.address)
+      const expectedPayeeBalance = payeeBalance.add(contractBalance.mul(shares).div(totalShares))
+      expect(newPayeeBalance.eq(expectedPayeeBalance)).to.equal(true)
+    })
+  })
+
+  describe("Claim an amount of reserved tokens", () => {
+    it("should mint the number of reserved tokens to an account", async () => {
+      const [_, account] = await ethers.getSigners()
+      const reserved = await hardhatLenia.getReservedLeft()
+      await hardhatLenia.claimReserved(2, account.address)
+      
+      expect(await hardhatLenia.balanceOf(account.address)).to.equal(2)
+      expect(await hardhatLenia.getReservedLeft()).to.equal(reserved - 2)
+      expect(await hardhatLenia.totalSupply()).to.equal(2)
+    })
+
+    it("should not exceed the maximum amount of reserved tokens", async () => {
+      const [_, account] = await ethers.getSigners()
+      const reserved = await hardhatLenia.getReservedLeft()
+      const reserveTx = hardhatLenia.claimReserved(reserved + 1, account.address)
+      
+      expect(reserveTx).to.be.revertedWith("Exceeds the max reserved")
+    })
+
+    it("should only be called by the owner", async () => {
+      const [_, account] = await ethers.getSigners()
+      const reserveTx = hardhatLenia.connect(account).claimReserved(2, account.address)
+      expect(reserveTx).to.be.revertedWith("Ownable: caller is not the owner")
     })
   })
 })
