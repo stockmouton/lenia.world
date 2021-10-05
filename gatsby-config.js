@@ -34,7 +34,7 @@ module.exports = {
     {
       resolve: `gatsby-plugin-env-variables`,
       options: {
-        allowList: ['STAGING']
+        allowList: []
       },
     },
     // this (optional) plugin enables Progressive Web App + Offline functionality

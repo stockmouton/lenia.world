@@ -40,10 +40,12 @@ contract Lenia is ERC721, ERC721Enumerable, PaymentSplitter, Ownable {
     mapping(address => bool) private _presaleList;
     bool private _isPresaleActive = false;
     bool private _isSaleActive = false;
-    string public baseURI;
+    
+    bool private _switchToOnChain = false;
+    string private __baseURI;
 
     string private engine;
-    bytes private gzipCells;
+    bytes[MAX_SUPPLY] private cells;
     LeniaDescriptor.LeniaParams[MAX_SUPPLY] private leniaParams;
     LeniaDescriptor.LeniaMetadata[MAX_SUPPLY] private metadata;
 
@@ -58,12 +60,12 @@ contract Lenia is ERC721, ERC721Enumerable, PaymentSplitter, Ownable {
         return engine;
     }
 
-    function setCells(bytes memory gzipCellsInput) public onlyOwner {
-        gzipCells = gzipCellsInput;
+    function setCells(uint256 id, bytes memory cellsInput) public onlyOwner {
+        cells[id] = cellsInput;
     }
 
-    function getCells() public view returns(bytes memory) {
-        return gzipCells;
+    function getCells(uint256 id) public view returns(bytes memory) {
+        return cells[id];
     }
 
     function setLeniaParams(
@@ -117,12 +119,15 @@ contract Lenia is ERC721, ERC721Enumerable, PaymentSplitter, Ownable {
         return metadata[id];
     }
     
-    function getTokenURI(uint256 id) public view onlyOwner returns(string memory) {
-        require(id < MAX_SUPPLY, "id out of bounds");
+    function tokenURI(uint256 tokenId) public view virtual override(ERC721) returns (string memory) {
+        if (_switchToOnChain) {
+            return LeniaDescriptor.constructTokenURI(metadata[tokenId], leniaParams[tokenId]);
+        } else {
+            string memory tokenURIstr = super.tokenURI(tokenId);
 
-        return LeniaDescriptor.constructTokenURI(metadata[id], leniaParams[id]);
+            return bytes(tokenURIstr).length > 0 ? string(abi.encodePacked(tokenURIstr, ".json")) : "";
+        }
     }
-
 
     function isPresaleActive() public view returns(bool) {
         return _isPresaleActive;
@@ -172,11 +177,11 @@ contract Lenia is ERC721, ERC721Enumerable, PaymentSplitter, Ownable {
     }
 
     function setBaseURI(string memory uri) external onlyOwner {
-        baseURI = uri;
+        __baseURI = uri;
     }
 
     function _baseURI() internal view override(ERC721) returns(string memory) {
-        return baseURI;
+        return __baseURI;
     }
 
     function getPrice() public view returns (uint256) {

@@ -6,7 +6,7 @@ import Dropdown from "./dropdown";
 import Menu from "./menu"
 import Toast from './toast'
 import WalletConnectProvider from '@walletconnect/web3-provider'
-import { allowedChainId, chainDisplayName, networkName } from '../utils/wallet'
+import { allowedChainIds, chainDisplayName, networkName } from '../utils/wallet'
  
 
 const WalletConnectorButton = () => {
@@ -82,7 +82,7 @@ const WalletConnectorButton = () => {
   }
 
   const getConnectorButtonContent = () => {
-    if (account && chainId !== allowedChainId) return `Wrong Network! Please connect to ${chainDisplayName}`
+    if (account && !allowedChainIds.includes(chainId)) return `Wrong Network! Please connect to ${chainDisplayName}`
     if (account) return getTruncatedAccount(account)
     return 'Connect Wallet'
   }
@@ -91,7 +91,7 @@ const WalletConnectorButton = () => {
     <>
       <NavBar.Button 
         onClick={handleClick}
-        disabled={account && chainId !== allowedChainId}
+        disabled={account && !allowedChainIds.includes(chainId)}
       >
         {getConnectorButtonContent()}
       </NavBar.Button>
