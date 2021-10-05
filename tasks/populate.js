@@ -86,10 +86,10 @@ task("set-cells", "Set cells in the smart contract")
         }
         const gzipCells = await gzip(allCells.join("%%"));
 
-        const setCellsTx = await lenia.setCells(gzipCells)
-        const receipt = await setCellsTx.wait()
+        const setLeniaCellsTx = await lenia.setLeniaCells(gzipCells)
+        const receipt = await setLeniaCellsTx.wait()
 
-        const cells = await lenia.getCells();
+        const cells = await lenia.getLeniaCells();
         if (cells.length) {
             console.log('Cells successfully set in the smart contract')
         } else {
@@ -117,7 +117,7 @@ task("get-cells", "get a Lenia cells")
         const LeniaDeployment = await hre.deployments.get('Lenia')
         const lenia = LeniaContractFactory.attach(LeniaDeployment.address)
  
-        const contractGzipCellsHex = await lenia.getCells()
+        const contractGzipCellsHex = await lenia.getLeniaCells()
         const contractGzipCell = Buffer.from(ethers.utils.arrayify(contractGzipCellsHex))
         const contractCells = await ungzip(contractGzipCell);
         const contractAllCells = contractCells.toString('utf-8').split('%%')
@@ -254,7 +254,7 @@ task("get-metadata", "Get a Lenia metadata")
         const LeniaDeployment = await hre.deployments.get('Lenia')
         const lenia = LeniaContractFactory.attach(LeniaDeployment.address)
  
-        const contractGzipCellsHex = await lenia.getCells()
+        const contractGzipCellsHex = await lenia.getLeniaCells()
         const contractGzipCell = Buffer.from(ethers.utils.arrayify(contractGzipCellsHex))
         const contractCells = await ungzip(contractGzipCell);
         const contractAllCells = contractCells.toString('utf-8').split('%%')

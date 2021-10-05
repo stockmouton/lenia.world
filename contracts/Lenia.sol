@@ -41,12 +41,13 @@ contract Lenia is ERC721, ERC721Enumerable, PaymentSplitter, Ownable {
     bool private _isPresaleActive = false;
     bool private _isSaleActive = false;
     
-    bool private _switchToOnChain = false;
     string private __baseURI;
 
+    // Lenia on chain
     string private engine;
-    bytes[MAX_SUPPLY] private cells;
     LeniaDescriptor.LeniaParams[MAX_SUPPLY] private leniaParams;
+
+    // Metadata on chain?
     LeniaDescriptor.LeniaMetadata[MAX_SUPPLY] private metadata;
 
     constructor(address[] memory payees, uint256[] memory shares_) ERC721("Lenia", "LENIA") PaymentSplitter(payees, shares_) {
@@ -60,15 +61,18 @@ contract Lenia is ERC721, ERC721Enumerable, PaymentSplitter, Ownable {
         return engine;
     }
 
-    function setCells(uint256 id, bytes memory cellsInput) public onlyOwner {
-        cells[id] = cellsInput;
+    function setLeniaCells(uint256 id, bytes memory cellsInput) public onlyOwner {
+        LeniaDescriptor.LeniaParams storage params = leniaParams[id];
+        params.cells = cellsInput;
     }
 
-    function getCells(uint256 id) public view returns(bytes memory) {
-        return cells[id];
+    function getLeniaCells(uint256 id) public view returns(bytes memory) {
+        require(id < MAX_SUPPLY, "id out of bounds");
+
+        return leniaParams[id].cells;
     }
 
-    function setLeniaParams(
+    function setLeniaKenelsParams(
         uint256 id,
         string memory m,
         string memory s
@@ -89,16 +93,18 @@ contract Lenia is ERC721, ERC721Enumerable, PaymentSplitter, Ownable {
 
     function setMetadata(
         uint256 id,
-        string memory paddedID,
+        string memory stringID,
         string memory imageURL,
+        string memory animationURL,
         LeniaDescriptor.LeniaAttribute[] memory attributes
     )
         public
         onlyOwner
     {
         LeniaDescriptor.LeniaMetadata storage params = metadata[id];
-        params.paddedID = paddedID;
+        params.stringID = stringID;
         params.imageURL = imageURL;
+        params.animationURL = animationURL;
         uint256 attrLengths = params.leniaAttributes.length;
         for (uint256 i = 0; i < attributes.length; i++) {
             if (i >= attrLengths) {
@@ -111,6 +117,8 @@ contract Lenia is ERC721, ERC721Enumerable, PaymentSplitter, Ownable {
             storageAttr.numericalValue = currentAttr.numericalValue;
             storageAttr.traitType = currentAttr.traitType;
         }
+
+        params.metadataReady = true;
     }
 
     function getMetadata(uint256 id) public view onlyOwner returns(LeniaDescriptor.LeniaMetadata memory) {
@@ -122,8 +130,13 @@ contract Lenia is ERC721, ERC721Enumerable, PaymentSplitter, Ownable {
     // TODO: We need to decide if we want later to put the data onchain instead of pointing to a centralized
     // storage for the metadata
     function tokenURI(uint256 tokenId) public view virtual override(ERC721) returns (string memory) {
-        if (_switchToOnChain) {
-            return LeniaDescriptor.constructTokenURI(metadata[tokenId], leniaParams[tokenId]);
+        require(tokenId < MAX_SUPPLY, "id out of bounds");
+
+        LeniaDescriptor.LeniaParams storage currentLeniaParams = leniaParams[tokenId];
+        LeniaDescriptor.LeniaMetadata storage currentMetadata = metadata[tokenId];
+        
+        if (LeniaDescriptor.isReady(currentMetadata, currentLeniaParams)) {
+            return LeniaDescriptor.constructTokenURI(currentMetadata, currentLeniaParams);
         } else {
             string memory tokenURIstr = super.tokenURI(tokenId);
 

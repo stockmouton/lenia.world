@@ -5,6 +5,7 @@ const fs = require('fs')
 
 const { attrsMap, traitTypeAttrsMap, deployLeniaContract } = require('./utils')
 const { max } = require("lodash")
+const {gzip, ungzip} = require('node-gzip');
 
 describe("Lenia", function () {
   let hardhatLenia
@@ -33,21 +34,19 @@ describe("Lenia", function () {
     })
     
     it("should set and get cells per cells", async function () {
-      const {gzip, ungzip} = require('node-gzip');
-
       let metadata = require('../static/metadata/all_metadata.json')
       const max_length = 5 // metadata.length
       for (let i = 0; i < max_length; i++) {
           const element = metadata[i];
           const gzipCells = await gzip(element.config.cells);
 
-          await hardhatLenia.setCells(i, gzipCells)
+          await hardhatLenia.setLeniaCells(i, gzipCells)
       }
 
       for (let index = 0; index < max_length; index++) {
         const element = metadata[index];
         
-        const contractGzipCellsHex = await hardhatLenia.getCells(index)
+        const contractGzipCellsHex = await hardhatLenia.getLeniaCells(index)
         const contractGzipCell = Buffer.from(ethers.utils.arrayify(contractGzipCellsHex))
         const contractCellsBuffer = await ungzip(contractGzipCell);
         const contractCells = contractCellsBuffer.toString('utf-8')
@@ -62,7 +61,7 @@ describe("Lenia", function () {
       const max_length = 5 // metadata.length
       for (let index = 0; index < max_length; index++) {
         let element = metadata[index];
-        await hardhatLenia.setLeniaParams(
+        await hardhatLenia.setLeniaKenelsParams(
           index,
           element.config.kernels_params[0].m.toFixed(9),
           element.config.kernels_params[0].s.toFixed(9),
@@ -78,39 +77,132 @@ describe("Lenia", function () {
       
     })
 
-    it.skip("should set and get metadata", async function () {
+    it("should set and get metadata", async function () {
       const metadata = require('../static/metadata/all_metadata.json')
       
       const max_length = 5 // metadata.length
       for (let index = 0; index < max_length; index++) {
-        let element = metadata[index];        
-        const paddedID = index.toString().padStart(3, '0')
+        let element = metadata[index];
+
+        const stringID = index.toString()
 
         let imageURL = "image.mp4";
+        let animationURL = "video.mp4";
         let smLeniaAttributes = []
         for (let i = 0; i < element.attributes.length; i++) {
           const attr = element.attributes[i];
-          const traitTypeIndex = traitTypeAttrsMap.indexOf(attr.trait_type.toLowerCase())
+          const traitTypeIndex = traitTypeAttrsMap.indexOf(attr.trait_type)
           smLeniaAttributes.push({
             'traitType': traitTypeIndex,
-            'value': attrsMap[traitTypeIndex].indexOf(attr.value.toLowerCase()),
+            'value': attrsMap[traitTypeIndex].indexOf(attr.value),
             'numericalValue': attr.numerical_value ? attr.numerical_value.toFixed(9) : traitTypeIndex.toFixed(1),
           })
         }
-        const setMetadataTx = await hardhatLenia.setMetadata(
-          index, 
-          paddedID,
-          imageURL,
-          smLeniaAttributes
+
+        await hardhatLenia.setMetadata(
+            index, 
+            stringID,
+            imageURL,
+            animationURL,
+            smLeniaAttributes
         )
       }
 
       for (let index = 0; index < max_length; index++) {        
+        const stringID = index.toString()
         const contractMetadata = await hardhatLenia.getMetadata(index)
-        const paddedID = index.toString().padStart(3, '0')
 
-        expect(contractMetadata.paddedID).to.equal(paddedID)
+        expect(contractMetadata.stringID).to.equal(stringID)
       }
+    })
+
+    it("should not return onchain metadata for unready element", async function () {
+      const metadata = require('../static/metadata/all_metadata.json')
+      
+      const index = 0;
+      
+      let element = metadata[index];
+        
+      const stringID = index.toString()
+
+      let imageURL = "image.mp4";
+      let animationURL = "video.mp4";
+      let smLeniaAttributes = []
+      for (let i = 0; i < element.attributes.length; i++) {
+        const attr = element.attributes[i];
+        const traitTypeIndex = traitTypeAttrsMap.indexOf(attr.trait_type)
+        smLeniaAttributes.push({
+          'traitType': traitTypeIndex,
+          'value': attrsMap[traitTypeIndex].indexOf(attr.value),
+          'numericalValue': attr.numerical_value ? attr.numerical_value.toFixed(9) : traitTypeIndex.toFixed(1),
+        })
+      }
+
+      await hardhatLenia.setMetadata(
+          index, 
+          stringID,
+          imageURL,
+          animationURL,
+          smLeniaAttributes
+      )
+
+      try {
+        const tokenURI = await hardhatLenia.tokenURI(index)
+      }
+      catch (error) {
+          const errorString = 'VM Exception while processing transaction'
+          expect(error.message.startsWith(errorString)).to.equal(true);
+      }
+    })
+
+    it("should return onchain metadata for ready element", async function () {
+      const metadata = require('../static/metadata/all_metadata.json')
+      
+      const index = 0;
+      
+      let element = metadata[index];
+        
+      const stringID = index.toString()
+
+      // Fake lenia params
+      let m = element.config.kernels_params[0].m
+      let s = element.config.kernels_params[0].s
+      const gzipCells = await gzip(element.config.cells);
+      // gzipCells = Buffer.from('x');
+
+      let imageURL = "image.mp4";
+      let animationURL = "video.mp4";
+      let smLeniaAttributes = []
+      for (let i = 0; i < element.attributes.length; i++) {
+        const attr = element.attributes[i];
+        const traitTypeIndex = traitTypeAttrsMap.indexOf(attr.trait_type)
+        smLeniaAttributes.push({
+          'traitType': traitTypeIndex,
+          'value': attrsMap[traitTypeIndex].indexOf(attr.value),
+          'numericalValue': attr.numerical_value ? attr.numerical_value.toFixed(9) : traitTypeIndex.toFixed(1),
+        })
+      }
+
+      await hardhatLenia.setLeniaKenelsParams(
+          index,
+          m.toFixed(9),
+          s.toFixed(9),
+      )
+
+      await hardhatLenia.setLeniaCells(
+          index,
+          gzipCells
+      )
+
+      await hardhatLenia.setMetadata(
+          index, 
+          stringID,
+          imageURL,
+          animationURL,
+          smLeniaAttributes
+      )
+
+      const tokenURI = await hardhatLenia.tokenURI(index)
     })
   })
 
