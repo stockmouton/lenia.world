@@ -4,6 +4,7 @@ const UglifyJS = require("uglify-js")
 const fs = require('fs')
 
 const { attrsMap, traitTypeAttrsMap, deployLeniaContract } = require('./utils')
+const { max } = require("lodash")
 
 describe("Lenia", function () {
   let hardhatLenia
@@ -34,7 +35,7 @@ describe("Lenia", function () {
     it("should set and get cells per cells", async function () {
       const {gzip, ungzip} = require('node-gzip');
 
-      let metadata = require('../tmp/data/all_metadata.json')
+      let metadata = require('../static/metadata/all_metadata.json')
       const max_length = 5 // metadata.length
       for (let i = 0; i < max_length; i++) {
           const element = metadata[i];
@@ -56,7 +57,7 @@ describe("Lenia", function () {
     })
 
     it("should set and get lenia parameters", async function () {
-      const metadata = require('../src/fake/metadata.json')
+      const metadata = require('../static/metadata/all_metadata.json')
       
       const max_length = 5 // metadata.length
       for (let index = 0; index < max_length; index++) {
@@ -77,8 +78,8 @@ describe("Lenia", function () {
       
     })
 
-    it("should set and get metadata", async function () {
-      const metadata = require('../src/fake/metadata.json')
+    it.skip("should set and get metadata", async function () {
+      const metadata = require('../static/metadata/all_metadata.json')
       
       const max_length = 5 // metadata.length
       for (let index = 0; index < max_length; index++) {
@@ -113,7 +114,7 @@ describe("Lenia", function () {
     })
   })
 
-  describe("Transactions", function () {
+  describe("Presale", function () {
     it("should toggle the presale status", async function () {
       let isPreSaleActive = await hardhatLenia.isPresaleActive()
       expect(isPreSaleActive).to.equal(false)
@@ -154,8 +155,8 @@ describe("Lenia", function () {
         })
         
         // Check if the supply has increased
-        const contractTotalSupply = await hardhatLenia.totalSupply()
-        expect(contractTotalSupply).to.equal(lastMintedSupply + 1)
+        const totalSupply = await hardhatLenia.totalSupply()
+        expect(totalSupply).to.equal(lastMintedSupply + 1)
         lastMintedSupply += 1
 
         // Try to mint again with the same address and fail
@@ -176,7 +177,9 @@ describe("Lenia", function () {
         await expect(failingMintTx).to.be.revertedWith('Not eligible for the presale')
       }
     })
+  })
 
+  describe("Sale", () => {
     it("should toggle the sale status", async function () {
       expect(await hardhatLenia.isSaleActive()).to.equal(false)
   
@@ -193,16 +196,32 @@ describe("Lenia", function () {
   
     it("should mint for the sale", async function () {
       await hardhatLenia.toggleSaleStatus()
-  
-      expect(await hardhatLenia.isSaleActive()).to.equal(true)
-  
+    
       const contractPrice = await hardhatLenia.getPrice()
       await hardhatLenia.mint({
         value: contractPrice
       })
 
-      const contractTotalSupply = await hardhatLenia.totalSupply()
-      expect(contractTotalSupply).to.equal(1)
+      const totalSupply = await hardhatLenia.totalSupply()
+      expect(totalSupply).to.equal(1)
+    })
+
+    it("should not mint when max supply is reached", async function () {
+      await hardhatLenia.toggleSaleStatus()
+
+      const maxSupply = await hardhatLenia.MAX_SUPPLY()
+      const reserved = await hardhatLenia.getReservedLeft()
+      const publicSupply = maxSupply - reserved
+      for (i = 1; i <= publicSupply + 1; i++) {
+        const contractPrice = await hardhatLenia.getPrice()
+        const mintTx = hardhatLenia.mint({
+          value: contractPrice
+        })
+        
+        const totalSupply = await hardhatLenia.totalSupply()
+        if (i <= publicSupply) expect(totalSupply).to.equal(i)
+        else expect(mintTx).to.be.revertedWith("Tokens are sold out")
+      }
     })
   })
 })

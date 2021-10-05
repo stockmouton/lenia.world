@@ -10,9 +10,9 @@ describe("LeniaDescriptor", function () {
         hardhatLenia = await deployLeniaContract(ethers)
     })
 
-    describe("constructTokenURI", function () {
+    describe.skip("constructTokenURI", function () {
         if (!process.env.REPORT_GAS) {
-            it("empty attributes array - should return a valid JSON the engine", async function () {
+            it("empty attributes array - should return a valid JSON engine", async function () {
                 const index = 0;
                 const paddedID = index.toString().padStart(3, '0')
 
@@ -22,22 +22,19 @@ describe("LeniaDescriptor", function () {
                 let s = 1.123456789
                 let smLeniaAttributes = []
 
-                const setLeniaParamsTx = await hardhatLenia.setLeniaParams(
+                await hardhatLenia.setLeniaParams(
                     index,
                     m.toFixed(9),
                     s.toFixed(9),
                 )
-                const leniaParamsReceipt = await setLeniaParamsTx.wait()
 
-                const setMetadataTx = await hardhatLenia.setMetadata(
+                await hardhatLenia.setMetadata(
                     index, 
                     paddedID,
                     imageURL,
                     smLeniaAttributes
                 )
-                const metadataReceipt = await setMetadataTx.wait()
-
-                const encodedContractMetadata = await hardhatLenia.getTokenURI(index)
+                const encodedContractMetadata = await hardhatLenia.tokenURI(index)
                 const contractMetadata = decodeContractMetdata(encodedContractMetadata)
 
                 expect(contractMetadata.name).to.equal(name)
@@ -60,22 +57,20 @@ describe("LeniaDescriptor", function () {
                     'traitType': traitTypeAttrsMap.indexOf(attrTraitType0),
                 }]
                 
-                const setLeniaParamsTx = await hardhatLenia.setLeniaParams(
+                await hardhatLenia.setLeniaParams(
                     index,
                     m.toFixed(9),
                     s.toFixed(9),
                 )
-                const leniaParamsReceipt = await setLeniaParamsTx.wait()
 
-                const setMetadataTx = await hardhatLenia.setMetadata(
+                await hardhatLenia.setMetadata(
                     index, 
                     paddedID,
                     imageURL,
                     smLeniaAttributes
                 )
-                const metadataReceipt = await setMetadataTx.wait()
 
-                const encodedContractMetadata = await hardhatLenia.getTokenURI(index)
+                const encodedContractMetadata = await hardhatLenia.tokenURI(index)
                 const contractMetadata = decodeContractMetdata(encodedContractMetadata)
 
                 expect(contractMetadata.attributes[0].value).to.equal(attrValue0)
@@ -101,22 +96,20 @@ describe("LeniaDescriptor", function () {
                     })
                 }
             
-                const setLeniaParamsTx = await hardhatLenia.setLeniaParams(
+                await hardhatLenia.setLeniaParams(
                     index,
                     m.toFixed(9),
                     s.toFixed(9),
                 )
-                const leniaParamsReceipt = await setLeniaParamsTx.wait()
 
-                const setMetadataTx = await hardhatLenia.setMetadata(
+                await hardhatLenia.setMetadata(
                     index, 
                     paddedID,
                     imageURL,
                     smLeniaAttributes
                 )
-                const metadataReceipt = await setMetadataTx.wait()
 
-                const encodedContractMetadata = await hardhatLenia.getTokenURI(index)
+                const encodedContractMetadata = await hardhatLenia.tokenURI(index)
                 const contractMetadata = decodeContractMetdata(encodedContractMetadata)
                     
                 currentAttrIndex = 0
