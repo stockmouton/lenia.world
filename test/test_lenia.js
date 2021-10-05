@@ -511,4 +511,12 @@ describe("Lenia", function () {
       expect(reserveTx).to.be.revertedWith("Ownable: caller is not the owner")
     })
   })
+
+  describe("Set Base URI", async () => {
+    it.only("should only be called by the owner", async () => {
+      const [_, account] = await ethers.getSigners()
+      const reserveTx = hardhatLenia.connect(account).setBaseURI('stockmouton.com')
+      expect(reserveTx).to.be.revertedWith("Ownable: caller is not the owner")
+    })
+  })
 })
