@@ -13,7 +13,7 @@ task("set-engine", "Set the engine in the smart contract")
         types.string,
     ).setAction( async ({ enginePath }, hre) => {
         if (hre.hardhatArguments.network == null) {
-            throw new Error('Please add the missing --network <localhost|rinkeby|goerli> argument')
+            throw new Error('Please add the missing --network <localhost|rinkeby|mainnet> argument')
         }
     
         const LeniaDescriptorLibraryDeployment = await hre.deployments.get('LeniaDescriptor')
@@ -41,7 +41,7 @@ task("set-engine", "Set the engine in the smart contract")
 
 task("get-engine", "Set the engine in the smart contract",  async (taskArgs, hre) => {
     if (hre.hardhatArguments.network == null) {
-        throw new Error('Please add the missing --network <localhost|rinkeby|goerli> argument')
+        throw new Error('Please add the missing --network <localhost|rinkeby|mainnet> argument')
     }
 
     const LeniaDescriptorLibraryDeployment = await hre.deployments.get('LeniaDescriptor')
@@ -65,7 +65,7 @@ task("set-cells", "Set cells in the smart contract")
         types.string,
     ).setAction( async ({ metadataPath }, hre ) => {
         if (hre.hardhatArguments.network == null) {
-            throw new Error('Please add the missing --network <localhost|rinkeby|goerli> argument')
+            throw new Error('Please add the missing --network <localhost|rinkeby|mainnet> argument')
         }
     
         const LeniaDescriptorLibraryDeployment = await hre.deployments.get('LeniaDescriptor')
@@ -105,7 +105,7 @@ task("get-cells", "get a Lenia cells")
         types.int,
     ).setAction( async ({ index }, hre ) => {
         if (hre.hardhatArguments.network == null) {
-            throw new Error('Please add the missing --network <localhost|rinkeby|goerli> argument')
+            throw new Error('Please add the missing --network <localhost|rinkeby|mainnet> argument')
         }
     
         const LeniaDescriptorLibraryDeployment = await hre.deployments.get('LeniaDescriptor')
@@ -133,7 +133,7 @@ task("set-leniaparams", "Set all metadata in the contract")
         types.string,
     ).setAction( async ({ metadataPath }, hre ) => {
         if (hre.hardhatArguments.network == null) {
-            throw new Error('Please add the missing --network <localhost|rinkeby|goerli> argument')
+            throw new Error('Please add the missing --network <localhost|rinkeby|mainnet> argument')
         }
     
         const LeniaDescriptorLibraryDeployment = await hre.deployments.get('LeniaDescriptor')
@@ -167,7 +167,7 @@ task("get-leniaparams", "Get a Lenia metadata")
         types.int,
     ).setAction( async ({ index }, hre ) => {
         if (hre.hardhatArguments.network == null) {
-            throw new Error('Please add the missing --network <localhost|rinkeby|goerli> argument')
+            throw new Error('Please add the missing --network <localhost|rinkeby|mainnet> argument')
         }
     
         const LeniaDescriptorLibraryDeployment = await hre.deployments.get('LeniaDescriptor')
@@ -191,7 +191,7 @@ task("set-metadata", "Set all metadata in the contract")
         types.string,
     ).setAction( async ({ metadataPath }, hre ) => {
         if (hre.hardhatArguments.network == null) {
-            throw new Error('Please add the missing --network <localhost|rinkeby|goerli> argument')
+            throw new Error('Please add the missing --network <localhost|rinkeby|mainnet> argument')
         }
     
         const LeniaDescriptorLibraryDeployment = await hre.deployments.get('LeniaDescriptor')
@@ -242,7 +242,7 @@ task("get-metadata", "Get a Lenia metadata")
         types.int,
     ).setAction( async ({ index }, hre ) => {
         if (hre.hardhatArguments.network == null) {
-            throw new Error('Please add the missing --network <localhost|rinkeby|goerli> argument')
+            throw new Error('Please add the missing --network <localhost|rinkeby|mainnet> argument')
         }
     
         const LeniaDescriptorLibraryDeployment = await hre.deployments.get('LeniaDescriptor')

@@ -2,7 +2,7 @@
 .env-development
 .env-production
 .env.*
-ori_metadata
+metadata/ori
 
 # Logs
 logs

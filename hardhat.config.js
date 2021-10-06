@@ -14,7 +14,7 @@ const ethers = require("ethers")
 require('./tasks');
 const {generatePrivateKey} = require('./test/utils')
 const defaultPrivateKey = {
-  'privateKey': '0xbc14f35250faa51f04d1d19b9d01b4e79efc2267a366a93a4c9102d7f4229f05',
+  'privateKey': process.env.DAO_PK,
   'balance': ethers.utils.parseEther("10000").toString()
 }
 const randomPrivateKeys = [...Array(210).keys()].map(() => (
@@ -40,13 +40,9 @@ module.exports = {
       chainId: 1337,
       accounts: allPrivateKeys
     },
-    goerli: {
-      url: process.env.GOERLI_URL || "",
-      accounts: process.env.GOERLI_PRIVATE_KEY !== undefined ? [process.env.GOERLI_PRIVATE_KEY] : [],
-    },
     rinkeby: {
-      url: `https://eth-rinkeby.alchemyapi.io/v2/${process.env.RINKEBY_ALCHEMY_API_KEY}`,
-      accounts: process.env.RINKEBY_PRIVATE_KEY !== undefined ? [process.env.RINKEBY_PRIVATE_KEY] : [],
+      url: `https://eth-rinkeby.alchemyapi.io/v2/${process.env.ALCHEMY_API_KEY}`,
+      accounts: [process.env.DAO_PK, process.env.ADMIN1_PK, process.env.ADMIN2_PK, process.env.ADMIN3_PK]
     },
     mainnet: {
       url: `https://eth-mainnet.alchemyapi.io/v2/${process.env.MAINNET_ALCHEMY_API_KEY}`,
@@ -65,5 +61,8 @@ module.exports = {
   },
   namedAccounts: {
     deployer: 0,
+    admin1: 1,
+    admin2: 2,
+    admin3: 3,
   },
 }

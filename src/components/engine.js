@@ -30,13 +30,14 @@ const Engine = ({ lenia_id }) => {
                 document.body.appendChild(script);
             }
         } else {
-            const all_metadata = require('../../static/metadata/all_metadata.json')
-            require('../engine')
-            const lenia_metadata = all_metadata[0]
-            if (nodeRef.current) {
-                window.leniaEngine.init(lenia_metadata);
-                window.leniaEngine.run();
-            }
+            // Load a default Lenia
+            // const all_metadata = require('../../static/metadata/all_metadata.json')
+            // require('../engine')
+            // const lenia_metadata = all_metadata[0]
+            // if (nodeRef.current) {
+            //     window.leniaEngine.init(lenia_metadata);
+            //     window.leniaEngine.run();
+            // }
         }
         
     }, [web3Provider, account])
