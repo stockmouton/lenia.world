@@ -1,6 +1,6 @@
 const UglifyJS = require("uglify-js");
 const fs = require('fs');
-const { gzip, ungzip } = require('node-gzip');
+const pako = require('pako');
 
 const { decodeContractMetdata, attrsMap, traitTypeAttrsMap } = require('../test/utils')
 const rootFolder = __dirname + '/..'
@@ -28,8 +28,9 @@ task("set-engine", "Set the engine in the smart contract")
         const engineFullpath = rootFolder + '/' + enginePath;
         const engineCode = fs.readFileSync(engineFullpath, 'utf-8')
         const result = UglifyJS.minify([engineCode]);
-        const setEngineTx = await lenia.setEngine(result.code)
-        await setEngineTx.wait()
+        const gzipEngine = pako.deflate(result.code);
+        
+        await lenia.setEngine(gzipEngine)
     
         const contractEngine = await lenia.getEngine();
         if (contractEngine.length) {
@@ -53,7 +54,7 @@ task("get-engine", "Set the engine in the smart contract",  async (taskArgs, hre
     const LeniaDeployment = await hre.deployments.get('Lenia')
     const lenia = LeniaContractFactory.attach(LeniaDeployment.address)
     
-    const contractEngine = await lenia.getEngine();
+    const contractEngine = await leniaUtils.getEngineCode(hre.ethers.provider, lenia)
     console.log(contractEngine)
 })
 

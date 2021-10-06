@@ -5,8 +5,9 @@ import {Web3Provider} from "../components/web3-provider";
 import Layout from "../components/layout"
 import Engine from "../components/engine"
 
-const LeniaPage = () => {
+const GeneratorPage = () => {
     const [id] = useQueryParam("id", NumberParam);
+    
     return (
         <Web3Provider>
             <Layout>
@@ -16,4 +17,4 @@ const LeniaPage = () => {
     )
 }
 
-export default LeniaPage
+export default GeneratorPage

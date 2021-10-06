@@ -1,10 +1,11 @@
 const { expect } = require("chai")
-const { ethers, provider } = require("hardhat")
+const { ethers } = require("hardhat")
 const UglifyJS = require("uglify-js")
 const fs = require('fs')
+const pako = require('pako');
 
 const { attrsMap, traitTypeAttrsMap, deployLeniaContract } = require('./utils')
-const {gzip, ungzip} = require('node-gzip');
+const leniaUtils = require('../src/utils/sm')
 
 describe("Lenia", function () {
   let hardhatLenia
@@ -25,87 +26,60 @@ describe("Lenia", function () {
     it("should set and get the engine", async function () {
       const engineCode = fs.readFileSync('./src/engine.js', 'utf-8')
       const result = UglifyJS.minify([engineCode])
-      const gzipEngine = await gzip(result.code);
+      const gzipEngine = pako.deflate(result.code);
+
       await hardhatLenia.setEngine(gzipEngine)
 
-      const contractGzipEngineHex = await hardhatLenia.getEngine()
-      const contractGzipEngine = Buffer.from(ethers.utils.arrayify(contractGzipEngineHex))
-      const contractEngineBuffer = await ungzip(contractGzipEngine);
-      const contractEngine = contractEngineBuffer.toString('utf-8')
-
+      const contractEngine = await leniaUtils.getEngineCode(ethers.provider, hardhatLenia)
       expect(contractEngine).to.equal(result.code)
     })
 
     it("should log (and get) the engine using calldata", async function () {
       const engineCode = fs.readFileSync('./src/engine.js', 'utf-8')
       const result = UglifyJS.minify([engineCode])
-      const gzipEngine = await gzip(result.code);
+      const gzipEngine = pako.deflate(result.code);
 
       const logEngineTx = await hardhatLenia.logEngine(gzipEngine)
       await hardhatLenia.setEngine(logEngineTx.hash)
 
-
-      const txHash = await hardhatLenia.getEngine()
-      expect(txHash.length).to.equal(66)
-      const retrievedTx = await ethers.provider.getTransaction(txHash)
-      const inputDataHex = retrievedTx.data;
-
-      const retrievedInputData = ethers.utils.defaultAbiCoder.decode(
-          [ 'bytes' ],
-          ethers.utils.hexDataSlice(inputDataHex, 4)
-      );
-      const contractGzipEngineHex = retrievedInputData[0]
-      const contractGzipEngine = Buffer.from(ethers.utils.arrayify(contractGzipEngineHex))
-      const contractEngineBuffer = await ungzip(contractGzipEngine);
-      const contractEngine = contractEngineBuffer.toString('utf-8')
-
+      const contractEngine = await leniaUtils.getEngineCode(ethers.provider, hardhatLenia)
       expect(contractEngine).to.equal(result.code)
     })
 
     it("should set and get lenia parameters", async function () {
-      const metadata = require('../static/metadata/all_metadata.json')
+      const metadata = require('../metadata/fake/all_metadata.json')
       
       const max_length = 5 // metadata.length
       for (let index = 0; index < max_length; index++) {
         let element = metadata[index];
-
-        const gzipCells = await gzip(element.config.cells);
+        const m = element.config.kernels_params[0].m.toFixed(9)
+        const s = element.config.kernels_params[0].s.toFixed(9)
+        const gzipCells = pako.deflate(element.config.cells);
 
         await hardhatLenia.setLeniaParams(
-          index,
-          element.config.kernels_params[0].m.toFixed(9),
-          element.config.kernels_params[0].s.toFixed(9),
-          gzipCells
+          index, m, s, gzipCells
         )
       }
 
       for (let index = 0; index < max_length; index++) {
         const element = metadata[index];
-        
-        const contractParams = await hardhatLenia.getLeniaParams(index)
-        const m = contractParams.m
-        const s = contractParams.s
-        const contractGzipCellsHex = contractParams.cells
-        const contractGzipCells = Buffer.from(ethers.utils.arrayify(contractGzipCellsHex))
-        const contractCellsBuffer = await ungzip(contractGzipCells);
-        const contractCells = contractCellsBuffer.toString('utf-8')
-
-        expect(m).to.equal(element.config.kernels_params[0].m.toFixed(9))
-        expect(s).to.equal(element.config.kernels_params[0].s.toFixed(9))
-        expect(contractCells).to.equal(element.config.cells)
+        const leniaParams = await leniaUtils.getLeniaParameters(ethers.provider, hardhatLenia, index)
+        expect(leniaParams.m).to.equal(element.config.kernels_params[0].m.toFixed(9))
+        expect(leniaParams.s).to.equal(element.config.kernels_params[0].s.toFixed(9))
+        expect(leniaParams.cells).to.equal(element.config.cells)
       }
       
     })
 
     it("should log (and get) cells using callData", async function () {
-      let metadata = require('../static/metadata/all_metadata.json')
+      const metadata = require('../metadata/fake/all_metadata.json')
       
-      const max_length =  metadata.length
+      const max_length = 5
       for (let index = 0; index < max_length; index++) {
         element = metadata[index]
         const m = element.config.kernels_params[0].m.toFixed(9)
         const s = element.config.kernels_params[0].s.toFixed(9)
-        const gzipCells = await gzip(element.config.cells);
+        const gzipCells = pako.deflate(element.config.cells);
 
         // Update the cells as a hash
         const logLeniaParamsTx = await hardhatLenia.logLeniaParams(
@@ -116,33 +90,16 @@ describe("Lenia", function () {
 
       for (let index = 0; index < max_length; index++) {
         const element = metadata[index];
+        const leniaParams = await leniaUtils.getLeniaParameters(ethers.provider, hardhatLenia, index)
 
-        const leniaParams = await hardhatLenia.getLeniaParams(index)
-        const txHash = leniaParams.cells
-        expect(txHash.length).to.equal(66)
-
-        const retrievedTx = await ethers.provider.getTransaction(txHash)
-        const inputDataHex = retrievedTx.data;
-
-        const retrievedInputData = ethers.utils.defaultAbiCoder.decode(
-          [ 'string', 'string', 'bytes' ],
-          ethers.utils.hexDataSlice(inputDataHex, 4)
-        );
-        const m = retrievedInputData[0]
-        const s = retrievedInputData[1]
-        const contractGzipCellsHex = retrievedInputData[2]
-        const contractGzipCells = Buffer.from(ethers.utils.arrayify(contractGzipCellsHex))
-        const contractCellsBuffer = await ungzip(contractGzipCells);
-        const contractCells = contractCellsBuffer.toString('utf-8')
-
-        expect(m).to.equal(element.config.kernels_params[0].m.toFixed(9))
-        expect(s).to.equal(element.config.kernels_params[0].s.toFixed(9))
-        expect(contractCells).to.equal(element.config.cells)
+        expect(leniaParams.m).to.equal(element.config.kernels_params[0].m.toFixed(9))
+        expect(leniaParams.s).to.equal(element.config.kernels_params[0].s.toFixed(9))
+        expect(leniaParams.cells).to.equal(element.config.cells)
       }
     })
 
     it("should set and get metadata", async function () {
-      const metadata = require('../static/metadata/all_metadata.json')
+      const metadata = require('../metadata/fake/all_metadata.json')
       
       const max_length = 5 // metadata.length
       for (let index = 0; index < max_length; index++) {
@@ -181,7 +138,7 @@ describe("Lenia", function () {
     })
 
     it("should not return onchain metadata for unready element", async function () {
-      const metadata = require('../static/metadata/all_metadata.json')
+      const metadata = require('../metadata/fake/all_metadata.json')
       
       const index = 0;
       
@@ -222,7 +179,7 @@ describe("Lenia", function () {
     })
 
     it("should return onchain metadata for ready element", async function () {
-      const metadata = require('../static/metadata/all_metadata.json')
+      const metadata = require('../metadata/fake/all_metadata.json')
       
       const index = 0;
       
@@ -231,9 +188,9 @@ describe("Lenia", function () {
       const stringID = index.toString()
 
       // Fake lenia params
-      let m = element.config.kernels_params[0].m
-      let s = element.config.kernels_params[0].s
-      const gzipCells = await gzip(element.config.cells);
+      const m = element.config.kernels_params[0].m.toFixed(9)
+      const s = element.config.kernels_params[0].s.toFixed(9)
+      const gzipCells = pako.deflate(element.config.cells);
 
       let imageURL = "image.gif";
       let animationURL = "video.mp4";
@@ -249,10 +206,7 @@ describe("Lenia", function () {
       }
 
       await hardhatLenia.setLeniaParams(
-          index,
-          m.toFixed(9),
-          s.toFixed(9),
-          gzipCells
+          index, m, s, gzipCells
       )
 
       await hardhatLenia.setMetadata(
@@ -401,7 +355,7 @@ describe("Lenia", function () {
       expect(await hardhatLenia.isSaleActive()).to.equal(false)
     })
 
-    it.only("should toggle the sale status only by the owner", async () => {
+    it("should toggle the sale status only by the owner", async () => {
       const [_, account] = await ethers.getSigners()
       const toggleSaleTx = hardhatLenia.toggleSaleStatus()
       expect(toggleSaleTx).to.be.revertedWith("Ownable: caller is not the owner")
@@ -513,7 +467,7 @@ describe("Lenia", function () {
   })
 
   describe("Set Base URI", async () => {
-    it.only("should only be called by the owner", async () => {
+    it("should only be called by the owner", async () => {
       const [_, account] = await ethers.getSigners()
       const reserveTx = hardhatLenia.connect(account).setBaseURI('stockmouton.com')
       expect(reserveTx).to.be.revertedWith("Ownable: caller is not the owner")

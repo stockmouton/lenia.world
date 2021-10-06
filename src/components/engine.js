@@ -3,6 +3,8 @@ import React, { useRef, useEffect, useState } from "react"
 import artifacts from '../artifacts.json'
 import { useWeb3 } from "./web3-provider"
 
+import { getEngineCode } from "../utils/sm"
+
 const Engine = ({ lenia_id }) => {
     const { web3Provider, account } = useWeb3()
     const [contract, setContract] = useState(null)
@@ -24,10 +26,12 @@ const Engine = ({ lenia_id }) => {
             // lenia_metadata["config"]["cells"] = lenia_cells
 
             if ( !('leniaEngine' in window) ) {
-                const engine = await contract.methods.getEngine().call({ from: account })
-                var script = document.createElement('script');
-                script.innerHTML = engine
-                document.body.appendChild(script);
+                const engine = getEngineCode(web3Provider, contract, account)
+                if (typeof engine === 'string' && engine.length > 0) {
+                    var script = document.createElement('script');
+                    script.innerHTML = engine
+                    document.body.appendChild(script);
+                }
             }
         } else {
             // Load a default Lenia
