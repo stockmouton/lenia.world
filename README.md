@@ -68,18 +68,44 @@ Now that the smart contract is deployed, we can finally deploy the website.
 For deploying the website to Github Page, just type:
 ```
 yarn deploy
-
 ```
 
 
 ## Smart contract interaction (once deployed)
 
-In order to mint some Lenia, you will need to flip the `isSaleActive` flag on the smart contract:
+It is super important to follow the current steps in order to successfully mint the Lenia and see the results in the LeniaDEX
+
+### 1.Presale
+In order to mint some Lenia for the presale, you will need to flip the `isPresaleActive` flag on the smart contract:
+```
+yarn sm-start-presale # Local node
+
+NETWORK=rinkeby yarn sm-start-presale # Testnet
+```
+
+### 1bis.Public Sale
+In order to mint some Lenia for the public sale, you will need to flip the `isSaleActive` flag on the smart contract:
 ```
 yarn sm-start-sale # Local node
 
 NETWORK=rinkeby yarn sm-start-sale # Testnet
 ```
+
+### Minting
+Before minting, please: 
+- set the baseURI for fetching each NFT metadata.
+```
+yarn sm-set-baseuri --baseuri <http://localhost:800/metadata/|https://lenia.world/metadata/> # Local node
+
+NETWORK=rinkeby yarn sm-set-baseuri --baseuri <http://localhost:800/metadata/|https://lenia.world/metadata/> # Testnet
+```
+- run the long running script to upload the metadata to the `static` public folder so that your Lenia can be revealed.
+```
+yarn sm-reveal # Local node
+
+NETWORK=rinkeby yarn sm-reveal # Rinkeby
+```
+
 
 ## How to test on a mobile phone
 

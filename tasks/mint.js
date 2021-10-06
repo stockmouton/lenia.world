@@ -1,5 +1,6 @@
 const fs = require('fs')
 const path = require('path')
+const prompt = require('prompt');
 
 task("add-presale-list", "Add a range of addresses to the presale list", async (taskArgs, hre) => {
   if (hre.hardhatArguments.network == null) {
