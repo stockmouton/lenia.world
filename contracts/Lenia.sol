@@ -157,6 +157,10 @@ contract Lenia is ERC721, ERC721Enumerable, PaymentSplitter, Ownable {
         }
     }
 
+    function isEligibleForPresale(address account) public view returns(bool) {
+        return _presaleList[account];
+    }
+
     function presaleMint() external payable {
         require(_isPresaleActive, "Presale is not active");
 
@@ -164,7 +168,7 @@ contract Lenia is ERC721, ERC721Enumerable, PaymentSplitter, Ownable {
 
         require(isSenderEligible == true, "Not eligible for the presale");
         uint256 supply = totalSupply();
-        require(supply <= MAX_SUPPLY - _reserved, "Tokens are sold out");
+        require(supply < MAX_SUPPLY - _reserved, "Tokens are sold out");
         require(_price <= msg.value, "Insufficient funds");
 
         _safeMint(msg.sender, supply);
