@@ -1,6 +1,5 @@
 import styled from "styled-components"
 import Lead from "./lead"
-import Button from "./button"
 import { createMediaQuery, BREAKPOINTS } from "../global-styles"
 
 const Jumbotron = styled.div`
@@ -15,6 +14,10 @@ const Jumbotron = styled.div`
   ${Lead} {
     font-size: 1.25rem;
     line-height: 1.25;
+  }
+
+  p {
+    color: #f1f1f1;
   }
 
   ${createMediaQuery(BREAKPOINTS.sm, `

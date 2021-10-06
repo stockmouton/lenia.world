@@ -24,7 +24,7 @@ task("add-presale-list", "Add a range of addresses to the presale list", async (
     presaleList = accounts.map(account => account.address).filter((_, i) => i < 10)
   }
   
-  console.log(reserved)
+  console.log(presaleList)
   console.log('Is this ok? [y/N]')
   const { ok } = await prompt.get(['ok']);
   if (ok !== 'y') {
