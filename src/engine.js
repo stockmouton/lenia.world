@@ -127,7 +127,7 @@
         then = Date.now();
         startTime = then;
         function loop() {
-            window.requestAnimationFrame(loop);
+            // window.requestAnimationFrame(loop);
 
             now = Date.now();
             elapsed = now - then;

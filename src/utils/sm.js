@@ -3,10 +3,10 @@ const { ethers } = require("ethers");
 const pako = require('pako');
 
 
-exports.getEngineCode = async function(provider, leniaContract, account=null) {
+exports.getEngineCode = async function(provider, leniaContract) {
     let contractGzipEngineHex;
     if (provider instanceof Web3) {
-        contractGzipEngineHex = await leniaContract.methods.getEngine().call({ from: account })
+        contractGzipEngineHex = await leniaContract.methods.getEngine()
     } else {
         contractGzipEngineHex = await leniaContract.getEngine()
     }
@@ -30,7 +30,12 @@ exports.getEngineCode = async function(provider, leniaContract, account=null) {
 }
 
 exports.getLeniaParameters = async function(provider, leniaContract, index) {
-    let contractLeniaParams = await leniaContract.getLeniaParams(index)
+    let contractLeniaParams;
+    if (provider instanceof Web3) {
+        contractLeniaParams = await leniaContract.methods.getLeniaParams(index)
+    } else {
+        contractLeniaParams = await leniaContract.getLeniaParams(index)
+    }
 
     if (contractLeniaParams.cells.length == 66) {
         const txHash = contractLeniaParams.cells

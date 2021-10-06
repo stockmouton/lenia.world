@@ -1,7 +1,6 @@
 import React, { useRef, useEffect, useState } from "react"
 import * as d3 from 'd3'
 import styled from "styled-components"
-import _max from "lodash/max"
 const axios = require('axios');
 
 import artifacts from '../artifacts.json'
