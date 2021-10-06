@@ -6,11 +6,10 @@ const deployLeniaContract = async hre => {
   const {deploy} = deployments
   
   const accounts = await getNamedAccounts()
-  
-  if (hre.hardhatArguments.network == 'mainnet') {
-    assert(accounts.length == 4, 'Expecting 4 addresses to deploy on mainnet')
+  if (hre.hardhatArguments.network == 'mainnet' || hre.hardhatArguments.network == 'rinkeby') {
+    assert(Object.keys(accounts).length == 4, 'Expecting 4 addresses to deploy on mainnet')
+    
     console.log(accounts)
-
     console.log('Is this ok? [y/N]')
     const { ok } = await prompt.get(['ok']);
     if (ok !== 'y') {
@@ -20,7 +19,7 @@ const deployLeniaContract = async hre => {
   }
 
   
-  const deployer = accounts[0]
+  const deployer = accounts.deployer
   const leniaDescriptorLibrary = await deploy("LeniaDescriptor", {
     from: deployer,
     log: true, 

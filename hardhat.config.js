@@ -40,13 +40,9 @@ module.exports = {
       chainId: 1337,
       accounts: allPrivateKeys
     },
-    goerli: {
-      url: process.env.GOERLI_URL || "",
-      accounts: process.env.GOERLI_PRIVATE_KEY !== undefined ? [process.env.GOERLI_PRIVATE_KEY] : [],
-    },
     rinkeby: {
       url: `https://eth-rinkeby.alchemyapi.io/v2/${process.env.ALCHEMY_API_KEY}`,
-      accounts: process.env.RINKEBY_PRIVATE_KEY !== undefined ? [process.env.RINKEBY_PRIVATE_KEY] : [],
+      accounts: [process.env.DAO_PK, process.env.ADMIN1_PK, process.env.ADMIN2_PK, process.env.ADMIN3_PK]
     },
     mainnet: {
       url: `https://eth-mainnet.alchemyapi.io/v2/${process.env.MAINNET_ALCHEMY_API_KEY}`,
@@ -65,5 +61,8 @@ module.exports = {
   },
   namedAccounts: {
     deployer: 0,
+    admin1: 1,
+    admin2: 2,
+    admin3: 3,
   },
 }
