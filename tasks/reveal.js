@@ -3,7 +3,6 @@ const fs = require('fs')
 
 const ROOT_FOLDER = path.join(__dirname, '..')
 const METADATA_FOLDER = path.join(ROOT_FOLDER, 'static', 'metadata')
-const ORI_METADATA_FOLDER = path.join(ROOT_FOLDER, 'ori_metadata')
 
 let currentTimer;
 
@@ -15,24 +14,24 @@ function sleep(ms) {
     });
 }
 
-function checkIndex(index) {
+function checkIndex(oriMetadataFolder, index) {
     console.log(`Checking index ${index}`)
 
     const dst_json = path.join(METADATA_FOLDER, `${index}.json`)
     if (!fs.existsSync(dst_json)) {
-        const src_json = path.join(ORI_METADATA_FOLDER, `${index}.json`)
+        const src_json = path.join(oriMetadataFolder, `${index}.json`)
         console.log(` - Copying ${src_json} -> ${dst_json}`)
         fs.copyFileSync(src_json, dst_json)
     }
     const dst_mp4 = path.join(METADATA_FOLDER, `${index}.mp4`)
     if (!fs.existsSync(dst_mp4)) {
-        const src_mp4 = path.join(ORI_METADATA_FOLDER, `${index}.mp4`)
+        const src_mp4 = path.join(oriMetadataFolder, `${index}.mp4`)
         console.log(` - Copying ${src_mp4} -> ${dst_mp4}`)
         fs.copyFileSync(src_mp4, dst_mp4)
     }
     const dst_gif = path.join(METADATA_FOLDER, `${index}.gif`)
     if (!fs.existsSync(dst_gif)) {
-        const src_gif = path.join(ORI_METADATA_FOLDER, `${index}.gif`)
+        const src_gif = path.join(oriMetadataFolder, `${index}.gif`)
         console.log(` - Copying ${src_gif} -> ${dst_gif}`)
         fs.copyFileSync(src_gif, dst_gif)
     }
@@ -40,7 +39,14 @@ function checkIndex(index) {
 
 task("reveal", "listen and reveal",  async (taskArgs, hre) => {
     if (hre.hardhatArguments.network == null) {
-        throw new Error('Please add the missing --network <localhost|rinkeby|goerli> argument')
+        throw new Error('Please add the missing --network <localhost|rinkeby|mainnet> argument')
+    }
+
+    let oriMetadataFolder;
+    if (hre.hardhatArguments.network == 'localhost') {
+        oriMetadataFolder = path.join(ROOT_FOLDER, 'metadata', 'fake')
+    } else {
+        oriMetadataFolder = path.join(ROOT_FOLDER, 'metadata', 'ori')
     }
 
     const LeniaDescriptorLibraryDeployment = await hre.deployments.get('LeniaDescriptor')
@@ -60,7 +66,7 @@ task("reveal", "listen and reveal",  async (taskArgs, hre) => {
 
     // Check that up to totalSupply we have already put all files
     for (let index = 0; index < totalSupply; index++) {
-        checkIndex(index)
+        checkIndex(oriMetadataFolder, index)
     }
 
     console.log(`listening to contract at ${lenia.address}`)
@@ -73,7 +79,7 @@ task("reveal", "listen and reveal",  async (taskArgs, hre) => {
         // console.log(from, to, tokenID)
         if(from == '0x0000000000000000000000000000000000000000') {
             console.log(`Our new friend ${to} has mint a Lenia!`)
-            checkIndex(tokenID)
+            checkIndex(oriMetadataFolder, tokenID)
 
             totalSupply = await lenia.totalSupply()
             console.log(`Current total supply is ${totalSupply}`)

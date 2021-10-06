@@ -14,7 +14,7 @@ const ethers = require("ethers")
 require('./tasks');
 const {generatePrivateKey} = require('./test/utils')
 const defaultPrivateKey = {
-  'privateKey': '0xbc14f35250faa51f04d1d19b9d01b4e79efc2267a366a93a4c9102d7f4229f05',
+  'privateKey': process.env.DAO_PK,
   'balance': ethers.utils.parseEther("10000").toString()
 }
 const randomPrivateKeys = [...Array(210).keys()].map(() => (

@@ -69,7 +69,8 @@ const LeniaDex = () => {
         if (contract) {
             setContract(contract)
 
-            const totalLeniaMinted = await contract.methods.totalSupply().call({ from: account })
+            let totalLeniaMinted = await contract.methods.totalSupply().call({ from: account })
+            totalLeniaMinted = parseInt(totalLeniaMinted, 10)
             for (let index = 0; index < totalLeniaMinted; index++) {
               const tokenMetadataURI = await contract.methods.tokenURI(index).call({ from: account })
               const response = await axios.get(tokenMetadataURI);
@@ -77,7 +78,7 @@ const LeniaDex = () => {
               all_metadata.push(tokenMetadata)
             }
         }
-        
+
         const max_key1 = Math.ceil(10 * d3.max(all_metadata, (d) => getValue(d.attributes, key1))) / 10
         const max_key2 = Math.ceil(10 * d3.max(all_metadata, (d) => getValue(d.attributes, key2))) / 10
 

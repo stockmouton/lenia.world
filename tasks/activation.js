@@ -1,6 +1,6 @@
 task("start-presale", "Start Lenia presale", async (taskArgs, hre) => {
   if (hre.hardhatArguments.network == null) {
-    throw new Error('Please add the missing --network <localhost|rinkeby|goerli> argument')
+    throw new Error('Please add the missing --network <localhost|rinkeby|mainnet> argument')
   }
 
   const LeniaDescriptorLibraryDeployment = await hre.deployments.get('LeniaDescriptor')
@@ -37,7 +37,7 @@ task("set-baseuri", "Set the base uri")
     types.string,
   ).setAction( async ({ baseuri }, hre ) => {
     if (hre.hardhatArguments.network == null) {
-      throw new Error('Please add the missing --network <localhost|rinkeby|goerli> argument')
+      throw new Error('Please add the missing --network <localhost|rinkeby|mainnet> argument')
     }
 
     const LeniaDescriptorLibraryDeployment = await hre.deployments.get('LeniaDescriptor')
@@ -50,20 +50,12 @@ task("set-baseuri", "Set the base uri")
     const lenia = LeniaContractFactory.attach(LeniaDeployment.address)
 
     let setBaseURITx = await lenia.setBaseURI(baseuri)
-    await setBaseURITx.wait();
-
-    let baseURI =  await lenia.baseURI()
-    console.log(baseURI)
-    if (baseURI) {
-      console.log('baseURI was successfully set')
-    } else {
-      throw new Error('Something went wrong, sale couldn\'t be started')
-    }
+    console.log('baseURI was successfully set')
   })
 
 task("start-sale", "Start Lenia sale", async (taskArgs, hre) => {
     if (hre.hardhatArguments.network == null) {
-      throw new Error('Please add the missing --network <localhost|rinkeby|goerli> argument')
+      throw new Error('Please add the missing --network <localhost|rinkeby|mainnet> argument')
     }
 
     const LeniaDescriptorLibraryDeployment = await hre.deployments.get('LeniaDescriptor')
