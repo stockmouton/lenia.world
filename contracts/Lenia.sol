@@ -53,7 +53,7 @@ contract Lenia is ERC721, ERC721Enumerable, PaymentSplitter, Ownable {
     constructor(address[] memory payees, uint256[] memory shares_) ERC721("Lenia", "LENIA") PaymentSplitter(payees, shares_) {
     }
 
-    function logEngine(bytes calldata cellsInput) external {}
+    function logEngine(bytes calldata cellsInput) external onlyOwner {}
 
     function setEngine(bytes calldata engineInput) public onlyOwner {
         engine = engineInput;
@@ -67,7 +67,7 @@ contract Lenia is ERC721, ERC721Enumerable, PaymentSplitter, Ownable {
         string calldata m,
         string calldata s,
         bytes calldata cellsInput
-    ) external {}
+    ) external onlyOwner {}
 
     function setLeniaParams(
         uint256 id,

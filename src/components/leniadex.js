@@ -2,7 +2,6 @@ import React, { useRef, useEffect, useState } from "react"
 import Section from "./section"
 import * as d3 from 'd3'
 import styled from "styled-components"
-import _max from "lodash/max"
 const axios = require('axios');
 
 import { useWeb3 } from "./web3-provider"
