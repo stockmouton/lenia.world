@@ -42,7 +42,6 @@ export const LeniaContractProvider = ({ children }) => {
       const isSaleActive = await contract.methods.isSaleActive().call({ from: account })      
       const totalLeniaSupply = await contract.methods.MAX_SUPPLY().call({ from: account }) || 0
       const totalLeniaMinted = await contract.methods.totalSupply().call({ from: account }) || 0
-      
       setSaleStatus(getSaleStatus(isPresaleActive, isSaleActive))
       setIsEligibleForPresale(isEligibleForPresale)
       setTotalLeniaSupply(parseInt(totalLeniaSupply, 10))

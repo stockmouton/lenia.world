@@ -41,7 +41,7 @@ function getValue(attributes, key) {
 
 
 const LeniaDex = () => {
-  const { web3Provider, account } = useWeb3()
+  const { account } = useWeb3()
   const { contract, totalLeniaMinted } = useLeniaContract()
 
   const nodeRef = useRef(null);
@@ -65,8 +65,6 @@ const LeniaDex = () => {
   useEffect(async () => {
     if (nodeRef.current) {
       const all_metadata = [];
-      console.log(contract)
-      console.log(totalLeniaMinted)
       if (contract && totalLeniaMinted > 0) {
         for (let index = 0; index < totalLeniaMinted; index++) {
           const tokenMetadataURI = await contract.methods.tokenURI(index).call({ from: account })

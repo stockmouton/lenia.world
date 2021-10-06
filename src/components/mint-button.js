@@ -57,7 +57,7 @@ const MintButton = () => {
   }, [web3Provider, account])
 
   useEffect(() => {
-    const canAccountMint = (saleStatus === SALE_STATUSES.PRESALE && isEligibleForPresale) || saleStatus === SALE_STATUSES.SALE
+    const canAccountMint = (saleStatus === SALE_STATUSES.PRESALE && isEligibleForPresale) || saleStatus === SALE_STATUSES.PUBLIC
     setButtonStatus(getButtonStatus(canAccountMint, totalLeniaSupply == totalLeniaMinted && totalLeniaSupply > 0))
   }, [saleStatus, isEligibleForPresale, totalLeniaMinted, totalLeniaSupply])
 
@@ -90,7 +90,7 @@ const MintButton = () => {
       <span>Sale starts in <Countdown date={new Date('October 7, 2021 18:00:00')} /></span> :
       <span>Presale starts in <Countdown date={new Date('October 7, 2021 06:00:00')} /></span>,
     [BUTTON_STATUSES.READY]: 'Mint one lenia',
-    [BUTTON_STATUSES.LOADING]: 'Processing transaction...',
+    [BUTTON_STATUSES.LOADING]: <>Processing transaction...</>,
     [BUTTON_STATUSES.SOLD_OUT]: 'Sold out!'
   }[buttonStatus])
 
