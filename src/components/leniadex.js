@@ -60,7 +60,6 @@ const LeniaDex = () => {
   const blue = "#ffffff"
   const key1 = "Robustness"
   const key2 = "Spread"
-  let baseURI;
 
   useEffect(async () => {
     if (nodeRef.current) {
@@ -70,7 +69,6 @@ const LeniaDex = () => {
         if (contract) {
             setContract(contract)
 
-            baseURI = await contract.methods.baseURI().call()
             const totalLeniaMinted = await contract.methods.totalSupply().call({ from: account })
             for (let index = 0; index < totalLeniaMinted; index++) {
               const tokenMetadataURI = await contract.methods.tokenURI(index).call({ from: account })

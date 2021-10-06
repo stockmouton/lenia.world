@@ -26,6 +26,7 @@
     "lodash": "^4.17.21",
     "node-gzip": "^1.1.2",
     "process": "^0.11.10",
+    "prompt": "^1.2.0",
     "prop-types": "^15.7.2",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
@@ -80,6 +81,7 @@
     "sm-set-metadata": "hardhat set-metadata --network ${NETWORK:-localhost}",
     "sm-claim-reserved": "hardhat claim-reserved --network ${NETWORK:-localhost}",
     "sm-estimate-gas": "REPORT_GAS=true hardhat test",
+    "sm-reveal": "hardhat reveal --network ${NETWORK:-localhost}",
     "debug": "ndb"
   },
   "repository": {

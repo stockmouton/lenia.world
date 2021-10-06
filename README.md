@@ -74,7 +74,7 @@ yarn deploy
 
 ## Smart contract interaction (once deployed)
 
-In order to mint some Lenia, you will need to flip the `hasSaleStarted` flag on the smart contract:
+In order to mint some Lenia, you will need to flip the `isSaleActive` flag on the smart contract:
 ```
 yarn sm-start-sale # Local node
 

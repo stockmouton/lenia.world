@@ -51,14 +51,13 @@ const MintButton = () => {
     if (!isStaging) return
 
     const contract = web3Provider ? new web3Provider.eth.Contract(artifacts.contracts.Lenia.abi, artifacts.contracts.Lenia.address) : null
-
     if (contract) {
       setContract(contract)
       try {
-        const hasSaleStarted = await contract.methods.hasSaleStarted().call({ from: account })
+        const isSaleActive = await contract.methods.isSaleActive().call({ from: account })
         const totalLeniaSupply = await contract.methods.MAX_SUPPLY().call({ from: account })
         const totalLeniaMinted = await contract.methods.totalSupply().call({ from: account })
-        setButtonStatus(hasSaleStarted ? BUTTON_STATUSES.READY : BUTTON_STATUSES.DISABLED)
+        setButtonStatus(isSaleActive ? BUTTON_STATUSES.READY : BUTTON_STATUSES.DISABLED)
         setTotalLeniaSupply(totalLeniaSupply)
         setTotalLeniaMinted(totalLeniaMinted)
       } catch (error) {
