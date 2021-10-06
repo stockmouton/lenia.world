@@ -1,0 +1,27 @@
+[
+  {
+    "name": "Stockmouton DAO",
+    "address": "0x01823F2d3bAD3aC490602A62A4D3Daaca7E27c86",
+    "reserved": 2
+  },
+  {
+    "name": "Morgan Giraud",
+    "address": "0x92d30E8F910377F501bBe51B2C6ae898919854Bc",
+    "reserved": 3
+  },
+  {
+    "name": "Alex Orange",
+    "address": "0x3Be02EaFab2bB7d48B9d1edC3DBd9AED5143869d",
+    "reserved": 2
+  },
+  {
+    "name": "BBA",
+    "address": "",
+    "reserved": 2
+  },
+  {
+    "name": "Toomaie",
+    "address": "",
+    "reserved": 2
+  }
+]

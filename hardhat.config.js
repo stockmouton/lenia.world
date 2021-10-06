@@ -46,8 +46,8 @@ module.exports = {
     },
     mainnet: {
       url: `https://eth-mainnet.alchemyapi.io/v2/${process.env.MAINNET_ALCHEMY_API_KEY}`,
-      accounts: [],
-    },
+      accounts: process.env.MAINNET_PRIVATE_KEY !== undefined ? [process.env.MAINNET_PRIVATE_KEY] : [],
+    }
   },
   plugins: ["solidity-coverage"],
   gasReporter: {

@@ -48,11 +48,13 @@ You will need money in your local account to interact with the smart contract:
 ## Deployment
 
 ### Smart contract
-Before deploying either on testnet or on mainnet, we need to set the owner private key. (If you deploy on testnet, you also need to create an account on alchemy and set you alchemy_API_KEY)
+Before deploying either on testnet or on mainnet, we need to set the owner private key but you will also need to create an account on Alchemy, which will give you an API key for their RPC.
 ```
 RINKEBY_PRIVATE_KEY=xxxxxx # Your rinkeby wallet private key
-PRIVATE_KEY=xxxxxx # Your mainnet wallet private key
-ALCHEMY_API_KEY=xxxxxxx
+MAINNET_PRIVATE_KEY=xxxxxx # Your mainnet wallet private key
+
+RINKEBY_ALCHEMY_API_KEY=xxxxxxx
+MAINNET_ALCHEMY_API_KEY=xxxxxxx
 ```
 
 Then you can deploy the smart contract to a remote network (we use Rinkeby as a testnet): 
