@@ -78,6 +78,7 @@
     "sm-set-cells": "hardhat set-cells --network ${NETWORK:-localhost}",
     "sm-set-leniaparams": "hardhat set-leniaparams --network ${NETWORK:-localhost}",
     "sm-set-metadata": "hardhat set-metadata --network ${NETWORK:-localhost}",
+    "sm-claim-reserved": "hardhat claim-reserved --network ${NETWORK:-localhost}",
     "sm-estimate-gas": "REPORT_GAS=true hardhat test",
     "debug": "ndb"
   },

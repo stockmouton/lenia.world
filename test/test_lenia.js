@@ -362,7 +362,7 @@ describe("Lenia", function () {
           value: contractPrice
         })
         
-        if (i <= publicSupply) {
+        if (i < publicSupply) {
           await mintTx
           expect(await hardhatLenia.totalSupply()).to.equal(i + 1)
         }
@@ -395,19 +395,19 @@ describe("Lenia", function () {
       expect(await hardhatLenia.isSaleActive()).to.equal(true)
   
       await hardhatLenia.toggleSaleStatus()
-  
-      isSaleActive = await hardhatLenia.isSaleActive()
-  
+    
       expect(await hardhatLenia.isSaleActive()).to.equal(false)
     })
 
-    it.only("should toggle the sale status only by the owner", async () => {
+    it("should toggle the sale status only by the owner", async () => {
       const [_, account] = await ethers.getSigners()
       const toggleSaleTx = hardhatLenia.toggleSaleStatus()
       expect(toggleSaleTx).to.be.revertedWith("Ownable: caller is not the owner")
     })
 
     it("should not mint when sale is not active", async function () {    
+      console.log(await hardhatLenia.isSaleActive())
+      
       const contractPrice = await hardhatLenia.getPrice()
       const mintTx = hardhatLenia.mint({
         value: contractPrice
@@ -513,7 +513,7 @@ describe("Lenia", function () {
   })
 
   describe("Set Base URI", async () => {
-    it.only("should only be called by the owner", async () => {
+    it("should only be called by the owner", async () => {
       const [_, account] = await ethers.getSigners()
       const reserveTx = hardhatLenia.connect(account).setBaseURI('stockmouton.com')
       expect(reserveTx).to.be.revertedWith("Ownable: caller is not the owner")

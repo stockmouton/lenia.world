@@ -94,13 +94,15 @@ const MintButton = () => {
   }
 
   const getButtonContent = () => ({
-    [BUTTON_STATUSES.DISABLED]: 'Minting day TBA!',
+    [BUTTON_STATUSES.DISABLED]: 'Mint day: Thursday Oct 7th',
     [BUTTON_STATUSES.READY]: 'Mint one lenia',
     [BUTTON_STATUSES.LOADING]: 'Processing transaction...',
   }[buttonStatus])
 
   return (
     <>
+      <p>Presale: Thursday Oct 7th, 6AM UTC</p>
+      <p>Public Sale: Thursday Oct 7th, 6PM UTC</p>
       <StyledButton onClick={handleClick} disabled={[BUTTON_STATUSES.DISABLED, BUTTON_STATUSES.LOADING].includes(buttonStatus)}>{getButtonContent()}</StyledButton>
       {Boolean(totalLeniaSupply) && <LeniaSupplyContent>{totalLeniaMinted}/{totalLeniaSupply} lenia minted</LeniaSupplyContent>}
       {mintingTransactionStatus == MINTING_TRANSACTION_STATUSES.ERROR && error && <Toast type="error" onClose={handleToastClose}>{error?.message}</Toast>}
