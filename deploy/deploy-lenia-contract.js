@@ -1,9 +1,26 @@
+const prompt = require('prompt');
+const { assert } = require("chai")
+
 const deployLeniaContract = async hre => {
   const {deployments, getNamedAccounts} = hre
   const {deploy} = deployments
+  
+  const accounts = await getNamedAccounts()
+  
+  if (hre.hardhatArguments.network == 'mainnet') {
+    assert(accounts.length == 4, 'Expecting 4 addresses to deploy on mainnet')
+    console.log(accounts)
 
-  const {deployer} = await getNamedAccounts()
+    console.log('Is this ok? [y/N]')
+    const { ok } = await prompt.get(['ok']);
+    if (ok !== 'y') {
+      console.log('Quitting!')
+      process.exit()
+    }
+  }
 
+  
+  const deployer = accounts[0]
   const leniaDescriptorLibrary = await deploy("LeniaDescriptor", {
     from: deployer,
     log: true, 
