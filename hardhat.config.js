@@ -13,6 +13,14 @@ require("solidity-coverage")
 const ethers = require("ethers")
 require('./tasks');
 const {generatePrivateKey} = require('./test/utils')
+const defaultPrivateKey = {
+  'privateKey': '0xbc14f35250faa51f04d1d19b9d01b4e79efc2267a366a93a4c9102d7f4229f05',
+  'balance': ethers.utils.parseEther("10000").toString()
+}
+const randomPrivateKeys = [...Array(210).keys()].map(() => (
+  {'privateKey': generatePrivateKey(), 'balance': ethers.utils.parseEther("10000").toString()}
+))
+const allPrivateKeys = [].concat([defaultPrivateKey], randomPrivateKeys)
 
 /**
  * @type import('hardhat/config').HardhatUserConfig
@@ -30,7 +38,7 @@ module.exports = {
   networks: {
     hardhat: {
       chainId: 1337,
-      accounts: [...Array(210).keys()].map(() => ({'privateKey': generatePrivateKey(), 'balance': ethers.utils.parseEther("10000").toString()}))
+      accounts: allPrivateKeys
     },
     goerli: {
       url: process.env.GOERLI_URL || "",
