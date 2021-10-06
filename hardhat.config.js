@@ -20,7 +20,7 @@ const defaultPrivateKey = {
 const randomPrivateKeys = [...Array(210).keys()].map(() => (
   {'privateKey': generatePrivateKey(), 'balance': ethers.utils.parseEther("10000").toString()}
 ))
-const allPrivateKeys = [].concat([defaultPrivateKey], randomPrivateKeys)
+const allPrivateKeys = [defaultPrivateKey, ...randomPrivateKeys]
 
 /**
  * @type import('hardhat/config').HardhatUserConfig
