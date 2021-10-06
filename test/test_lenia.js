@@ -286,6 +286,25 @@ describe("Lenia", function () {
       expect(isPreSaleActive).to.equal(false)
     })
 
+    it("should add addresses to the presale list", async function() {
+      const [_, ...otherAccounts] = await ethers.getSigners()
+      const eligibleAccounts = otherAccounts.filter((_, i) => i < (otherAccounts.length / 2))
+      const eligibleAddresses = eligibleAccounts.map(account => account.address)
+      const uneligibleAccounts = otherAccounts.filter((_, i) => i >= (otherAccounts.length / 2))
+      const uneligibleAddresses = uneligibleAccounts.map(account => account.address)
+
+      // Add eligible addresses to the presale list
+      await hardhatLenia.addPresaleList(eligibleAddresses)
+
+      for (i = 0; i < eligibleAddresses.length; i++) {
+        expect(await hardhatLenia.isEligibleForPresale(eligibleAddresses[i])).to.equal(true)
+      }
+
+      for (i = 0; i < uneligibleAddresses.length; i++) {
+        expect(await hardhatLenia.isEligibleForPresale(uneligibleAddresses[i])).to.equal(false)
+      }
+    })
+
     it("should mint for the presale only once for an eligible address", async function () {
       const [_, ...otherAccounts] = await ethers.getSigners()
       const eligibleAccounts = otherAccounts.filter((_, i) => i < (otherAccounts.length / 2))

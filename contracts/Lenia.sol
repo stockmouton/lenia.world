@@ -157,6 +157,10 @@ contract Lenia is ERC721, ERC721Enumerable, PaymentSplitter, Ownable {
         }
     }
 
+    function isEligibleForPresale(address account) public view returns(bool) {
+        return _presaleList[account];
+    }
+
     function presaleMint() external payable {
         require(_isPresaleActive, "Presale is not active");
 
