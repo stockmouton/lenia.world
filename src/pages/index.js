@@ -23,6 +23,7 @@ import MORGAN_PICTURE from "../images/morgangiraud.png"
 import TOOMAIE_PICTURE from "../images/toomaie.jpeg"
 
 const IndexPage = () => {
+  const [isStaging] = useQueryParam("staging", BooleanParam)
   return (
     <Web3Provider>
       <Web3ModalProvider>
@@ -75,7 +76,7 @@ const IndexPage = () => {
                   </ul>
                 </article>
               </Section>
-              {<LeniaDex />}
+              {isStaging && <LeniaDex />}
               <Section id="why-though">
                 <Section.Header><h1>Why Though?</h1></Section.Header>
                 <article>
