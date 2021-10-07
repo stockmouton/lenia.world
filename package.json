@@ -88,6 +88,8 @@
     "sm-claim-reserved": "hardhat claim-reserved --network ${NETWORK:-localhost}",
     "sm-estimate-gas": "REPORT_GAS=true hardhat test",
     "sm-reveal": "hardhat reveal --network ${NETWORK:-localhost}",
+    "sm-release": "hardhat release --network ${NETWORK:-localhost}",
+    "sm-etherscan-verify": "hardhat etherscan-verify --network ${NETWORK:-localhost} --solc-input",
     "debug": "ndb"
   },
   "repository": {

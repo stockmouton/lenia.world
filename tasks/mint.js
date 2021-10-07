@@ -17,7 +17,7 @@ task("add-presale-list", "Add a range of addresses to the presale list", async (
   const lenia = LeniaContractFactory.attach(LeniaDeployment.address)
 
   let presaleList;
-  if (hre.hardhatArguments.network === 'mainnet') {
+  if (hre.hardhatArguments.network === 'mainnet' || hre.hardhatArguments.network === 'rinkeby') {
     presaleList = JSON.parse(fs.readFileSync(path.join(__dirname, `data/presale-list-${hre.hardhatArguments.network}.json`), 'utf8'))
   } else {
     const accounts = await hre.ethers.getSigners()
@@ -84,7 +84,7 @@ task("claim-reserved", "Claim reserved tokens for the team", async (taskArgs, hr
   const lenia = LeniaContractFactory.attach(LeniaDeployment.address)
 
   let reserved
-  if (hre.hardhatArguments.network === 'mainnet') {
+  if (hre.hardhatArguments.network === 'mainnet' || hre.hardhatArguments.network === 'rinkeby') {
     reserved = JSON.parse(fs.readFileSync(path.join(__dirname, `data/claim-reserved-${hre.hardhatArguments.network}.json`), 'utf8'))
   } else {
     const accounts = await hre.ethers.getSigners()

@@ -58,8 +58,8 @@ const IndexPage = () => {
                 <article>
                   <ul>
                     <li><b>Total number of Lenia:</b> 202</li>
-                    <li><b>Price per Lenia:</b> TBA</li>
-                    <li><b>Mint date:</b> TBA</li>
+                    <li><b>Price per Lenia:</b> 0.15 ETH</li>
+                    <li><b>Mint date:</b> Thursday, October 7th, 6PM UTC</li>
                     <li><b>Premint pass:</b> 50 (12 hours window to mint before the public sale starts)</li>
                     <li>Mint one Lenia per transaction</li>
                     <li>Metadata and Rendering Engine are stored on chain</li>
@@ -76,7 +76,7 @@ const IndexPage = () => {
                   </ul>
                 </article>
               </Section>
-              {<LeniaDex />}
+              {isStaging && <LeniaDex />}
               <Section id="why-though">
                 <Section.Header><h1>Why Though?</h1></Section.Header>
                 <article>

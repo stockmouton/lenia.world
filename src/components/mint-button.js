@@ -4,9 +4,10 @@ import { useWeb3 } from "./web3-provider"
 import Toast from './toast'
 import styled from "styled-components"
 import { createMediaQuery, BREAKPOINTS } from "../global-styles"
-import Countdown from "./countdown"
 import { useWeb3Modal } from './web3-modal-provider'
 import { useLeniaContract, SALE_STATUSES } from './lenia-contract-provider'
+import {ETHEREUM_CHAIN_IDS} from '../utils/wallet'
+import Link from "./link"
 
 const BUTTON_STATUSES = {
   CONNECT: 'CONNECT',
@@ -40,14 +41,15 @@ const StyledButton = styled(Button)`
 `
 
 const MintButton = () => {
-  const { web3Provider, account } = useWeb3()
+  const { web3Provider, account, chainId } = useWeb3()
   const { openWeb3Modal } = useWeb3Modal()
   const { isEligibleForPresale, saleStatus, totalLeniaMinted, totalLeniaSupply, initBlockchainData, updateBlockchainData, contract } = useLeniaContract()
   const [mintingTransactionStatus, setMintingTransactionStatus] = useState(MINTING_TRANSACTION_STATUSES.READY)
   const [buttonStatus, setButtonStatus] = useState(BUTTON_STATUSES.CONNECT)
   const [error, setError] = useState(null)
 
-  const getButtonStatus = (canAccountMint, isSoldOut) => {
+  const getButtonStatus = (account, canAccountMint, isSoldOut) => {
+    if (account === '') return BUTTON_STATUSES.CONNECT
     if (isSoldOut) return BUTTON_STATUSES.SOLD_OUT
     return canAccountMint ? BUTTON_STATUSES.READY : BUTTON_STATUSES.NOT_ALLOWED
   }
@@ -58,8 +60,8 @@ const MintButton = () => {
 
   useEffect(() => {
     const canAccountMint = (saleStatus === SALE_STATUSES.PRESALE && isEligibleForPresale) || saleStatus === SALE_STATUSES.PUBLIC
-    setButtonStatus(getButtonStatus(canAccountMint, totalLeniaSupply == totalLeniaMinted && totalLeniaSupply > 0))
-  }, [saleStatus, isEligibleForPresale, totalLeniaMinted, totalLeniaSupply])
+    setButtonStatus(getButtonStatus(account, canAccountMint, totalLeniaSupply == totalLeniaMinted && totalLeniaSupply > 0))
+  }, [saleStatus, isEligibleForPresale, totalLeniaMinted, totalLeniaSupply, account])
 
   const handleClick = async () => {
     if (account === '') return openWeb3Modal()
@@ -87,8 +89,8 @@ const MintButton = () => {
   const getButtonContent = () => ({
     [BUTTON_STATUSES.CONNECT]: 'Connect Wallet',
     [BUTTON_STATUSES.NOT_ALLOWED]: saleStatus === SALE_STATUSES.PRESALE ?
-      <span>Sale starts in <Countdown date={new Date('October 7, 2021 18:00:00')} /></span> :
-      <span>Presale starts in <Countdown date={new Date('October 7, 2021 06:00:00')} /></span>,
+      <span>Sale starts at 6pm UTC</span> :
+      <span>Presale starts at 6am UTC</span>,
     [BUTTON_STATUSES.READY]: 'Mint one lenia',
     [BUTTON_STATUSES.LOADING]: <>Processing transaction...</>,
     [BUTTON_STATUSES.SOLD_OUT]: 'Sold out!'
@@ -103,7 +105,7 @@ const MintButton = () => {
       <StyledButton onClick={handleClick} disabled={[BUTTON_STATUSES.NOT_ALLOWED, BUTTON_STATUSES.LOADING, BUTTON_STATUSES.SOLD_OUT].includes(buttonStatus)}>{getButtonContent()}</StyledButton>
       {saleStatus !== SALE_STATUSES.NOT_STARTED && Boolean(totalLeniaSupply) && <LeniaSupplyContent>{totalLeniaMinted}/{totalLeniaSupply} Lenia minted</LeniaSupplyContent>}
       {mintingTransactionStatus == MINTING_TRANSACTION_STATUSES.ERROR && error && <Toast type="error" onClose={handleToastClose}>{error?.message}</Toast>}
-      {mintingTransactionStatus == MINTING_TRANSACTION_STATUSES.SUCCESS && <Toast onClose={handleToastClose}>You successfully minted a lenia.</Toast>}
+      {mintingTransactionStatus == MINTING_TRANSACTION_STATUSES.SUCCESS && <Toast onClose={handleToastClose}>You successfully minted a lenia! <Link href={`https://${chainId === ETHEREUM_CHAIN_IDS.MAINNET ? '' : 'testnets.'}opensea.io/account/${chainId === ETHEREUM_CHAIN_IDS.MAINNET ? 'lenia-nft' : 'lenia'}`}>Go check your Lenia on Opensea.</Link></Toast>}
     </>
   )
 }

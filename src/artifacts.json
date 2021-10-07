@@ -1,9 +1,9 @@
 {
-  "name": "localhost",
-  "chainId": "1337",
+  "name": "rinkeby",
+  "chainId": "4",
   "contracts": {
     "LeniaDescriptor": {
-      "address": "0xA51c1fc2f0D1a1b8494Ed1FE312d7C3a78Ed91C0",
+      "address": "0x70B5c2B4E3f7429b6C1B6BA012e9Cd56C2Edb3a3",
       "abi": [
         {
           "inputs": [],
@@ -217,7 +217,7 @@
       ]
     },
     "Lenia": {
-      "address": "0x0DCd1Bf9A1b36cE34237eEaFef220932846BCD82",
+      "address": "0x19DE8eECe41816e9be6484B08a223A832121f8f4",
       "abi": [
         {
           "inputs": [

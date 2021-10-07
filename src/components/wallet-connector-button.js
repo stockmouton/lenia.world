@@ -20,7 +20,7 @@ const WalletConnectorButton = () => {
       // If the cached provider is not cleared,
       // WalletConnect will default to the existing session
       // and does not allow to re-scan the QR code with a new wallet.
-      web3Modal.clearCachedProvider()
+      await web3Modal.clearCachedProvider()
     } catch(error) {
       setError(error)
     }
