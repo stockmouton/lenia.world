@@ -68,7 +68,7 @@
     "serve": "gatsby serve",
     "clean": "gatsby clean",
     "test": "yarn sm-test",
-    "deploy": "gatsby build && gh-pages -d public -b prod",
+    "deploy": "gatsby clean && gatsby build && gh-pages -d public -b prod",
     "local-node": "hardhat node",
     "sm-compile": "hardhat compile",
     "sm-test": "hardhat test",

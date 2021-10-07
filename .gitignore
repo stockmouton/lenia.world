@@ -41,3 +41,6 @@ artifacts/
 cache/
 src/artifacts.json
 deployments/localhost/
+
+# Lenia related
+static/metadata/
