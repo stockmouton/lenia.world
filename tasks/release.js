@@ -34,3 +34,24 @@ task("release", "Withdraw money from contract for one address", async (taskArgs,
   // wait until the transaction is mined
   await releaseTx.wait();
 })
+
+task("get-shares", "Get shares").addParam(
+  'address',
+  'An Ethereum address'
+).setAction( async ({ address }, hre) => {
+if (hre.hardhatArguments.network == null) {
+  throw new Error('Please add the missing --network <localhost|rinkeby|goerli> argument')
+}
+
+const LeniaDescriptorLibraryDeployment = await hre.deployments.get('LeniaDescriptor')
+const LeniaContractFactory = await hre.ethers.getContractFactory("Lenia", {
+libraries: {
+    LeniaDescriptor: LeniaDescriptorLibraryDeployment.address
+},
+})
+const LeniaDeployment = await hre.deployments.get('Lenia')
+const lenia = LeniaContractFactory.attach(LeniaDeployment.address)
+
+const shares = await lenia.shares(address)
+console.log(`Shares for ${address} is ${shares})`)
+})
