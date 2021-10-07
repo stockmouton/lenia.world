@@ -12,6 +12,16 @@ export const Web3Provider = ({ children }) => {
   const [chainId, setChainId] = useState(null)
   const [error, setError] = useState(null)
 
+  const initAccount = async (web3Provider, isFirstConnection = false) => {
+    try {
+      const accounts = await web3Provider.eth.getAccounts()
+      if (isFirstConnection && accounts.length == 0) throw new Error('There is no existing account present.')
+      setAccount(accounts[0])
+    } catch (error) {
+      setError(error)
+    }
+  }
+
   const initWeb3Provider = async provider => {
     try {
       const web3Provider = new Web3(provider)
@@ -26,6 +36,7 @@ export const Web3Provider = ({ children }) => {
       setWeb3Provider(web3Provider)
       setProvider(provider)
       setChainId(newChainId)
+      initAccount(web3Provider, true)
 
       provider.on("accountsChanged", accounts => {
         if (accounts.length == 0) {
@@ -64,20 +75,19 @@ export const Web3Provider = ({ children }) => {
     }
   }
 
+  const checkExistingProvider = () => {
+    // Check if browser is running Metamask
+    let web3Provider
+    if (window.ethereum) {
+      initWeb3Provider(window.ethereum);
+    } else if (window.web3) {
+      initWeb3Provider(window.web3.currentProvider);
+    }
+  };
+
   const handleToastClose = () => setError(null)
 
-  useEffect(async () => {
-    if (web3Provider == null) return;
-
-    try {
-      const accounts = await web3Provider.eth.getAccounts()
-      if (accounts.length == 0) throw new Error('There is no existing account present.')
-      setAccount(accounts[0])
-    } catch (error) {
-      setError(error)
-    }
-
-  }, [web3Provider])
+  useEffect(checkExistingProvider, []);
 
   return (
     <>

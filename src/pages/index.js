@@ -23,7 +23,6 @@ import MORGAN_PICTURE from "../images/morgangiraud.png"
 import TOOMAIE_PICTURE from "../images/toomaie.jpeg"
 
 const IndexPage = () => {
-  const [isStaging] = useQueryParam("staging", BooleanParam)
   return (
     <Web3Provider>
       <Web3ModalProvider>
@@ -58,8 +57,8 @@ const IndexPage = () => {
                 <article>
                   <ul>
                     <li><b>Total number of Lenia:</b> 202</li>
-                    <li><b>Price per Lenia:</b> TBA</li>
-                    <li><b>Mint date:</b> TBA</li>
+                    <li><b>Price per Lenia:</b> 0.15 ETH</li>
+                    <li><b>Mint date:</b> Thursday, October 7th, 6PM UTC</li>
                     <li><b>Premint pass:</b> 50 (12 hours window to mint before the public sale starts)</li>
                     <li>Mint one Lenia per transaction</li>
                     <li>Metadata and Rendering Engine are stored on chain</li>

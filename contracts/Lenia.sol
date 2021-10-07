@@ -34,7 +34,7 @@ import { LeniaDescriptor } from "./libs/LeniaDescriptor.sol";
 contract Lenia is ERC721, ERC721Enumerable, PaymentSplitter, Ownable {
 
     uint256 public constant MAX_SUPPLY = 202;
-    uint256 private _price = 0.1 ether;
+    uint256 private _price = 0.15 ether;
     uint256 private _reserved = 11;
 
     mapping(address => bool) private _presaleList;

@@ -95,7 +95,7 @@ NETWORK=rinkeby yarn sm-start-sale # Testnet
 Before minting, please: 
 - set the baseURI for fetching each NFT metadata.
 ```
-yarn sm-set-baseuri --baseuri <http://localhost:800/metadata/|https://lenia.world/metadata/> # Local node
+yarn sm-set-baseuri --baseuri <http://localhost:8000/metadata/|https://lenia.world/metadata/> # Local node
 
 NETWORK=rinkeby yarn sm-set-baseuri --baseuri <http://localhost:800/metadata/|https://lenia.world/metadata/> # Testnet
 ```

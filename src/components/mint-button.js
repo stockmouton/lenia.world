@@ -47,7 +47,8 @@ const MintButton = () => {
   const [buttonStatus, setButtonStatus] = useState(BUTTON_STATUSES.CONNECT)
   const [error, setError] = useState(null)
 
-  const getButtonStatus = (canAccountMint, isSoldOut) => {
+  const getButtonStatus = (account, canAccountMint, isSoldOut) => {
+    if (account === '') return BUTTON_STATUSES.CONNECT
     if (isSoldOut) return BUTTON_STATUSES.SOLD_OUT
     return canAccountMint ? BUTTON_STATUSES.READY : BUTTON_STATUSES.NOT_ALLOWED
   }
@@ -58,8 +59,8 @@ const MintButton = () => {
 
   useEffect(() => {
     const canAccountMint = (saleStatus === SALE_STATUSES.PRESALE && isEligibleForPresale) || saleStatus === SALE_STATUSES.PUBLIC
-    setButtonStatus(getButtonStatus(canAccountMint, totalLeniaSupply == totalLeniaMinted && totalLeniaSupply > 0))
-  }, [saleStatus, isEligibleForPresale, totalLeniaMinted, totalLeniaSupply])
+    setButtonStatus(getButtonStatus(account, canAccountMint, totalLeniaSupply == totalLeniaMinted && totalLeniaSupply > 0))
+  }, [saleStatus, isEligibleForPresale, totalLeniaMinted, totalLeniaSupply, account])
 
   const handleClick = async () => {
     if (account === '') return openWeb3Modal()
@@ -87,8 +88,8 @@ const MintButton = () => {
   const getButtonContent = () => ({
     [BUTTON_STATUSES.CONNECT]: 'Connect Wallet',
     [BUTTON_STATUSES.NOT_ALLOWED]: saleStatus === SALE_STATUSES.PRESALE ?
-      <span>Sale starts in <Countdown date={new Date('October 7, 2021 18:00:00')} /></span> :
-      <span>Presale starts in <Countdown date={new Date('October 7, 2021 06:00:00')} /></span>,
+      <span>Sale starts at 6pm UTC</span> :
+      <span>Presale starts at 6am UTC</span>,
     [BUTTON_STATUSES.READY]: 'Mint one lenia',
     [BUTTON_STATUSES.LOADING]: <>Processing transaction...</>,
     [BUTTON_STATUSES.SOLD_OUT]: 'Sold out!'
