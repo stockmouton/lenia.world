@@ -43,12 +43,12 @@ const Footer = () => (
         </Link>
       </SocialMedia.Item>
       <SocialMedia.Item>
-        <Link>
+        <Link href="https://opensea.io/collection/lenia-nft">
           <OpenseaLogo height={18} />
         </Link>
       </SocialMedia.Item>
       <SocialMedia.Item>
-        <Link>
+        <Link href="https://etherscan.io/address/0xe95004c7f061577df60e9e46c1e724cc75b01850">
           <EtherscanLogo height={18} />
         </Link>
       </SocialMedia.Item>
