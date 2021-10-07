@@ -105,9 +105,12 @@ task("claim-reserved", "Claim reserved tokens for the team", async (taskArgs, hr
   }
   for (i = 0; i < reserved.length; i++) {
     const futureOwner = reserved[i]
+    console.log(futureOwner)
     const claimReservedTx = await lenia.claimReserved(futureOwner.reserved, futureOwner.address);
+    console.log(claimReservedTx)
     // wait until the transaction is mined
     await claimReservedTx.wait();
+    console.log('successful transaction')
 
     const tokensOfOwner = await lenia.tokensOfOwner(futureOwner.address)
     console.log(`${futureOwner.name}(${futureOwner.address}) owns:`)
