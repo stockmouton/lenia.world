@@ -376,6 +376,12 @@ describe("Lenia", function () {
       expect(isSaleActive).to.equal(false)
     })
 
+    it("should toggle the sale status only by the owner", async () => {
+      const [_, account] = await ethers.getSigners()
+      const toggleSaleTx = hardhatLenia.connect(account).toggleSaleStatus()
+      expect(toggleSaleTx).to.be.revertedWith("Ownable: caller is not the owner")
+    })
+
     it("should not mint when sale is not active", async function () {          
       const contractPrice = await hardhatLenia.getPrice()
       const mintTx = hardhatLenia.mint({
