@@ -26,7 +26,7 @@ describe("Royalties", function () {
   })
 
   describe("Deployment", function () {
-    it.only("Should set the payees", async function () {
+    it("Should set the payees", async function () {
       const [owner] = await ethers.getSigners()
       const firstPayee = await hardhatLenia.payee(0)
       expect(firstPayee).to.equal(owner.address)
