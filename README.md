@@ -45,6 +45,15 @@ yarn clean
 You will need money in your local account to interact with the smart contract:
 - Add one of the dev private keys to your Metamask wallet to enjoy those sweet default 10k ETH.
 
+### About metadata
+We have 2 metadata folders: one at the root of the project, the second one in the static folder. 
+
+The one in the `static` folder is used by Gatsby when we deploy the website to update the `public` folder. 
+
+**Beware Gatsby is caching elements in the public folder, beware to clean it before deployinf to ensure the public foler is synced with the static folder**
+
+The other one at the root folder is used to ensure a gradual reveal in production. The `fake` subfolder can be used for local/preprod, to test the script. The `ori` subfolder should contain the original assets.
+
 ## Deployment
 
 ### Smart contract
