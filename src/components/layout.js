@@ -60,18 +60,18 @@ const Layout = ({ children }) => {
                 <BrandName>Discord</BrandName>
               </NavBar.Link>
             </NavBar.Item.AboveSm>
-            {/* <NavBar.Item.AboveSm>
-              <NavBar.Link>
+            <NavBar.Item.AboveSm>
+              <NavBar.Link href="https://opensea.io/collection/lenia-nft">
                 <BrandLogo><OpenseaLogo height={18} /></BrandLogo>
                 <BrandName>Opensea</BrandName>
               </NavBar.Link>
             </NavBar.Item.AboveSm>
             <NavBar.Item.AboveSm>
-              <NavBar.Link>
+              <NavBar.Link href="https://etherscan.io/address/0xe95004c7f061577df60e9e46c1e724cc75b01850">
                 <BrandLogo><EtherscanLogo height={18} /></BrandLogo>
                 <BrandName>Etherscan</BrandName>
               </NavBar.Link>
-            </NavBar.Item.AboveSm> */}
+            </NavBar.Item.AboveSm>
             <NavBar.Item.AboveSm>
               <NavBar.Link href="https://github.com/stockmouton/lenia.stockmouton.com">
                 <BrandLogo><GithubLogo height={18} /></BrandLogo>
