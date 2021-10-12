@@ -7,7 +7,7 @@ const GeneratorPage = () => {
     const [id] = useQueryParam("id", NumberParam);
     
     return (
-        <Generator onchain={false} lenia_id={id || 0} />
+        <Generator scale={1} lenia_id={id || 0} />
     )
 }
 
