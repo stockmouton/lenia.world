@@ -10,7 +10,7 @@ import Grid from "../components/grid"
 import Profile from "../components/profile"
 import { Web3Provider } from "../components/web3-provider";
 import { Web3ModalProvider } from "../components/web3-modal-provider"
-import MintButton from "../components/mint-button";
+import SoldOutButton from "../components/sold-out-button";
 import Link from "../components/link";
 import Panel from "../components/panel";
 import LeniaDex from "../components/leniadex"
@@ -36,13 +36,13 @@ const IndexPage = () => {
                 <h1>Enter the Leniaverse...</h1>
                 <Lead>
                   <p>
-                    After months of exploring the Leniaverse, 202 unique life-forms have been discovered and are ready to be unleashed on the Ethereum blockchain. Their name: <b>Lenia</b>.
+                    After months of exploring the Leniaverse, 202 unique life-forms have been discovered and unleashed on the Ethereum blockchain. Their name: <b>Lenia</b>.
                   </p>
                   <p>
                     Join us on our big adventure in this uncharted part of the metaverse where Artificial Intelligence meets Art & Emerging Life.
                   </p>
                 </Lead>
-                <MintButton />
+                <SoldOutButton />
               </Jumbotron>
               <Section id="niftty-gritty">
                 <Section.Header><h1>N(i)FTty-gritty</h1></Section.Header>
@@ -149,15 +149,11 @@ const IndexPage = () => {
                 <Section.Header><h1>Quite Asked Questions</h1></Section.Header>
                 <Panel
                   heading="What are Lenia?"
-                  body={<p>Lenia are pure mathematical creatures and a subject of active research in the field of Artificial Life.</p>}
+                  body={<p>Lenia are pure mathematical creatures and a subject of active research in the field of Artificial Life. See this <Link href="https://twitter.com/lenia_nft/status/1443662675536498692?s=20">Twitter thread</Link> for more explanation.</p>}
                 />
                 <Panel
-                  heading="When is launch date?"
-                  body={<p>Launch date is set to happen early October. Final mint date TBA.</p>}
-                />
-                <Panel
-                  heading="What will be the cost?"
-                  body={<p>The price of each Lenia will be announced soon.</p>}
+                  heading="When was the launch date?"
+                  body={<p>Launch date for the genesis collection happened on Thursday, October 7th 2021.</p>}
                 />
                 <Panel
                   heading="What is the DAO?"
