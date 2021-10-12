@@ -1,223 +1,9 @@
 {
-  "name": "mainnet",
-  "chainId": "1",
+  "name": "rinkeby",
+  "chainId": "4",
   "contracts": {
-    "LeniaDescriptor": {
-      "address": "0x9B9a52668EC93427Cbf34d729fbC816C9d0481e6",
-      "abi": [
-        {
-          "inputs": [],
-          "name": "DESCRIPTION",
-          "outputs": [
-            {
-              "internalType": "string",
-              "name": "",
-              "type": "string"
-            }
-          ],
-          "stateMutability": "view",
-          "type": "function"
-        },
-        {
-          "inputs": [],
-          "name": "EXTERNAL_LINK",
-          "outputs": [
-            {
-              "internalType": "string",
-              "name": "",
-              "type": "string"
-            }
-          ],
-          "stateMutability": "view",
-          "type": "function"
-        },
-        {
-          "inputs": [],
-          "name": "NAME_PREFIX",
-          "outputs": [
-            {
-              "internalType": "string",
-              "name": "",
-              "type": "string"
-            }
-          ],
-          "stateMutability": "view",
-          "type": "function"
-        },
-        {
-          "inputs": [
-            {
-              "components": [
-                {
-                  "internalType": "bool",
-                  "name": "metadataReady",
-                  "type": "bool"
-                },
-                {
-                  "internalType": "string",
-                  "name": "stringID",
-                  "type": "string"
-                },
-                {
-                  "internalType": "string",
-                  "name": "imageURL",
-                  "type": "string"
-                },
-                {
-                  "internalType": "string",
-                  "name": "animationURL",
-                  "type": "string"
-                },
-                {
-                  "components": [
-                    {
-                      "internalType": "uint16",
-                      "name": "traitType",
-                      "type": "uint16"
-                    },
-                    {
-                      "internalType": "uint16",
-                      "name": "value",
-                      "type": "uint16"
-                    },
-                    {
-                      "internalType": "string",
-                      "name": "numericalValue",
-                      "type": "string"
-                    }
-                  ],
-                  "internalType": "struct LeniaDescriptor.LeniaAttribute[]",
-                  "name": "leniaAttributes",
-                  "type": "tuple[]"
-                }
-              ],
-              "internalType": "struct LeniaDescriptor.LeniaMetadata",
-              "name": "metadata",
-              "type": "tuple"
-            },
-            {
-              "components": [
-                {
-                  "internalType": "string",
-                  "name": "m",
-                  "type": "string"
-                },
-                {
-                  "internalType": "string",
-                  "name": "s",
-                  "type": "string"
-                },
-                {
-                  "internalType": "bytes",
-                  "name": "cells",
-                  "type": "bytes"
-                }
-              ],
-              "internalType": "struct LeniaDescriptor.LeniaParams",
-              "name": "leniaParams",
-              "type": "tuple"
-            }
-          ],
-          "name": "constructTokenURI",
-          "outputs": [
-            {
-              "internalType": "string",
-              "name": "",
-              "type": "string"
-            }
-          ],
-          "stateMutability": "pure",
-          "type": "function"
-        },
-        {
-          "inputs": [
-            {
-              "components": [
-                {
-                  "internalType": "bool",
-                  "name": "metadataReady",
-                  "type": "bool"
-                },
-                {
-                  "internalType": "string",
-                  "name": "stringID",
-                  "type": "string"
-                },
-                {
-                  "internalType": "string",
-                  "name": "imageURL",
-                  "type": "string"
-                },
-                {
-                  "internalType": "string",
-                  "name": "animationURL",
-                  "type": "string"
-                },
-                {
-                  "components": [
-                    {
-                      "internalType": "uint16",
-                      "name": "traitType",
-                      "type": "uint16"
-                    },
-                    {
-                      "internalType": "uint16",
-                      "name": "value",
-                      "type": "uint16"
-                    },
-                    {
-                      "internalType": "string",
-                      "name": "numericalValue",
-                      "type": "string"
-                    }
-                  ],
-                  "internalType": "struct LeniaDescriptor.LeniaAttribute[]",
-                  "name": "leniaAttributes",
-                  "type": "tuple[]"
-                }
-              ],
-              "internalType": "struct LeniaDescriptor.LeniaMetadata",
-              "name": "metadata",
-              "type": "tuple"
-            },
-            {
-              "components": [
-                {
-                  "internalType": "string",
-                  "name": "m",
-                  "type": "string"
-                },
-                {
-                  "internalType": "string",
-                  "name": "s",
-                  "type": "string"
-                },
-                {
-                  "internalType": "bytes",
-                  "name": "cells",
-                  "type": "bytes"
-                }
-              ],
-              "internalType": "struct LeniaDescriptor.LeniaParams",
-              "name": "leniaParams",
-              "type": "tuple"
-            }
-          ],
-          "name": "isReady",
-          "outputs": [
-            {
-              "internalType": "bool",
-              "name": "",
-              "type": "bool"
-            }
-          ],
-          "stateMutability": "pure",
-          "type": "function"
-        }
-      ]
-    },
     "Lenia": {
-      "address": "0xE95004C7F061577df60E9e46C1E724cC75b01850",
+      "address": "0x17D0503c61E41E4b10f199E2C80d6630a0062d1A",
       "abi": [
         {
           "inputs": [
@@ -1243,6 +1029,220 @@
         {
           "stateMutability": "payable",
           "type": "receive"
+        }
+      ]
+    },
+    "LeniaDescriptor": {
+      "address": "0x70B5c2B4E3f7429b6C1B6BA012e9Cd56C2Edb3a3",
+      "abi": [
+        {
+          "inputs": [],
+          "name": "DESCRIPTION",
+          "outputs": [
+            {
+              "internalType": "string",
+              "name": "",
+              "type": "string"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [],
+          "name": "EXTERNAL_LINK",
+          "outputs": [
+            {
+              "internalType": "string",
+              "name": "",
+              "type": "string"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [],
+          "name": "NAME_PREFIX",
+          "outputs": [
+            {
+              "internalType": "string",
+              "name": "",
+              "type": "string"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "components": [
+                {
+                  "internalType": "bool",
+                  "name": "metadataReady",
+                  "type": "bool"
+                },
+                {
+                  "internalType": "string",
+                  "name": "stringID",
+                  "type": "string"
+                },
+                {
+                  "internalType": "string",
+                  "name": "imageURL",
+                  "type": "string"
+                },
+                {
+                  "internalType": "string",
+                  "name": "animationURL",
+                  "type": "string"
+                },
+                {
+                  "components": [
+                    {
+                      "internalType": "uint16",
+                      "name": "traitType",
+                      "type": "uint16"
+                    },
+                    {
+                      "internalType": "uint16",
+                      "name": "value",
+                      "type": "uint16"
+                    },
+                    {
+                      "internalType": "string",
+                      "name": "numericalValue",
+                      "type": "string"
+                    }
+                  ],
+                  "internalType": "struct LeniaDescriptor.LeniaAttribute[]",
+                  "name": "leniaAttributes",
+                  "type": "tuple[]"
+                }
+              ],
+              "internalType": "struct LeniaDescriptor.LeniaMetadata",
+              "name": "metadata",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "string",
+                  "name": "m",
+                  "type": "string"
+                },
+                {
+                  "internalType": "string",
+                  "name": "s",
+                  "type": "string"
+                },
+                {
+                  "internalType": "bytes",
+                  "name": "cells",
+                  "type": "bytes"
+                }
+              ],
+              "internalType": "struct LeniaDescriptor.LeniaParams",
+              "name": "leniaParams",
+              "type": "tuple"
+            }
+          ],
+          "name": "constructTokenURI",
+          "outputs": [
+            {
+              "internalType": "string",
+              "name": "",
+              "type": "string"
+            }
+          ],
+          "stateMutability": "pure",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "components": [
+                {
+                  "internalType": "bool",
+                  "name": "metadataReady",
+                  "type": "bool"
+                },
+                {
+                  "internalType": "string",
+                  "name": "stringID",
+                  "type": "string"
+                },
+                {
+                  "internalType": "string",
+                  "name": "imageURL",
+                  "type": "string"
+                },
+                {
+                  "internalType": "string",
+                  "name": "animationURL",
+                  "type": "string"
+                },
+                {
+                  "components": [
+                    {
+                      "internalType": "uint16",
+                      "name": "traitType",
+                      "type": "uint16"
+                    },
+                    {
+                      "internalType": "uint16",
+                      "name": "value",
+                      "type": "uint16"
+                    },
+                    {
+                      "internalType": "string",
+                      "name": "numericalValue",
+                      "type": "string"
+                    }
+                  ],
+                  "internalType": "struct LeniaDescriptor.LeniaAttribute[]",
+                  "name": "leniaAttributes",
+                  "type": "tuple[]"
+                }
+              ],
+              "internalType": "struct LeniaDescriptor.LeniaMetadata",
+              "name": "metadata",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "string",
+                  "name": "m",
+                  "type": "string"
+                },
+                {
+                  "internalType": "string",
+                  "name": "s",
+                  "type": "string"
+                },
+                {
+                  "internalType": "bytes",
+                  "name": "cells",
+                  "type": "bytes"
+                }
+              ],
+              "internalType": "struct LeniaDescriptor.LeniaParams",
+              "name": "leniaParams",
+              "type": "tuple"
+            }
+          ],
+          "name": "isReady",
+          "outputs": [
+            {
+              "internalType": "bool",
+              "name": "",
+              "type": "bool"
+            }
+          ],
+          "stateMutability": "pure",
+          "type": "function"
         }
       ]
     }
