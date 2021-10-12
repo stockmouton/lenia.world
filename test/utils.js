@@ -11,7 +11,6 @@ exports.deployLeniaContract = async (ethers) => {
             LeniaDescriptor: leniaDescriptorLibrary.address
         }
     })
-
     const otherAddresses = otherAccounts.map(account => account.address)
     // Simulate splitting Ether balance among a group of accounts
     const payeeAdresses = [
@@ -21,7 +20,10 @@ exports.deployLeniaContract = async (ethers) => {
         otherAddresses[2], // Team Member 3
     ]
     const payeeShares = [450, 225, 225, 100]
-    return Lenia.deploy(payeeAdresses, payeeShares)
+
+    const contractPromise = Lenia.deploy(payeeAdresses, payeeShares)
+
+    return contractPromise
 }
 
 exports.generatePrivateKey = () => {

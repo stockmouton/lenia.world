@@ -5,7 +5,7 @@ const pako = require('pako');
 
 exports.getEngineCode = async function(provider, leniaContract) {
     let contractGzipEngineHex;
-    if (provider instanceof Web3) {
+    if (Web3 != null && provider instanceof Web3) {
         contractGzipEngineHex = await leniaContract.methods.getEngine()
     } else {
         contractGzipEngineHex = await leniaContract.getEngine()
@@ -31,7 +31,7 @@ exports.getEngineCode = async function(provider, leniaContract) {
 
 exports.getLeniaParameters = async function(provider, leniaContract, index) {
     let contractLeniaParams;
-    if (provider instanceof Web3) {
+    if (Web3 != null && provider instanceof Web3) {
         contractLeniaParams = await leniaContract.methods.getLeniaParams(index)
     } else {
         contractLeniaParams = await leniaContract.getLeniaParams(index)

@@ -361,26 +361,22 @@ describe("Lenia", function () {
 
   describe("Sale", () => {
     it("should toggle the sale status", async function () {
-      expect(await hardhatLenia.isSaleActive()).to.equal(false)
+      let isSaleActive;
+
+      isSaleActive = await hardhatLenia.isSaleActive()
+      expect(isSaleActive).to.equal(false)
   
       await hardhatLenia.toggleSaleStatus()
   
-      expect(await hardhatLenia.isSaleActive()).to.equal(true)
+      isSaleActive = await hardhatLenia.isSaleActive()
+      expect(isSaleActive).to.equal(true)
   
       await hardhatLenia.toggleSaleStatus()
-    
-      expect(await hardhatLenia.isSaleActive()).to.equal(false)
+      isSaleActive = await hardhatLenia.isSaleActive()
+      expect(isSaleActive).to.equal(false)
     })
 
-    it("should toggle the sale status only by the owner", async () => {
-      const [_, account] = await ethers.getSigners()
-      const toggleSaleTx = hardhatLenia.toggleSaleStatus()
-      expect(toggleSaleTx).to.be.revertedWith("Ownable: caller is not the owner")
-    })
-
-    it("should not mint when sale is not active", async function () {    
-      console.log(await hardhatLenia.isSaleActive())
-      
+    it("should not mint when sale is not active", async function () {          
       const contractPrice = await hardhatLenia.getPrice()
       const mintTx = hardhatLenia.mint({
         value: contractPrice
@@ -399,7 +395,7 @@ describe("Lenia", function () {
 
       const totalSupply = await hardhatLenia.totalSupply()
       const contractBalance = await hardhatLenia.provider.getBalance(hardhatLenia.address)
-      expect(ethers.utils.formatEther(contractBalance)).to.equal('0.1')
+      expect(ethers.utils.formatEther(contractBalance)).to.equal('0.15')
       expect(totalSupply).to.equal(1)
     })
 
