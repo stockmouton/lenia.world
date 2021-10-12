@@ -127,7 +127,7 @@
         then = Date.now();
         startTime = then;
         function loop() {
-            // window.requestAnimationFrame(loop);
+            window.requestAnimationFrame(loop);
 
             now = Date.now();
             elapsed = now - then;
@@ -301,6 +301,8 @@
         const attributes = metadata["attributes"]
 
         let scale = config["world_params"]["scale"]
+        scale = parseInt(Math.min(Math.max(scale, 1), 10), 10)
+
         let cellsSt = config["cells"]
         let init_cells = decompress_array(cellsSt)
 
@@ -309,6 +311,10 @@
 
         let x1 = Math.floor(WORLD_SIZE / 2 - init_cells.shape[2] / 2 * scale)
         let y1 = Math.floor(WORLD_SIZE / 2 - init_cells.shape[1] / 2 * scale)
+        console.log(init_cells)
+        if (scale > 2) { 
+            update_fn()
+        }
         AddCellArray(init_cells, x1, y1, 0, 0, scale, 0, 0);
     }
 
@@ -583,7 +589,7 @@
         }
     }
 
-    function ClearField(x) {
+    function ClearCells(x) {
         for (let i=0; i<WORLD_SIZE; i++) {
             for (let j=0; j<WORLD_SIZE; j++) {
                 cells[i][j] = x;
@@ -640,6 +646,7 @@
         }
         update_fn(false);
     }
+
     ///////////////////////////
     // Utils
     ///////////////////////////

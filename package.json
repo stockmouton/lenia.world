@@ -85,6 +85,7 @@
     "sm-set-leniaparams": "hardhat set-leniaparams --network ${NETWORK:-localhost}",
     "sm-get-leniaparams": "hardhat get-leniaparams --network ${NETWORK:-localhost}",
     "sm-set-metadata": "hardhat set-metadata --network ${NETWORK:-localhost}",
+    "sm-populate-all": "hardhat populate-all --network ${NETWORK:-localhost}",
     "sm-claim-reserved": "hardhat claim-reserved --network ${NETWORK:-localhost}",
     "sm-estimate-gas": "REPORT_GAS=true hardhat test",
     "sm-reveal": "hardhat reveal --network ${NETWORK:-localhost}",

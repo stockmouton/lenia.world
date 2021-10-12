@@ -242,3 +242,86 @@ task("get-metadata", "Get a Lenia metadata")
         contractMetadata.config.cells = contractAllCells[index];
         console.log(contractMetadata)
     })
+
+task("populate-all", "Full populate the contract")
+    .addOptionalParam(
+        'enginePath',
+        'The path to the engine JS code',
+        'src/engine.js',
+        types.string,
+    )
+    .addOptionalParam(
+        'metadataPath',
+        'The path to the metadata containing the cells',
+        'metadata/fake/all_metadata.json',
+        types.string,
+    )
+    .setAction( async ( {enginePath, metadataPath}, hre ) => {
+        if (hre.hardhatArguments.network == null) {
+            throw new Error('Please add the missing --network <localhost> argument')
+        }
+        if(hre.hardhatArguments.network != 'localhost') {
+            throw new Error('This task only work for localhost')
+        }
+        const accounts = await hre.ethers.getSigners()
+
+        const LeniaDescriptorLibraryDeployment = await hre.deployments.get('LeniaDescriptor')
+        const LeniaContractFactory = await hre.ethers.getContractFactory("Lenia", {
+            libraries: {
+                LeniaDescriptor: LeniaDescriptorLibraryDeployment.address
+            },
+        })
+
+        const LeniaDeployment = await hre.deployments.get('Lenia')
+        const lenia = LeniaContractFactory.attach(LeniaDeployment.address)
+        
+        const engineFullpath = rootFolder + '/' + enginePath;
+        console.log(`Setting the engine at ${engineFullpath}`)
+        const engineCode = fs.readFileSync(engineFullpath, 'utf-8')
+        const result = UglifyJS.minify([engineCode]);
+        const gzipEngine = pako.deflate(result.code);
+        await lenia.setEngine(gzipEngine)
+        console.log('Setting the engine: Done')
+
+        const metadataFullpath = rootFolder + '/' + metadataPath
+        console.log(`Setting all lenia Parameters using metadata at ${metadataFullpath}`)
+        const metadata = require(metadataFullpath)
+        for (let index = 0; index < metadata.length; index++) {
+            let element = metadata[index];
+            const m = element.config.kernels_params[0].m.toFixed(9)
+            const s = element.config.kernels_params[0].s.toFixed(9)
+            const gzipCells = pako.deflate(element.config.cells);
+
+            await lenia.setLeniaParams(index, m, s, gzipCells);
+        }
+        console.log('Setting all lenia Parameters: Done')
+
+        let isSaleActive = await lenia.isSaleActive()
+        if (!isSaleActive) {
+            console.log('Starting sales')
+            const setSaleStartTx = await lenia.toggleSaleStatus();
+            isSaleActive = await lenia.isSaleActive()
+            if (!isSaleActive) {
+                throw new Error('Sale did not activate')
+            }
+            console.log('Starting sales: Done')
+        }
+        
+        console.log('Claiming Reserved')
+        const claimReservedTx = await lenia.claimReserved(11, accounts[0].address);
+        console.log('Claiming Reserved: Done')
+
+        console.log('Minting everything')
+        const maxSupply = Number(await lenia.MAX_SUPPLY())
+        const totalSupply = Number(await lenia.totalSupply())
+        const contractPrice = await lenia.getPrice()
+        console.log(maxSupply, totalSupply);
+        for (let index = 0; index < maxSupply - totalSupply; index++) {
+            await lenia.mint({
+                value: contractPrice
+            })
+        }
+        console.log('Minting Everything: Done')
+
+        console.log('if you want assets to be update, you need to launch the reveal script now.');
+    })
