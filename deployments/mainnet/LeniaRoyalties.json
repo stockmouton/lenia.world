@@ -1,0 +1,359 @@
+{
+  "address": "0x2B85971a561E3472A738e4b0ed1299145a20E554",
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "address[]",
+          "name": "payees",
+          "type": "address[]"
+        },
+        {
+          "internalType": "uint256[]",
+          "name": "shares_",
+          "type": "uint256[]"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "constructor"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "account",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "shares",
+          "type": "uint256"
+        }
+      ],
+      "name": "PayeeAdded",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "from",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        }
+      ],
+      "name": "PaymentReceived",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "to",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        }
+      ],
+      "name": "PaymentReleased",
+      "type": "event"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "index",
+          "type": "uint256"
+        }
+      ],
+      "name": "payee",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address payable",
+          "name": "account",
+          "type": "address"
+        }
+      ],
+      "name": "release",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "account",
+          "type": "address"
+        }
+      ],
+      "name": "released",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "account",
+          "type": "address"
+        }
+      ],
+      "name": "shares",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "totalReleased",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "totalShares",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "stateMutability": "payable",
+      "type": "receive"
+    }
+  ],
+  "transactionHash": "0xcec7798d2d4fca863cc224ed2afb6af557ca0a7d08c5b26f5bfd2561823c5220",
+  "receipt": {
+    "to": null,
+    "from": "0x598c2d33bc8AbFf3380f1987dDED251f2f9a6269",
+    "contractAddress": "0x2B85971a561E3472A738e4b0ed1299145a20E554",
+    "transactionIndex": 142,
+    "gasUsed": "725721",
+    "logsBloom": "0x00000000000000000000000000000000000000000000000000000000000000000000008000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000800000000000000000000000000000000000000000000000000000000000000000000000000000000000000000400000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000080000000000000040000000000000000000000000000020000000000000000000000000000000000000000000000000000000",
+    "blockHash": "0x0504bdd8d4f8ae98a8d862692af83ce86aa38613d66c352190d2fd7a7ee03d64",
+    "transactionHash": "0xcec7798d2d4fca863cc224ed2afb6af557ca0a7d08c5b26f5bfd2561823c5220",
+    "logs": [
+      {
+        "transactionIndex": 142,
+        "blockNumber": 13402442,
+        "transactionHash": "0xcec7798d2d4fca863cc224ed2afb6af557ca0a7d08c5b26f5bfd2561823c5220",
+        "address": "0x2B85971a561E3472A738e4b0ed1299145a20E554",
+        "topics": [
+          "0x40c340f65e17194d14ddddb073d3c9f888e3cb52b5aae0c6c7706b4fbc905fac"
+        ],
+        "data": "0x00000000000000000000000001823f2d3bad3ac490602a62a4d3daaca7e27c860000000000000000000000000000000000000000000000000000000000000002",
+        "logIndex": 336,
+        "blockHash": "0x0504bdd8d4f8ae98a8d862692af83ce86aa38613d66c352190d2fd7a7ee03d64"
+      },
+      {
+        "transactionIndex": 142,
+        "blockNumber": 13402442,
+        "transactionHash": "0xcec7798d2d4fca863cc224ed2afb6af557ca0a7d08c5b26f5bfd2561823c5220",
+        "address": "0x2B85971a561E3472A738e4b0ed1299145a20E554",
+        "topics": [
+          "0x40c340f65e17194d14ddddb073d3c9f888e3cb52b5aae0c6c7706b4fbc905fac"
+        ],
+        "data": "0x00000000000000000000000092d30e8f910377f501bbe51b2c6ae898919854bc0000000000000000000000000000000000000000000000000000000000000001",
+        "logIndex": 337,
+        "blockHash": "0x0504bdd8d4f8ae98a8d862692af83ce86aa38613d66c352190d2fd7a7ee03d64"
+      },
+      {
+        "transactionIndex": 142,
+        "blockNumber": 13402442,
+        "transactionHash": "0xcec7798d2d4fca863cc224ed2afb6af557ca0a7d08c5b26f5bfd2561823c5220",
+        "address": "0x2B85971a561E3472A738e4b0ed1299145a20E554",
+        "topics": [
+          "0x40c340f65e17194d14ddddb073d3c9f888e3cb52b5aae0c6c7706b4fbc905fac"
+        ],
+        "data": "0x0000000000000000000000003be02eafab2bb7d48b9d1edc3dbd9aed5143869d0000000000000000000000000000000000000000000000000000000000000001",
+        "logIndex": 338,
+        "blockHash": "0x0504bdd8d4f8ae98a8d862692af83ce86aa38613d66c352190d2fd7a7ee03d64"
+      },
+      {
+        "transactionIndex": 142,
+        "blockNumber": 13402442,
+        "transactionHash": "0xcec7798d2d4fca863cc224ed2afb6af557ca0a7d08c5b26f5bfd2561823c5220",
+        "address": "0x2B85971a561E3472A738e4b0ed1299145a20E554",
+        "topics": [
+          "0x40c340f65e17194d14ddddb073d3c9f888e3cb52b5aae0c6c7706b4fbc905fac"
+        ],
+        "data": "0x000000000000000000000000bd152acfa5f810cba903c2efe7074be88e335f500000000000000000000000000000000000000000000000000000000000000002",
+        "logIndex": 339,
+        "blockHash": "0x0504bdd8d4f8ae98a8d862692af83ce86aa38613d66c352190d2fd7a7ee03d64"
+      }
+    ],
+    "blockNumber": 13402442,
+    "cumulativeGasUsed": "17606929",
+    "status": 1,
+    "byzantium": true
+  },
+  "args": [
+    [
+      "0x01823F2d3bAD3aC490602A62A4D3Daaca7E27c86",
+      "0x92d30E8F910377F501bBe51B2C6ae898919854Bc",
+      "0x3Be02EaFab2bB7d48B9d1edC3DBd9AED5143869d",
+      "0xBD152AcFA5f810Cba903c2eFe7074Be88E335f50"
+    ],
+    [
+      2,
+      1,
+      1,
+      2
+    ]
+  ],
+  "solcInputHash": "c7658983b9313e203016812786711e70",
+  "metadata": "{\"compiler\":{\"version\":\"0.8.6+commit.11564f7e\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"internalType\":\"address[]\",\"name\":\"payees\",\"type\":\"address[]\"},{\"internalType\":\"uint256[]\",\"name\":\"shares_\",\"type\":\"uint256[]\"}],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"shares\",\"type\":\"uint256\"}],\"name\":\"PayeeAdded\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"from\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"}],\"name\":\"PaymentReceived\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"to\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"}],\"name\":\"PaymentReleased\",\"type\":\"event\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"index\",\"type\":\"uint256\"}],\"name\":\"payee\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address payable\",\"name\":\"account\",\"type\":\"address\"}],\"name\":\"release\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"}],\"name\":\"released\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"}],\"name\":\"shares\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"totalReleased\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"totalShares\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"stateMutability\":\"payable\",\"type\":\"receive\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{\"payee(uint256)\":{\"details\":\"Getter for the address of the payee number `index`.\"},\"release(address)\":{\"details\":\"Triggers a transfer to `account` of the amount of Ether they are owed, according to their percentage of the total shares and their previous withdrawals.\"},\"released(address)\":{\"details\":\"Getter for the amount of Ether already released to a payee.\"},\"shares(address)\":{\"details\":\"Getter for the amount of shares held by an account.\"},\"totalReleased()\":{\"details\":\"Getter for the total amount of Ether already released.\"},\"totalShares()\":{\"details\":\"Getter for the total shares held by payees.\"}},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"contracts/LeniaRoyalties.sol\":\"LeniaRoyalties\"},\"evmVersion\":\"berlin\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\",\"useLiteralContent\":true},\"optimizer\":{\"enabled\":true,\"runs\":10000},\"remappings\":[]},\"sources\":{\"@openzeppelin/contracts/finance/PaymentSplitter.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n\\npragma solidity ^0.8.0;\\n\\nimport \\\"../utils/Address.sol\\\";\\nimport \\\"../utils/Context.sol\\\";\\nimport \\\"../utils/math/SafeMath.sol\\\";\\n\\n/**\\n * @title PaymentSplitter\\n * @dev This contract allows to split Ether payments among a group of accounts. The sender does not need to be aware\\n * that the Ether will be split in this way, since it is handled transparently by the contract.\\n *\\n * The split can be in equal parts or in any other arbitrary proportion. The way this is specified is by assigning each\\n * account to a number of shares. Of all the Ether that this contract receives, each account will then be able to claim\\n * an amount proportional to the percentage of total shares they were assigned.\\n *\\n * `PaymentSplitter` follows a _pull payment_ model. This means that payments are not automatically forwarded to the\\n * accounts but kept in this contract, and the actual transfer is triggered as a separate step by calling the {release}\\n * function.\\n */\\ncontract PaymentSplitter is Context {\\n    event PayeeAdded(address account, uint256 shares);\\n    event PaymentReleased(address to, uint256 amount);\\n    event PaymentReceived(address from, uint256 amount);\\n\\n    uint256 private _totalShares;\\n    uint256 private _totalReleased;\\n\\n    mapping(address => uint256) private _shares;\\n    mapping(address => uint256) private _released;\\n    address[] private _payees;\\n\\n    /**\\n     * @dev Creates an instance of `PaymentSplitter` where each account in `payees` is assigned the number of shares at\\n     * the matching position in the `shares` array.\\n     *\\n     * All addresses in `payees` must be non-zero. Both arrays must have the same non-zero length, and there must be no\\n     * duplicates in `payees`.\\n     */\\n    constructor(address[] memory payees, uint256[] memory shares_) payable {\\n        require(payees.length == shares_.length, \\\"PaymentSplitter: payees and shares length mismatch\\\");\\n        require(payees.length > 0, \\\"PaymentSplitter: no payees\\\");\\n\\n        for (uint256 i = 0; i < payees.length; i++) {\\n            _addPayee(payees[i], shares_[i]);\\n        }\\n    }\\n\\n    /**\\n     * @dev The Ether received will be logged with {PaymentReceived} events. Note that these events are not fully\\n     * reliable: it's possible for a contract to receive Ether without triggering this function. This only affects the\\n     * reliability of the events, and not the actual splitting of Ether.\\n     *\\n     * To learn more about this see the Solidity documentation for\\n     * https://solidity.readthedocs.io/en/latest/contracts.html#fallback-function[fallback\\n     * functions].\\n     */\\n    receive() external payable virtual {\\n        emit PaymentReceived(_msgSender(), msg.value);\\n    }\\n\\n    /**\\n     * @dev Getter for the total shares held by payees.\\n     */\\n    function totalShares() public view returns (uint256) {\\n        return _totalShares;\\n    }\\n\\n    /**\\n     * @dev Getter for the total amount of Ether already released.\\n     */\\n    function totalReleased() public view returns (uint256) {\\n        return _totalReleased;\\n    }\\n\\n    /**\\n     * @dev Getter for the amount of shares held by an account.\\n     */\\n    function shares(address account) public view returns (uint256) {\\n        return _shares[account];\\n    }\\n\\n    /**\\n     * @dev Getter for the amount of Ether already released to a payee.\\n     */\\n    function released(address account) public view returns (uint256) {\\n        return _released[account];\\n    }\\n\\n    /**\\n     * @dev Getter for the address of the payee number `index`.\\n     */\\n    function payee(uint256 index) public view returns (address) {\\n        return _payees[index];\\n    }\\n\\n    /**\\n     * @dev Triggers a transfer to `account` of the amount of Ether they are owed, according to their percentage of the\\n     * total shares and their previous withdrawals.\\n     */\\n    function release(address payable account) public virtual {\\n        require(_shares[account] > 0, \\\"PaymentSplitter: account has no shares\\\");\\n\\n        uint256 totalReceived = address(this).balance + _totalReleased;\\n        uint256 payment = (totalReceived * _shares[account]) / _totalShares - _released[account];\\n\\n        require(payment != 0, \\\"PaymentSplitter: account is not due payment\\\");\\n\\n        _released[account] = _released[account] + payment;\\n        _totalReleased = _totalReleased + payment;\\n\\n        Address.sendValue(account, payment);\\n        emit PaymentReleased(account, payment);\\n    }\\n\\n    /**\\n     * @dev Add a new payee to the contract.\\n     * @param account The address of the payee to add.\\n     * @param shares_ The number of shares owned by the payee.\\n     */\\n    function _addPayee(address account, uint256 shares_) private {\\n        require(account != address(0), \\\"PaymentSplitter: account is the zero address\\\");\\n        require(shares_ > 0, \\\"PaymentSplitter: shares are 0\\\");\\n        require(_shares[account] == 0, \\\"PaymentSplitter: account already has shares\\\");\\n\\n        _payees.push(account);\\n        _shares[account] = shares_;\\n        _totalShares = _totalShares + shares_;\\n        emit PayeeAdded(account, shares_);\\n    }\\n}\\n\",\"keccak256\":\"0x5b5c64239a7980f0c2c5baa584a3350912c7260db32f6d6544a2755f59a0c488\",\"license\":\"MIT\"},\"@openzeppelin/contracts/utils/Address.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n\\npragma solidity ^0.8.0;\\n\\n/**\\n * @dev Collection of functions related to the address type\\n */\\nlibrary Address {\\n    /**\\n     * @dev Returns true if `account` is a contract.\\n     *\\n     * [IMPORTANT]\\n     * ====\\n     * It is unsafe to assume that an address for which this function returns\\n     * false is an externally-owned account (EOA) and not a contract.\\n     *\\n     * Among others, `isContract` will return false for the following\\n     * types of addresses:\\n     *\\n     *  - an externally-owned account\\n     *  - a contract in construction\\n     *  - an address where a contract will be created\\n     *  - an address where a contract lived, but was destroyed\\n     * ====\\n     */\\n    function isContract(address account) internal view returns (bool) {\\n        // This method relies on extcodesize, which returns 0 for contracts in\\n        // construction, since the code is only stored at the end of the\\n        // constructor execution.\\n\\n        uint256 size;\\n        assembly {\\n            size := extcodesize(account)\\n        }\\n        return size > 0;\\n    }\\n\\n    /**\\n     * @dev Replacement for Solidity's `transfer`: sends `amount` wei to\\n     * `recipient`, forwarding all available gas and reverting on errors.\\n     *\\n     * https://eips.ethereum.org/EIPS/eip-1884[EIP1884] increases the gas cost\\n     * of certain opcodes, possibly making contracts go over the 2300 gas limit\\n     * imposed by `transfer`, making them unable to receive funds via\\n     * `transfer`. {sendValue} removes this limitation.\\n     *\\n     * https://diligence.consensys.net/posts/2019/09/stop-using-soliditys-transfer-now/[Learn more].\\n     *\\n     * IMPORTANT: because control is transferred to `recipient`, care must be\\n     * taken to not create reentrancy vulnerabilities. Consider using\\n     * {ReentrancyGuard} or the\\n     * https://solidity.readthedocs.io/en/v0.5.11/security-considerations.html#use-the-checks-effects-interactions-pattern[checks-effects-interactions pattern].\\n     */\\n    function sendValue(address payable recipient, uint256 amount) internal {\\n        require(address(this).balance >= amount, \\\"Address: insufficient balance\\\");\\n\\n        (bool success, ) = recipient.call{value: amount}(\\\"\\\");\\n        require(success, \\\"Address: unable to send value, recipient may have reverted\\\");\\n    }\\n\\n    /**\\n     * @dev Performs a Solidity function call using a low level `call`. A\\n     * plain `call` is an unsafe replacement for a function call: use this\\n     * function instead.\\n     *\\n     * If `target` reverts with a revert reason, it is bubbled up by this\\n     * function (like regular Solidity function calls).\\n     *\\n     * Returns the raw returned data. To convert to the expected return value,\\n     * use https://solidity.readthedocs.io/en/latest/units-and-global-variables.html?highlight=abi.decode#abi-encoding-and-decoding-functions[`abi.decode`].\\n     *\\n     * Requirements:\\n     *\\n     * - `target` must be a contract.\\n     * - calling `target` with `data` must not revert.\\n     *\\n     * _Available since v3.1._\\n     */\\n    function functionCall(address target, bytes memory data) internal returns (bytes memory) {\\n        return functionCall(target, data, \\\"Address: low-level call failed\\\");\\n    }\\n\\n    /**\\n     * @dev Same as {xref-Address-functionCall-address-bytes-}[`functionCall`], but with\\n     * `errorMessage` as a fallback revert reason when `target` reverts.\\n     *\\n     * _Available since v3.1._\\n     */\\n    function functionCall(\\n        address target,\\n        bytes memory data,\\n        string memory errorMessage\\n    ) internal returns (bytes memory) {\\n        return functionCallWithValue(target, data, 0, errorMessage);\\n    }\\n\\n    /**\\n     * @dev Same as {xref-Address-functionCall-address-bytes-}[`functionCall`],\\n     * but also transferring `value` wei to `target`.\\n     *\\n     * Requirements:\\n     *\\n     * - the calling contract must have an ETH balance of at least `value`.\\n     * - the called Solidity function must be `payable`.\\n     *\\n     * _Available since v3.1._\\n     */\\n    function functionCallWithValue(\\n        address target,\\n        bytes memory data,\\n        uint256 value\\n    ) internal returns (bytes memory) {\\n        return functionCallWithValue(target, data, value, \\\"Address: low-level call with value failed\\\");\\n    }\\n\\n    /**\\n     * @dev Same as {xref-Address-functionCallWithValue-address-bytes-uint256-}[`functionCallWithValue`], but\\n     * with `errorMessage` as a fallback revert reason when `target` reverts.\\n     *\\n     * _Available since v3.1._\\n     */\\n    function functionCallWithValue(\\n        address target,\\n        bytes memory data,\\n        uint256 value,\\n        string memory errorMessage\\n    ) internal returns (bytes memory) {\\n        require(address(this).balance >= value, \\\"Address: insufficient balance for call\\\");\\n        require(isContract(target), \\\"Address: call to non-contract\\\");\\n\\n        (bool success, bytes memory returndata) = target.call{value: value}(data);\\n        return verifyCallResult(success, returndata, errorMessage);\\n    }\\n\\n    /**\\n     * @dev Same as {xref-Address-functionCall-address-bytes-}[`functionCall`],\\n     * but performing a static call.\\n     *\\n     * _Available since v3.3._\\n     */\\n    function functionStaticCall(address target, bytes memory data) internal view returns (bytes memory) {\\n        return functionStaticCall(target, data, \\\"Address: low-level static call failed\\\");\\n    }\\n\\n    /**\\n     * @dev Same as {xref-Address-functionCall-address-bytes-string-}[`functionCall`],\\n     * but performing a static call.\\n     *\\n     * _Available since v3.3._\\n     */\\n    function functionStaticCall(\\n        address target,\\n        bytes memory data,\\n        string memory errorMessage\\n    ) internal view returns (bytes memory) {\\n        require(isContract(target), \\\"Address: static call to non-contract\\\");\\n\\n        (bool success, bytes memory returndata) = target.staticcall(data);\\n        return verifyCallResult(success, returndata, errorMessage);\\n    }\\n\\n    /**\\n     * @dev Same as {xref-Address-functionCall-address-bytes-}[`functionCall`],\\n     * but performing a delegate call.\\n     *\\n     * _Available since v3.4._\\n     */\\n    function functionDelegateCall(address target, bytes memory data) internal returns (bytes memory) {\\n        return functionDelegateCall(target, data, \\\"Address: low-level delegate call failed\\\");\\n    }\\n\\n    /**\\n     * @dev Same as {xref-Address-functionCall-address-bytes-string-}[`functionCall`],\\n     * but performing a delegate call.\\n     *\\n     * _Available since v3.4._\\n     */\\n    function functionDelegateCall(\\n        address target,\\n        bytes memory data,\\n        string memory errorMessage\\n    ) internal returns (bytes memory) {\\n        require(isContract(target), \\\"Address: delegate call to non-contract\\\");\\n\\n        (bool success, bytes memory returndata) = target.delegatecall(data);\\n        return verifyCallResult(success, returndata, errorMessage);\\n    }\\n\\n    /**\\n     * @dev Tool to verifies that a low level call was successful, and revert if it wasn't, either by bubbling the\\n     * revert reason using the provided one.\\n     *\\n     * _Available since v4.3._\\n     */\\n    function verifyCallResult(\\n        bool success,\\n        bytes memory returndata,\\n        string memory errorMessage\\n    ) internal pure returns (bytes memory) {\\n        if (success) {\\n            return returndata;\\n        } else {\\n            // Look for revert reason and bubble it up if present\\n            if (returndata.length > 0) {\\n                // The easiest way to bubble the revert reason is using memory via assembly\\n\\n                assembly {\\n                    let returndata_size := mload(returndata)\\n                    revert(add(32, returndata), returndata_size)\\n                }\\n            } else {\\n                revert(errorMessage);\\n            }\\n        }\\n    }\\n}\\n\",\"keccak256\":\"0x3336baae5cf23e94274d75336e2d412193be508504aee185e61dc7d58cd05c8a\",\"license\":\"MIT\"},\"@openzeppelin/contracts/utils/Context.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n\\npragma solidity ^0.8.0;\\n\\n/**\\n * @dev Provides information about the current execution context, including the\\n * sender of the transaction and its data. While these are generally available\\n * via msg.sender and msg.data, they should not be accessed in such a direct\\n * manner, since when dealing with meta-transactions the account sending and\\n * paying for execution may not be the actual sender (as far as an application\\n * is concerned).\\n *\\n * This contract is only required for intermediate, library-like contracts.\\n */\\nabstract contract Context {\\n    function _msgSender() internal view virtual returns (address) {\\n        return msg.sender;\\n    }\\n\\n    function _msgData() internal view virtual returns (bytes calldata) {\\n        return msg.data;\\n    }\\n}\\n\",\"keccak256\":\"0x90565a39ae45c80f0468dc96c7b20d0afc3055f344c8203a0c9258239f350b9f\",\"license\":\"MIT\"},\"@openzeppelin/contracts/utils/math/SafeMath.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n\\npragma solidity ^0.8.0;\\n\\n// CAUTION\\n// This version of SafeMath should only be used with Solidity 0.8 or later,\\n// because it relies on the compiler's built in overflow checks.\\n\\n/**\\n * @dev Wrappers over Solidity's arithmetic operations.\\n *\\n * NOTE: `SafeMath` is no longer needed starting with Solidity 0.8. The compiler\\n * now has built in overflow checking.\\n */\\nlibrary SafeMath {\\n    /**\\n     * @dev Returns the addition of two unsigned integers, with an overflow flag.\\n     *\\n     * _Available since v3.4._\\n     */\\n    function tryAdd(uint256 a, uint256 b) internal pure returns (bool, uint256) {\\n        unchecked {\\n            uint256 c = a + b;\\n            if (c < a) return (false, 0);\\n            return (true, c);\\n        }\\n    }\\n\\n    /**\\n     * @dev Returns the substraction of two unsigned integers, with an overflow flag.\\n     *\\n     * _Available since v3.4._\\n     */\\n    function trySub(uint256 a, uint256 b) internal pure returns (bool, uint256) {\\n        unchecked {\\n            if (b > a) return (false, 0);\\n            return (true, a - b);\\n        }\\n    }\\n\\n    /**\\n     * @dev Returns the multiplication of two unsigned integers, with an overflow flag.\\n     *\\n     * _Available since v3.4._\\n     */\\n    function tryMul(uint256 a, uint256 b) internal pure returns (bool, uint256) {\\n        unchecked {\\n            // Gas optimization: this is cheaper than requiring 'a' not being zero, but the\\n            // benefit is lost if 'b' is also tested.\\n            // See: https://github.com/OpenZeppelin/openzeppelin-contracts/pull/522\\n            if (a == 0) return (true, 0);\\n            uint256 c = a * b;\\n            if (c / a != b) return (false, 0);\\n            return (true, c);\\n        }\\n    }\\n\\n    /**\\n     * @dev Returns the division of two unsigned integers, with a division by zero flag.\\n     *\\n     * _Available since v3.4._\\n     */\\n    function tryDiv(uint256 a, uint256 b) internal pure returns (bool, uint256) {\\n        unchecked {\\n            if (b == 0) return (false, 0);\\n            return (true, a / b);\\n        }\\n    }\\n\\n    /**\\n     * @dev Returns the remainder of dividing two unsigned integers, with a division by zero flag.\\n     *\\n     * _Available since v3.4._\\n     */\\n    function tryMod(uint256 a, uint256 b) internal pure returns (bool, uint256) {\\n        unchecked {\\n            if (b == 0) return (false, 0);\\n            return (true, a % b);\\n        }\\n    }\\n\\n    /**\\n     * @dev Returns the addition of two unsigned integers, reverting on\\n     * overflow.\\n     *\\n     * Counterpart to Solidity's `+` operator.\\n     *\\n     * Requirements:\\n     *\\n     * - Addition cannot overflow.\\n     */\\n    function add(uint256 a, uint256 b) internal pure returns (uint256) {\\n        return a + b;\\n    }\\n\\n    /**\\n     * @dev Returns the subtraction of two unsigned integers, reverting on\\n     * overflow (when the result is negative).\\n     *\\n     * Counterpart to Solidity's `-` operator.\\n     *\\n     * Requirements:\\n     *\\n     * - Subtraction cannot overflow.\\n     */\\n    function sub(uint256 a, uint256 b) internal pure returns (uint256) {\\n        return a - b;\\n    }\\n\\n    /**\\n     * @dev Returns the multiplication of two unsigned integers, reverting on\\n     * overflow.\\n     *\\n     * Counterpart to Solidity's `*` operator.\\n     *\\n     * Requirements:\\n     *\\n     * - Multiplication cannot overflow.\\n     */\\n    function mul(uint256 a, uint256 b) internal pure returns (uint256) {\\n        return a * b;\\n    }\\n\\n    /**\\n     * @dev Returns the integer division of two unsigned integers, reverting on\\n     * division by zero. The result is rounded towards zero.\\n     *\\n     * Counterpart to Solidity's `/` operator.\\n     *\\n     * Requirements:\\n     *\\n     * - The divisor cannot be zero.\\n     */\\n    function div(uint256 a, uint256 b) internal pure returns (uint256) {\\n        return a / b;\\n    }\\n\\n    /**\\n     * @dev Returns the remainder of dividing two unsigned integers. (unsigned integer modulo),\\n     * reverting when dividing by zero.\\n     *\\n     * Counterpart to Solidity's `%` operator. This function uses a `revert`\\n     * opcode (which leaves remaining gas untouched) while Solidity uses an\\n     * invalid opcode to revert (consuming all remaining gas).\\n     *\\n     * Requirements:\\n     *\\n     * - The divisor cannot be zero.\\n     */\\n    function mod(uint256 a, uint256 b) internal pure returns (uint256) {\\n        return a % b;\\n    }\\n\\n    /**\\n     * @dev Returns the subtraction of two unsigned integers, reverting with custom message on\\n     * overflow (when the result is negative).\\n     *\\n     * CAUTION: This function is deprecated because it requires allocating memory for the error\\n     * message unnecessarily. For custom revert reasons use {trySub}.\\n     *\\n     * Counterpart to Solidity's `-` operator.\\n     *\\n     * Requirements:\\n     *\\n     * - Subtraction cannot overflow.\\n     */\\n    function sub(\\n        uint256 a,\\n        uint256 b,\\n        string memory errorMessage\\n    ) internal pure returns (uint256) {\\n        unchecked {\\n            require(b <= a, errorMessage);\\n            return a - b;\\n        }\\n    }\\n\\n    /**\\n     * @dev Returns the integer division of two unsigned integers, reverting with custom message on\\n     * division by zero. The result is rounded towards zero.\\n     *\\n     * Counterpart to Solidity's `/` operator. Note: this function uses a\\n     * `revert` opcode (which leaves remaining gas untouched) while Solidity\\n     * uses an invalid opcode to revert (consuming all remaining gas).\\n     *\\n     * Requirements:\\n     *\\n     * - The divisor cannot be zero.\\n     */\\n    function div(\\n        uint256 a,\\n        uint256 b,\\n        string memory errorMessage\\n    ) internal pure returns (uint256) {\\n        unchecked {\\n            require(b > 0, errorMessage);\\n            return a / b;\\n        }\\n    }\\n\\n    /**\\n     * @dev Returns the remainder of dividing two unsigned integers. (unsigned integer modulo),\\n     * reverting with custom message when dividing by zero.\\n     *\\n     * CAUTION: This function is deprecated because it requires allocating memory for the error\\n     * message unnecessarily. For custom revert reasons use {tryMod}.\\n     *\\n     * Counterpart to Solidity's `%` operator. This function uses a `revert`\\n     * opcode (which leaves remaining gas untouched) while Solidity uses an\\n     * invalid opcode to revert (consuming all remaining gas).\\n     *\\n     * Requirements:\\n     *\\n     * - The divisor cannot be zero.\\n     */\\n    function mod(\\n        uint256 a,\\n        uint256 b,\\n        string memory errorMessage\\n    ) internal pure returns (uint256) {\\n        unchecked {\\n            require(b > 0, errorMessage);\\n            return a % b;\\n        }\\n    }\\n}\\n\",\"keccak256\":\"0x8666f020bd8fc9dc14f07e2ebc52b5f236ab4cdde7c77679b08cb2f94730043b\",\"license\":\"MIT\"},\"contracts/LeniaRoyalties.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n\\n// @title Secondary Market Royalties contract for the Lenia collection\\n\\n/**********************************************\\n *                        .                   *\\n *                          ,,                *\\n *                      ......*#*             *\\n *                 .......    ..*%%,          *\\n *          .,,****,..             ,#(.       *\\n *         .,**((((*,.               .*(.     *\\n *          .**((**,,,,,,,             .*,    *\\n *        .......,,**(((((((*.          .,,   *\\n *       ...      ,*((##%&&&&@&(,        .,.  *\\n *       ..        ,((#&&@@@@@@@@&(*.  ..,,.  *\\n *    ,. ..          ,#&@@@@@@@@@@@%#(*,,,,.  *\\n *      ((,.           *%@@@@&%%%&&%#(((*,,.  *\\n *        (&*            *%@@@&&%%##(((**,.   *\\n *          (&(           .*(#%%##(((**,,.    *\\n *            .((,         .,*(((((**,..      *\\n *               .,*,,.....,,,,*,,,..         *\\n *                    ..........              *\\n **********************************************/\\n\\npragma solidity ^0.8.6;\\n\\nimport \\\"@openzeppelin/contracts/finance/PaymentSplitter.sol\\\";\\n\\ncontract LeniaRoyalties is PaymentSplitter {\\n    constructor(address[] memory payees, uint256[] memory shares_)\\n        PaymentSplitter(payees, shares_)\\n    {}\\n}\\n\",\"keccak256\":\"0xb0bc4f35234aeab399809fce9d0fb7fda9b930c88f4133ab4550a8eb93cd41a9\",\"license\":\"MIT\"}},\"version\":1}",
+  "bytecode": "0x60806040523480156200001157600080fd5b5060405162000d3638038062000d368339810160408190526200003491620003d8565b81818051825114620000a85760405162461bcd60e51b815260206004820152603260248201527f5061796d656e7453706c69747465723a2070617965657320616e6420736861726044820152710cae640d8cadccee8d040dad2e6dac2e8c6d60731b60648201526084015b60405180910390fd5b6000825111620000fb5760405162461bcd60e51b815260206004820152601a60248201527f5061796d656e7453706c69747465723a206e6f2070617965657300000000000060448201526064016200009f565b60005b825181101562000167576200015283828151811062000121576200012162000564565b60200260200101518383815181106200013e576200013e62000564565b60200260200101516200017260201b60201c565b806200015e8162000530565b915050620000fe565b505050505062000590565b6001600160a01b038216620001df5760405162461bcd60e51b815260206004820152602c60248201527f5061796d656e7453706c69747465723a206163636f756e74206973207468652060448201526b7a65726f206164647265737360a01b60648201526084016200009f565b60008111620002315760405162461bcd60e51b815260206004820152601d60248201527f5061796d656e7453706c69747465723a2073686172657320617265203000000060448201526064016200009f565b6001600160a01b03821660009081526002602052604090205415620002ad5760405162461bcd60e51b815260206004820152602b60248201527f5061796d656e7453706c69747465723a206163636f756e7420616c726561647960448201526a206861732073686172657360a81b60648201526084016200009f565b60048054600181019091557f8a35acfbc15ff81a39ae7d344fd709f28e8600b4aa8c65c6b64bfe7fe36bd19b0180546001600160a01b0319166001600160a01b0384169081179091556000908152600260205260408120829055546200031590829062000515565b600055604080516001600160a01b0384168152602081018390527f40c340f65e17194d14ddddb073d3c9f888e3cb52b5aae0c6c7706b4fbc905fac910160405180910390a15050565b600082601f8301126200037057600080fd5b81516020620003896200038383620004ef565b620004bc565b80838252828201915082860187848660051b8901011115620003aa57600080fd5b60005b85811015620003cb57815184529284019290840190600101620003ad565b5090979650505050505050565b60008060408385031215620003ec57600080fd5b82516001600160401b03808211156200040457600080fd5b818501915085601f8301126200041957600080fd5b815160206200042c6200038383620004ef565b8083825282820191508286018a848660051b89010111156200044d57600080fd5b600096505b84871015620004885780516001600160a01b03811681146200047357600080fd5b83526001969096019591830191830162000452565b5091880151919650909350505080821115620004a357600080fd5b50620004b2858286016200035e565b9150509250929050565b604051601f8201601f191681016001600160401b0381118282101715620004e757620004e76200057a565b604052919050565b60006001600160401b038211156200050b576200050b6200057a565b5060051b60200190565b600082198211156200052b576200052b6200054e565b500190565b60006000198214156200054757620005476200054e565b5060010190565b634e487b7160e01b600052601160045260246000fd5b634e487b7160e01b600052603260045260246000fd5b634e487b7160e01b600052604160045260246000fd5b61079680620005a06000396000f3fe6080604052600436106100695760003560e01c80639852595c116100435780639852595c1461014f578063ce7c2ac214610192578063e33b7de3146101d557600080fd5b806319165587146100c45780633a98ef39146100e65780638b83209b1461010a57600080fd5b366100bf577f6ef95f06320e7a25a04a175ca677b7052bdd97131872c2192525a629f51be770336040805173ffffffffffffffffffffffffffffffffffffffff90921682523460208301520160405180910390a1005b600080fd5b3480156100d057600080fd5b506100e46100df3660046105f9565b6101ea565b005b3480156100f257600080fd5b506000545b6040519081526020015b60405180910390f35b34801561011657600080fd5b5061012a61012536600461061d565b61045d565b60405173ffffffffffffffffffffffffffffffffffffffff9091168152602001610101565b34801561015b57600080fd5b506100f761016a3660046105f9565b73ffffffffffffffffffffffffffffffffffffffff1660009081526003602052604090205490565b34801561019e57600080fd5b506100f76101ad3660046105f9565b73ffffffffffffffffffffffffffffffffffffffff1660009081526002602052604090205490565b3480156101e157600080fd5b506001546100f7565b73ffffffffffffffffffffffffffffffffffffffff81166000908152600260205260409020546102a1576040517f08c379a000000000000000000000000000000000000000000000000000000000815260206004820152602660248201527f5061796d656e7453706c69747465723a206163636f756e7420686173206e6f2060448201527f736861726573000000000000000000000000000000000000000000000000000060648201526084015b60405180910390fd5b6000600154476102b19190610636565b73ffffffffffffffffffffffffffffffffffffffff8316600090815260036020908152604080832054835460029093529083205493945091926102f49085610689565b6102fe919061064e565b61030891906106c6565b905080610397576040517f08c379a000000000000000000000000000000000000000000000000000000000815260206004820152602b60248201527f5061796d656e7453706c69747465723a206163636f756e74206973206e6f742060448201527f647565207061796d656e740000000000000000000000000000000000000000006064820152608401610298565b73ffffffffffffffffffffffffffffffffffffffff83166000908152600360205260409020546103c8908290610636565b73ffffffffffffffffffffffffffffffffffffffff84166000908152600360205260409020556001546103fc908290610636565b600155610409838261049a565b6040805173ffffffffffffffffffffffffffffffffffffffff85168152602081018390527fdf20fd1e76bc69d672e4814fafb2c449bba3a5369d8359adf9e05e6fde87b056910160405180910390a1505050565b6000600482815481106104725761047261070c565b60009182526020909120015473ffffffffffffffffffffffffffffffffffffffff1692915050565b80471015610504576040517f08c379a000000000000000000000000000000000000000000000000000000000815260206004820152601d60248201527f416464726573733a20696e73756666696369656e742062616c616e63650000006044820152606401610298565b60008273ffffffffffffffffffffffffffffffffffffffff168260405160006040518083038185875af1925050503d806000811461055e576040519150601f19603f3d011682016040523d82523d6000602084013e610563565b606091505b50509050806105f4576040517f08c379a000000000000000000000000000000000000000000000000000000000815260206004820152603a60248201527f416464726573733a20756e61626c6520746f2073656e642076616c75652c207260448201527f6563697069656e74206d617920686176652072657665727465640000000000006064820152608401610298565b505050565b60006020828403121561060b57600080fd5b81356106168161073b565b9392505050565b60006020828403121561062f57600080fd5b5035919050565b60008219821115610649576106496106dd565b500190565b600082610684577f4e487b7100000000000000000000000000000000000000000000000000000000600052601260045260246000fd5b500490565b6000817fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff04831182151516156106c1576106c16106dd565b500290565b6000828210156106d8576106d86106dd565b500390565b7f4e487b7100000000000000000000000000000000000000000000000000000000600052601160045260246000fd5b7f4e487b7100000000000000000000000000000000000000000000000000000000600052603260045260246000fd5b73ffffffffffffffffffffffffffffffffffffffff8116811461075d57600080fd5b5056fea2646970667358221220f85b48313d0e2955a402815ffb0942297cb5247a29257ff6f1554d8ccb72622e64736f6c63430008060033",
+  "deployedBytecode": "0x6080604052600436106100695760003560e01c80639852595c116100435780639852595c1461014f578063ce7c2ac214610192578063e33b7de3146101d557600080fd5b806319165587146100c45780633a98ef39146100e65780638b83209b1461010a57600080fd5b366100bf577f6ef95f06320e7a25a04a175ca677b7052bdd97131872c2192525a629f51be770336040805173ffffffffffffffffffffffffffffffffffffffff90921682523460208301520160405180910390a1005b600080fd5b3480156100d057600080fd5b506100e46100df3660046105f9565b6101ea565b005b3480156100f257600080fd5b506000545b6040519081526020015b60405180910390f35b34801561011657600080fd5b5061012a61012536600461061d565b61045d565b60405173ffffffffffffffffffffffffffffffffffffffff9091168152602001610101565b34801561015b57600080fd5b506100f761016a3660046105f9565b73ffffffffffffffffffffffffffffffffffffffff1660009081526003602052604090205490565b34801561019e57600080fd5b506100f76101ad3660046105f9565b73ffffffffffffffffffffffffffffffffffffffff1660009081526002602052604090205490565b3480156101e157600080fd5b506001546100f7565b73ffffffffffffffffffffffffffffffffffffffff81166000908152600260205260409020546102a1576040517f08c379a000000000000000000000000000000000000000000000000000000000815260206004820152602660248201527f5061796d656e7453706c69747465723a206163636f756e7420686173206e6f2060448201527f736861726573000000000000000000000000000000000000000000000000000060648201526084015b60405180910390fd5b6000600154476102b19190610636565b73ffffffffffffffffffffffffffffffffffffffff8316600090815260036020908152604080832054835460029093529083205493945091926102f49085610689565b6102fe919061064e565b61030891906106c6565b905080610397576040517f08c379a000000000000000000000000000000000000000000000000000000000815260206004820152602b60248201527f5061796d656e7453706c69747465723a206163636f756e74206973206e6f742060448201527f647565207061796d656e740000000000000000000000000000000000000000006064820152608401610298565b73ffffffffffffffffffffffffffffffffffffffff83166000908152600360205260409020546103c8908290610636565b73ffffffffffffffffffffffffffffffffffffffff84166000908152600360205260409020556001546103fc908290610636565b600155610409838261049a565b6040805173ffffffffffffffffffffffffffffffffffffffff85168152602081018390527fdf20fd1e76bc69d672e4814fafb2c449bba3a5369d8359adf9e05e6fde87b056910160405180910390a1505050565b6000600482815481106104725761047261070c565b60009182526020909120015473ffffffffffffffffffffffffffffffffffffffff1692915050565b80471015610504576040517f08c379a000000000000000000000000000000000000000000000000000000000815260206004820152601d60248201527f416464726573733a20696e73756666696369656e742062616c616e63650000006044820152606401610298565b60008273ffffffffffffffffffffffffffffffffffffffff168260405160006040518083038185875af1925050503d806000811461055e576040519150601f19603f3d011682016040523d82523d6000602084013e610563565b606091505b50509050806105f4576040517f08c379a000000000000000000000000000000000000000000000000000000000815260206004820152603a60248201527f416464726573733a20756e61626c6520746f2073656e642076616c75652c207260448201527f6563697069656e74206d617920686176652072657665727465640000000000006064820152608401610298565b505050565b60006020828403121561060b57600080fd5b81356106168161073b565b9392505050565b60006020828403121561062f57600080fd5b5035919050565b60008219821115610649576106496106dd565b500190565b600082610684577f4e487b7100000000000000000000000000000000000000000000000000000000600052601260045260246000fd5b500490565b6000817fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff04831182151516156106c1576106c16106dd565b500290565b6000828210156106d8576106d86106dd565b500390565b7f4e487b7100000000000000000000000000000000000000000000000000000000600052601160045260246000fd5b7f4e487b7100000000000000000000000000000000000000000000000000000000600052603260045260246000fd5b73ffffffffffffffffffffffffffffffffffffffff8116811461075d57600080fd5b5056fea2646970667358221220f85b48313d0e2955a402815ffb0942297cb5247a29257ff6f1554d8ccb72622e64736f6c63430008060033",
+  "devdoc": {
+    "kind": "dev",
+    "methods": {
+      "payee(uint256)": {
+        "details": "Getter for the address of the payee number `index`."
+      },
+      "release(address)": {
+        "details": "Triggers a transfer to `account` of the amount of Ether they are owed, according to their percentage of the total shares and their previous withdrawals."
+      },
+      "released(address)": {
+        "details": "Getter for the amount of Ether already released to a payee."
+      },
+      "shares(address)": {
+        "details": "Getter for the amount of shares held by an account."
+      },
+      "totalReleased()": {
+        "details": "Getter for the total amount of Ether already released."
+      },
+      "totalShares()": {
+        "details": "Getter for the total shares held by payees."
+      }
+    },
+    "version": 1
+  },
+  "userdoc": {
+    "kind": "user",
+    "methods": {},
+    "version": 1
+  },
+  "storageLayout": {
+    "storage": [
+      {
+        "astId": 131,
+        "contract": "contracts/LeniaRoyalties.sol:LeniaRoyalties",
+        "label": "_totalShares",
+        "offset": 0,
+        "slot": "0",
+        "type": "t_uint256"
+      },
+      {
+        "astId": 133,
+        "contract": "contracts/LeniaRoyalties.sol:LeniaRoyalties",
+        "label": "_totalReleased",
+        "offset": 0,
+        "slot": "1",
+        "type": "t_uint256"
+      },
+      {
+        "astId": 137,
+        "contract": "contracts/LeniaRoyalties.sol:LeniaRoyalties",
+        "label": "_shares",
+        "offset": 0,
+        "slot": "2",
+        "type": "t_mapping(t_address,t_uint256)"
+      },
+      {
+        "astId": 141,
+        "contract": "contracts/LeniaRoyalties.sol:LeniaRoyalties",
+        "label": "_released",
+        "offset": 0,
+        "slot": "3",
+        "type": "t_mapping(t_address,t_uint256)"
+      },
+      {
+        "astId": 144,
+        "contract": "contracts/LeniaRoyalties.sol:LeniaRoyalties",
+        "label": "_payees",
+        "offset": 0,
+        "slot": "4",
+        "type": "t_array(t_address)dyn_storage"
+      }
+    ],
+    "types": {
+      "t_address": {
+        "encoding": "inplace",
+        "label": "address",
+        "numberOfBytes": "20"
+      },
+      "t_array(t_address)dyn_storage": {
+        "base": "t_address",
+        "encoding": "dynamic_array",
+        "label": "address[]",
+        "numberOfBytes": "32"
+      },
+      "t_mapping(t_address,t_uint256)": {
+        "encoding": "mapping",
+        "key": "t_address",
+        "label": "mapping(address => uint256)",
+        "numberOfBytes": "32",
+        "value": "t_uint256"
+      },
+      "t_uint256": {
+        "encoding": "inplace",
+        "label": "uint256",
+        "numberOfBytes": "32"
+      }
+    }
+  }
+}
