@@ -28,6 +28,17 @@ export const Web3Provider = ({ children }) => {
     }
   }
 
+  // We cannot force a disconnect with providers in general, just clear the cache (they should be user-initiated)
+  // so we will pretend that users stay actually disconnected next time they come back on the page.
+  const markUserDisconnected = () =>
+    window.localStorage.setItem('isUserConnected', false)
+
+  const markUserConnected = () =>
+    window.localStorage.setItem('isUserConnected', true)
+
+  const isUserMarkedConnected = () => 
+    window.localStorage.getItem('isUserConnected') || false
+
   const initWeb3Provider = async provider => {
     try {
       const web3Provider = new Web3(provider)
@@ -39,6 +50,8 @@ export const Web3Provider = ({ children }) => {
         return
       }
 
+      markUserConnected()
+
       setWeb3Provider(web3Provider)
       setProvider(provider)
       setChainId(newChainId)
@@ -46,7 +59,7 @@ export const Web3Provider = ({ children }) => {
 
       provider.on("accountsChanged", accounts => {
         if (accounts.length == 0) {
-          setError(new Error('There is no existing account present.'))
+          setError(new Error('You have been disconnected!'))
           resetWeb3()
           return;
         }
@@ -74,6 +87,8 @@ export const Web3Provider = ({ children }) => {
         setProvider(null)
       }
 
+      markUserDisconnected()
+
       setAccount('')
       setWeb3Provider(null)
     } catch (error) {
@@ -94,15 +109,19 @@ export const Web3Provider = ({ children }) => {
   }
 
   const initExistingProvider = () => {
-    // Check if browser is running Metamask
-    let web3Provider
-    if (window.ethereum) {
-      initWeb3Provider(window.ethereum);
-    } else if (window.web3) {
-      initWeb3Provider(window.web3.currentProvider);
-    } else {
-      initDefaultProvider()
+    let isWalletConnected = false
+    if (isUserMarkedConnected()) {
+      // Check if browser is running Metamask
+      if (window.ethereum) {
+        initWeb3Provider(window.ethereum);
+        isWalletConnected = true
+      } else if (window.web3) {
+        initWeb3Provider(window.web3.currentProvider);
+        isWalletConnected = true
+      }
     }
+    
+    if (!isWalletConnected) initDefaultProvider()
   };
 
   const handleToastClose = () => setError(null)

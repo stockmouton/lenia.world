@@ -8,7 +8,7 @@ import { useQueryParam, StringParam } from "use-query-params";
 
 const web3ModalContext = createContext({})
 
-const getNetworkName = () => {
+const getDefaultNetworkName = () => {
   if (process.env.NODE_ENV === 'production') return 'mainnet'
   return 'localhost'
 }

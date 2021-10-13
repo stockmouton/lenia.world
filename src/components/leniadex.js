@@ -52,7 +52,7 @@ function getValue(attributes, key) {
 
 const LeniaDex = () => {
   const { account } = useWeb3()
-  const { contract, totalLeniaMinted } = useLeniaContract()
+  const { contract } = useLeniaContract()
   const [isLoading, setIsLoading] = useState(true)
 
   const nodeRef = useRef(null);
@@ -73,17 +73,22 @@ const LeniaDex = () => {
   const key1 = "Robustness"
   const key2 = "Spread"
 
+  const formatIpfsUri = (uri) => {
+    return uri.replace("ipfs://", "https://ipfs.io/ipfs/")
+  }
+
   useEffect(async () => {
     if (nodeRef.current) {
       const allMetadata = [];
-      const totalLeniaSupply = await contract.methods.MAX_SUPPLY().call({ from: account }) || 0
-      console.log(totalLeniaSupply)
       if (contract) {
-        for (let index = 0; index < totalLeniaMinted; index++) {
+        const totalLeniaSupply = await contract.methods.MAX_SUPPLY().call({ from: account }) || 0
+        console.log(totalLeniaSupply)
+        for (let index = 0; index < totalLeniaSupply; index++) {
           const tokenMetadataURI = await contract.methods.tokenURI(index).call()
           try {
-            const {data} = await axios.get(tokenMetadataURI)
-            allMetadata.push(data)
+            
+            //const {data} = await axios.get(formatIpfsUri(tokenMetadataURI))
+            //allMetadata.push(data)
           } catch(error) {
             console.log(error)
             // It means the metadata for the Lenia has not been uploaded yet, so we just ignore it.
