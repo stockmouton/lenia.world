@@ -14,6 +14,7 @@
     let ADD_LENIA = false;
     let INIT_CELLS; let INIT_CELLS_X = 0; let INIT_CELLS_Y = 0;
     let SCALE;
+    let ZOOM;
     let IS_RUNNING = true;
 
     let CENTER = false;
@@ -156,9 +157,10 @@
     ///////////////////////////////
     // Loader
     ///////////////////////////////
-    function init(metadata) {
+    function init(metadata, zoom=1) {
         const config = metadata["config"];
         const attributes = metadata["attributes"];
+        ZOOM = parseInt(Math.min(Math.max(zoom, 1), 5), 10);
 
         let scale = config["world_params"]["scale"];
         SCALE = parseInt(Math.min(Math.max(scale, 1), 10), 10);
@@ -174,7 +176,7 @@
         } else {
             size_power2 = 11;
         }
-        resizeAll(size_power2);
+        resizeAll(size_power2, ZOOM - 1);
 
         let cellsSt = config["cells"];
         let initCells = decompressArray(cellsSt);
@@ -313,17 +315,9 @@
         }
     }
 
-    function resizeAll(size_power2) {
-        // This fix the global canvas size to 256x256
-        let min = -2;
-        let max = 3;
-        let pixel_size_power2 = Bound(8 - size_power2, min, max);
-
+    function resizeAll(size_power2, zoom_power2=0) {
         WORLD_SIZE = 1 << size_power2;
-        PIXEL =
-            pixel_size_power2 >= 0
-                ? 1 << pixel_size_power2
-                : Round(Math.pow(2, pixel_size_power2));
+        PIXEL = 1 << zoom_power2;
         CANVAS_SIZE = Math.round(WORLD_SIZE * PIXEL);
 
         InitAllArrays(WORLD_SIZE);
@@ -373,8 +367,6 @@
     function InitCanvas(id, canvas_size) {
         let canvas = document.getElementById(id);
         canvas.width = canvas.height = canvas_size;
-        canvas.style.width = canvas.width + "px";
-        canvas.style.height = canvas.height + "px";
         let ctx = canvas.getContext("2d");
         let img = ctx.createImageData(canvas.width, canvas.height);
         let rect = canvas.getBoundingClientRect();
@@ -440,10 +432,10 @@
                 if (IS_RUNNING) {
                     if (ADD_LENIA) {
                         const x = Math.floor(
-                            INIT_CELLS_X - (INIT_CELLS.shape[2] / 2) * SCALE
+                            INIT_CELLS_X / PIXEL - (INIT_CELLS.shape[2] / 2) * SCALE
                         );
                         const y = Math.floor(
-                            INIT_CELLS_Y - (INIT_CELLS.shape[1] / 2) * SCALE
+                            INIT_CELLS_Y / PIXEL - (INIT_CELLS.shape[1] / 2) * SCALE
                         );
                         initCellsArray(INIT_CELLS, x, y, 0, 0, SCALE, 0);
 
@@ -820,7 +812,6 @@
     }
     
     function onClick(e) {
-        console.log(e)
         INIT_CELLS_X = e.clientX;
         INIT_CELLS_Y = e.clientY;
         ADD_LENIA = true;
