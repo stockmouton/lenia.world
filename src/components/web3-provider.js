@@ -1,6 +1,7 @@
 import React, { createContext, useState, useEffect, useContext } from 'react'
 import Toast from './toast'
-import { allowedChainIds, chainDisplayName, getDecimalFromHex, switchChainConnection} from '../utils/wallet'
+import { getAllowedChainIds, chainDisplayName, getDecimalFromHex, switchChainConnection} from '../utils/wallet'
+import { useQueryParam, BooleanParam } from "use-query-params";
 
 const Web3 = typeof window !== 'undefined' ? require('web3') : null;
 const web3Context = createContext(null)
@@ -11,7 +12,10 @@ export const Web3Provider = ({ children }) => {
   const [provider, setProvider] = useState(null)
   const [chainId, setChainId] = useState(null)
   const [error, setError] = useState(null)
+  const [isStaging] = useQueryParam("staging", BooleanParam)
 
+  const allowedChainIds = getAllowedChainIds(isStaging)
+  
   const initAccount = async (web3Provider, isFirstConnection = false) => {
     try {
       const accounts = await web3Provider.eth.getAccounts()
