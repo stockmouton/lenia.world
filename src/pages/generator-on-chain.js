@@ -7,11 +7,12 @@ import GeneratorOnChain from "../components/generator-on-chain"
 
 const GeneratorPage = () => {
     const [id] = useQueryParam("id", NumberParam);
+    const [scale] = useQueryParam("scale", NumberParam);
     
     return (
         <Web3Provider>
             <Layout>
-                <GeneratorOnChain onchain={true} lenia_id={id || 0} />
+                <GeneratorOnChain scale={scale || 1} lenia_id={id || 0} />
             </Layout>
         </Web3Provider>
     )

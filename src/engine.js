@@ -1,40 +1,40 @@
-///////////////////////////
-// Globals
-///////////////////////////
 (() => {
+    ///////////////////////////////
+    // Globals
+    ///////////////////////////////
     const NB_CHARS = (ord('Z') - ord('A')) + (ord('z') - ord('a')) + (ord('þ') - ord('À'))
     const PRECISION = 1000000;
-    const EPSILON = 1/PRECISION;  // machine epsilon
+    const EPSILON = 1 / PRECISION;  // machine epsilon
     const π = Math.PI;
     let R = 13;
     let T = 10;
 
-    let gen = 0;
     let runGen = null;
 
     let IS_RUNNING = true;
 
     let centerID = 0;  const CENTER_OFF = 0;
-    const Flip_H = 1, Flip_V = 2, Flip_HV = 3, Mirror_H = 4, Mirror_X = 5, Mirror_D = 6;
-    let transA = null;
-    let transS = null;
-
 
     let WORLD_SIZE = 1;
     let PIXEL = 1;
-    let P_SIZE = 1;
+    let CANVAS_SIZE = 1;
     const COLORS = {
-        'blackwhite': hex_to_palette_rgba('#000000', ['#000000', '#ffffff']),
+        'alizarin': hex_to_palette_rgba("d6c3c9", ['f9c784', 'e7e7e7', '485696', '19180a', '3f220f', '772014', 'af4319', 'e71d36']),
+        'black-white': hex_to_palette_rgba('000000', ['1f2123', '393b41', '555860', '737780', '9497a1', 'b6b9c1', 'd9dbe1', 'ffffff']),
         'carmine-blue': hex_to_palette_rgba('#006eb8', ['#006eb8', '#fff200', '#cc1236']),
-        'carmine-green': hex_to_palette_rgba('#1a7444', ['#1a7444', '#fff200', '#cc1236']),
         'cinnamon': hex_to_palette_rgba('#a7d4e4', ['#a7d4e4', '#71502f', '#fdc57e']),
+        'city': hex_to_palette_rgba('F93943', ['23005c', '3a0099', '66daff', 'e6f9ff', '004b63', 'ffca66', 'fff6e6', 'ffa600']),
         'golden': hex_to_palette_rgba('#b6bfc1', ['#b6bfc1', '#253122', '#f3a257']),
+        'laurel': hex_to_palette_rgba('381d2a', ['60b9bf', 'bffbff', '96ff80', 'eaffe6', '71bf60', 'ff80b0', 'ffe6ef', 'ffbfd7']),
         'msdos': hex_to_palette_rgba('#0c0786', ['#0c0786', '#7500a8', '#c03b80', '#f79241', '#fcfea4']),
+        'pink-beach': hex_to_palette_rgba('f4777f', ['93003a', 'cf3759', 'ffbcaf', 'ffffe0', 'a5d5d8', '73a2c6', '4771b2', '00429d']),
         'rainbow': hex_to_palette_rgba('#000000', ['#FF0000', '#FF7F00', '#FFFF00', '#00FF00', '#0000FF', '#2E2B5F', '#8B00FF']),
+        'river-Leaf': hex_to_palette_rgba("80ab82", ['7dcd85', 'c5d6d8', '99f7ab', '2f52e0', 'bced09', 'f9cb40', 'ff715b', '4c5b5c']),
         'salvia': hex_to_palette_rgba('#b6bfc1', ['#b6bfc1', '#051230', '#97acc8']),
-        'whiteblack': hex_to_palette_rgba('#ffffff', ['#ffffff', '#000000']),
+        'summer': hex_to_palette_rgba('ffe000', ['ffbf66', 'fff4e6', '995900', 'ff9400', '6695ff', 'e6edff', '002577', '003dc7']),
+        'white-black': hex_to_palette_rgba('#ffffff', ['#ffffff', '#000000']),
     };
-    let colorName = 'blackwhite';
+    let colorName = 'msdos';
 
     let cells = null;
     let cellsOld = null;
@@ -52,294 +52,52 @@
     let field = null;
 
     let CANVAS_CELLS = null;
-    let CANVAS_FIELD = null;
-    let CANVAS_POTENTIAL = null;
     let CANVAS_HIDDEN = null;
-
 
     let shiftX, shiftY;
     let oldmX, oldmY;
-
-    function ResizeAll(size_power2) {
-        // This fix the global canvas size to 256x256
-        let min = -2
-        let max = 3
-        let pixel_size_power2 = Bound(8 - size_power2, min, max);
-        ResizeField(size_power2, pixel_size_power2);
-    }
-
-    function ResizeField(size_power2, pixel_size_power2) {
-        WORLD_SIZE = 1 << size_power2;
-        PIXEL = (pixel_size_power2>=0) ? 1 << pixel_size_power2 : Round(Math.pow(2, pixel_size_power2));
-        P_SIZE = Math.round(WORLD_SIZE * PIXEL);
-
-        InitAllArrays(WORLD_SIZE);
-        InitAllCanvas(P_SIZE);
-    }
-
-    function InitAllArrays(world_size) {
-        cells = null;      cells = InitArray(world_size);
-        cellsOld = null;   cellsOld = InitArray(world_size);
-        cellsTx = null;    cellsTx = InitArray(world_size);
-        cellsIm = null;    cellsIm = InitArray(world_size);
-
-        kernel = null;     kernel = InitArray(world_size);
-        kernelRe = null;   kernelRe = InitArray(world_size);
-        kernelIm = null;   kernelIm = InitArray(world_size);
-
-        potential = null;      potential = InitArray(world_size);
-        potentialRe = null;    potentialRe = InitArray(world_size);
-        potentialIm = null;    potentialIm = InitArray(world_size);
-
-        field = null;      field = InitArray(world_size);
-    }
-
-    function InitArray(world_size) {
-        let arr = [];
-        for (let i=0; i<world_size; i++)
-            arr.push(new Array(world_size).fill(0));
-        return arr;
-    }
-
-    function InitAllCanvas(world_nb_pixels) {
-        CANVAS_CELLS = InitCanvas("CANVAS_CELLS", world_nb_pixels);
-        CANVAS_FIELD = InitCanvas("CANVAS_FIELD", world_nb_pixels);
-        CANVAS_POTENTIAL = InitCanvas("CANVAS_POTENTIAL", world_nb_pixels);
-        CANVAS_HIDDEN = InitCanvas("CANVAS_HIDDEN", world_nb_pixels);
-    }
-
-    function InitCanvas(id, world_nb_pixels) {
-        let canvas = document.getElementById(id);
-        canvas.width = canvas.height = world_nb_pixels;
-        canvas.style.width = canvas.width+"px"; canvas.style.height = canvas.height+"px";
-        let ctx = canvas.getContext("2d");
-        let img = ctx.createImageData(canvas.width, canvas.height);
-        let rect = canvas.getBoundingClientRect();
-
-        return { can: canvas, ctx: ctx, img: img, left: rect.left, top: rect.top };
-    }
-
-    function run() {
-        let fps = 30;
-        let fpsInterval = 1000 / fps;
-        let startTime, now, then, elapsed;
-
-        then = Date.now();
-        startTime = then;
-        function loop() {
-            window.requestAnimationFrame(loop);
-
-            now = Date.now();
-            elapsed = now - then;
-            if (elapsed > fpsInterval) {
-                then = now - (elapsed % fpsInterval);
-                if (IS_RUNNING) {
-                    update_fn();
-                    DrawAllPanels();
-
-                    if (runGen==0) {
-                        runGen = null;
-                        IS_RUNNING = false;
-                    }
-                }
-            }
-        }
-        loop()
-    }
-
-
-    function Round(x) { return Math.round(x * PRECISION) / PRECISION; }
-    function Bound(x, min, max) { let v = Math.round(x * PRECISION) / PRECISION; return v<min ? min : v>max ? max : v; }
-    function Mod(x, n) { return ((x % n) + n) % n; }
-
-
-    //**random
-    function Random() { return genrand_real2(); }
-    function RandomInt(min, max) { return Math.floor(Random() * (max + 1 - min) + min); }
-
-    function get_kernel(kernels_params) {
-        let k_id = kernels_params[0]['k_id']
-        let k_q = kernels_params[0]['q']
-        let k_r = kernels_params[0]['r']
-        let tmp_bs = kernels_params[0]['b']
-        let bs
-        if (typeof(tmp_bs) == "string") {
-            bs = []
-            let tmp_bs_arr = tmp_bs.split(',')
-            for (let index = 0; index < tmp_bs_arr.length; index++) {
-                const split = tmp_bs_arr[index].split('/');
-                if (split.length == 2) {
-                    bs.push(parseInt(split[0], 10) / parseInt(split[1], 10))
-                } else {
-                    bs.push(parseFloat(split[0]))
-                }
-            }
-        } else {
-            bs = kernels_params[0]['b']
-        }
-
-        let weight = 0.0;
-        const world_size_center = WORLD_SIZE/2
-        for (let i=0; i<WORLD_SIZE; i++) {
-            for (let j=0; j<WORLD_SIZE; j++) {
-                let ii = ((i + world_size_center) % WORLD_SIZE) - world_size_center;
-                let jj = ((j + world_size_center) % WORLD_SIZE) - world_size_center;
-                let r = Math.sqrt(ii*ii + jj*jj) / R;
-                let v = kernelShell(k_id, k_q, bs, k_r, r);
-                weight += v;
-                kernelRe[i][j] = v;
-                ii = WORLD_SIZE - ((i + WORLD_SIZE/2) % WORLD_SIZE) - 1;
-                jj = ((j + WORLD_SIZE/2) % WORLD_SIZE);
-                kernel[ii][jj] = v;
-            }
-        }
-
-        for (let i=0; i<WORLD_SIZE; i++) {
-            for (let j=0; j<WORLD_SIZE; j++) {
-                kernelRe[i][j] /= weight;
-                kernelIm[i][j] /= weight;
-            }
-        }
-
-        FFT2D(1, kernelRe, kernelIm);
-
-    }
-
-    function update_fn(isUpdate) {
-        if (isUpdate==null) isUpdate = true;
-        for (let i=0; i<WORLD_SIZE; i++)
-            for (let j=0; j<WORLD_SIZE; j++)
-                cellsOld[i][j] = cells[i][j];
-        for (let i=0; i<WORLD_SIZE; i++)
-            cellsIm[i].fill(0);
-
-        // f * g = F-1( F(f) dot F(g) )
-        FFT2D(1, cells, cellsIm);
-        ComplexMatrixDot(cells, cellsIm, kernelRe, kernelIm, potentialRe, potentialIm);
-        FFT2D(-1, potentialRe, potentialIm);
-
-        shiftX = (centerID === CENTER_OFF) ? 0 : Math.floor(mX - WORLD_SIZE/2);
-        shiftY = (centerID === CENTER_OFF) ? 0 : Math.floor(mY - WORLD_SIZE/2);
-
-        for (let i=0; i<WORLD_SIZE; i++) {
-            for (let j=0; j<WORLD_SIZE; j++) {
-                let ii = (centerID === CENTER_OFF) ? i : Mod(i - shiftY, WORLD_SIZE);
-                let jj = (centerID === CENTER_OFF) ? j : Mod(j - shiftX, WORLD_SIZE);
-
-                let p = potential[ii][jj] = potentialRe[i][j];
-                let d = field[ii][jj] = growthFn(gf_id, gf_m, gf_s, p);
-                let v = cellsOld[i][j] + d / T;
-                
-                // Clip
-                if (v < 0) v = 0; else if (v > 1.) v = 1.;
-
-                if (isUpdate) {
-                    cells[ii][jj] = v;
-                } else {
-                    cells[i][j] = cellsOld[i][j]
-                };
-            }
-        }
-    }
-
-    function DrawAllPanels() {
-        DrawArray(CANVAS_CELLS, cells, 1);
-        DrawArray(CANVAS_FIELD, field, 1);
-        DrawArray(CANVAS_POTENTIAL, potential, 0.5 / gf_m);
-    }
-
-    function DrawArray(canvas, arr, max_val) {
-        const nb_colors = COLORS[colorName].length
-        let isAutoCenter = (centerID != CENTER_OFF) && (R != 2);
-        let buf = isAutoCenter ? CANVAS_HIDDEN.img.data : canvas.img.data;
-        let p = 0, rgba;
-        for (let i=0; i<P_SIZE; i++) {
-            let ii = Math.floor(i / PIXEL);
-            for (let j=0; j<P_SIZE; j++) {
-                let jj = Math.floor(j / PIXEL);
-
-                let v = arr[ii][jj] * max_val;
-                let c = Math.floor(v * nb_colors)
-                c = Math.max(c, 0);
-                c = Math.min(c, nb_colors - 1);
-                rgba = COLORS[colorName][c];
-                for (let n=0; n<3; n++){
-                    buf[p++] = rgba[n];
-                }
-
-                buf[p++] = 255;
-            }
-        }
-
-        let canvas0 = isAutoCenter ? CANVAS_HIDDEN : canvas;
-        canvas0.ctx.putImageData(canvas0.img, 0, 0);
-
-
-        if (isAutoCenter) {
-            let tX = oldmX * PIXEL;
-            let tY = oldmY * PIXEL;
-            canvas.ctx.save();
-            canvas.ctx.fillStyle = 'rgb(255, 255, 255)'
-            canvas.ctx.fillRect(0, 0, P_SIZE, P_SIZE);
-
-            canvas.ctx.translate(P_SIZE/2, P_SIZE/2);
-            canvas.ctx.drawImage(canvas0.can, -tX, -tY, P_SIZE, P_SIZE);
-            canvas.ctx.restore();
-        }
-    }
-
 
     ///////////////////////////////
     // Loader
     ///////////////////////////////
     function init(metadata) {
-        // Set world
-        let size_power2 = 7
-        ResizeAll(size_power2);
-
         const config = metadata["config"]
         const attributes = metadata["attributes"]
 
         let scale = config["world_params"]["scale"]
         scale = parseInt(Math.min(Math.max(scale, 1), 10), 10)
+        console.log(scale);
+        let size_power2;
+        if (scale <= 1) {
+            size_power2 = 7
+        } else if (scale <= 2) {
+            size_power2 = 8
+        } else if (scale <= 4) {
+            size_power2 = 9
+        } else if (scale <= 8) {
+            size_power2 = 10
+        } else {
+            size_power2 = 11
+        }
+        resizeAll(size_power2);
 
         let cellsSt = config["cells"]
-        let init_cells = decompress_array(cellsSt)
+        let init_cells = decompressArray(cellsSt)
 
-        SetRule(config["world_params"], config["kernels_params"], attributes);
-        get_kernel(config["kernels_params"]);
+        setParameters(config["world_params"], config["kernels_params"], attributes);
+        setKernel(config["kernels_params"]);
 
         let x1 = Math.floor(WORLD_SIZE / 2 - init_cells.shape[2] / 2 * scale)
         let y1 = Math.floor(WORLD_SIZE / 2 - init_cells.shape[1] / 2 * scale)
-        console.log(init_cells)
-        if (scale > 2) { 
-            update_fn()
-        }
-        AddCellArray(init_cells, x1, y1, 0, 0, scale, 0, 0);
+        // Scale it slowly to ensure stability
+        // console.log(init_cells)
+        // if (scale > 2) { 
+        //     update_fn()
+        // }
+        initCellsArray(init_cells, x1, y1, 0, 0, scale, 0);
     }
 
-    function SetRule(leniax_world_params, kernels_params, attributes) {
-        for (let index = 0; index < attributes.length; index++) {
-            const attribute = attributes[index];
-            if(attribute["trait_type"] === 'Colormap') {
-                colorName = attribute["value"]
-            }
-        }
-        
-        R = leniax_world_params["R"]
-        T = leniax_world_params["T"]
-
-        gf_id = kernels_params[0]['gf_id']
-        gf_m = kernels_params[0]['m']
-        gf_s = kernels_params[0]['s']
-
-        let scale = leniax_world_params["scale"]
-        if (scale!=1) {
-            R = Math.round(Bound(R * scale, 2, WORLD_SIZE));
-        }
-    }
-
-    function decompress_array(string_cells) {
+    function decompressArray(string_cells) {
         let string_array = string_cells.split('::')
 
         console.assert(string_array.length == 2 && string_array[0].length % 2 == 0)
@@ -416,7 +174,82 @@
         return arr_data
     }
 
-    function AddCellArray(newCells, x1, y1, x2, y2, scale, angle, flip) {
+    function setParameters(leniax_world_params, kernels_params, attributes) {
+        for (let index = 0; index < attributes.length; index++) {
+            const attribute = attributes[index];
+            if(attribute["trait_type"] === 'Colormap') {
+                colorName = attribute["value"].toLocaleLowerCase().replace(" ", "-")
+            }
+        }
+        
+        R = leniax_world_params["R"]
+        T = leniax_world_params["T"]
+
+        gf_id = kernels_params[0]['gf_id']
+        gf_m = kernels_params[0]['m']
+        gf_s = kernels_params[0]['s']
+
+        let scale = leniax_world_params["scale"]
+        if (scale!=1) {
+            R = Math.round(Bound(R * scale, 2, WORLD_SIZE));
+        }
+    }
+
+    function resizeAll(size_power2) {
+        // This fix the global canvas size to 256x256
+        let min = -2
+        let max = 3
+        let pixel_size_power2 = Bound(8 - size_power2, min, max);
+
+        WORLD_SIZE = 1 << size_power2;
+        PIXEL = (pixel_size_power2>=0) ? 1 << pixel_size_power2 : Round(Math.pow(2, pixel_size_power2));
+        CANVAS_SIZE = Math.round(WORLD_SIZE * PIXEL);
+
+        InitAllArrays(WORLD_SIZE);
+        InitAllCanvas(CANVAS_SIZE);
+    }
+
+    function InitAllArrays(world_size) {
+        cells = null;      cells = createDataArray(world_size);
+        cellsOld = null;   cellsOld = createDataArray(world_size);
+        cellsTx = null;    cellsTx = createDataArray(world_size);
+        cellsIm = null;    cellsIm = createDataArray(world_size);
+
+        kernel = null;     kernel = createDataArray(world_size);
+        kernelRe = null;   kernelRe = createDataArray(world_size);
+        kernelIm = null;   kernelIm = createDataArray(world_size);
+
+        potential = null;      potential = createDataArray(world_size);
+        potentialRe = null;    potentialRe = createDataArray(world_size);
+        potentialIm = null;    potentialIm = createDataArray(world_size);
+
+        field = null;      field = createDataArray(world_size);
+    }
+
+    function createDataArray(world_size) {
+        let arr = [];
+        for (let i=0; i<world_size; i++)
+            arr.push(new Array(world_size).fill(0));
+        return arr;
+    }
+
+    function InitAllCanvas(canvas_size) {
+        CANVAS_CELLS = InitCanvas("CANVAS_CELLS", canvas_size);
+        CANVAS_HIDDEN = InitCanvas("CANVAS_HIDDEN", canvas_size);
+    }
+
+    function InitCanvas(id, canvas_size) {
+        let canvas = document.getElementById(id);
+        canvas.width = canvas.height = canvas_size;
+        canvas.style.width = canvas.width+"px"; canvas.style.height = canvas.height+"px";
+        let ctx = canvas.getContext("2d");
+        let img = ctx.createImageData(canvas.width, canvas.height);
+        let rect = canvas.getBoundingClientRect();
+
+        return { can: canvas, ctx: ctx, img: img, left: rect.left, top: rect.top };
+    }
+
+    function initCellsArray(newCells, x1, y1, x2, y2, scale, angle) {
         let arr = newCells.arr[0]
         let h = newCells.shape[1]
         let w = newCells.shape[2]
@@ -433,18 +266,171 @@
                 let j = Math.round( (+ (fj-fw/2)*cos + (fi-fh/2)*sin) / scale + w/2 );
                 let fii = Mod(fi+fi0, WORLD_SIZE);
                 let fjj = Mod(fj+fj0, WORLD_SIZE);
-                if (flip==2||flip==3) i = h - 1 - i;
-                if (flip==1||flip==3) j = w - 1 - j;
                 let c = (i>=0 && j>=0 && i<h && j<arr[i].length) ? arr[i][j] : 0;
                 let v = (c!="") ? parseFloat(c) : 0;
+
                 if (v>0) cells[fii][fjj] = v;
             }
         }
     }
 
-    ///////////////////////////
+    ///////////////////////////////
+    // Runner
+    ///////////////////////////////
+    function run(fps = 30) {
+        let fpsInterval = 1000 / fps;
+        let startTime, now, then, elapsed;
+
+        then = Date.now();
+        startTime = then;
+        function loop() {
+            window.requestAnimationFrame(loop);
+
+            now = Date.now();
+            elapsed = now - then;
+            if (elapsed > fpsInterval) {
+                then = now - (elapsed % fpsInterval);
+                if (IS_RUNNING) {
+                    update_fn();
+                    DrawArray(CANVAS_CELLS, cells, 1);
+
+                    if (runGen==0) {
+                        runGen = null;
+                        IS_RUNNING = false;
+                    }
+                }
+            }
+        }
+        loop()
+    }
+
+    function update_fn(isUpdate) {
+        if (isUpdate==null) isUpdate = true;
+        for (let i=0; i<WORLD_SIZE; i++)
+            for (let j=0; j<WORLD_SIZE; j++)
+                cellsOld[i][j] = cells[i][j];
+        for (let i=0; i<WORLD_SIZE; i++)
+            cellsIm[i].fill(0);
+
+        // f * g = F-1( F(f) dot F(g) )
+        FFT2D(1, cells, cellsIm);
+        ComplexMatrixDot(cells, cellsIm, kernelRe, kernelIm, potentialRe, potentialIm);
+        FFT2D(-1, potentialRe, potentialIm);
+
+        shiftX = (centerID === CENTER_OFF) ? 0 : Math.floor(mX - WORLD_SIZE/2);
+        shiftY = (centerID === CENTER_OFF) ? 0 : Math.floor(mY - WORLD_SIZE/2);
+
+        for (let i=0; i<WORLD_SIZE; i++) {
+            for (let j=0; j<WORLD_SIZE; j++) {
+                let ii = (centerID === CENTER_OFF) ? i : Mod(i - shiftY, WORLD_SIZE);
+                let jj = (centerID === CENTER_OFF) ? j : Mod(j - shiftX, WORLD_SIZE);
+
+                let p = potential[ii][jj] = potentialRe[i][j];
+                let d = field[ii][jj] = growthFn(gf_id, gf_m, gf_s, p);
+                let v = cellsOld[i][j] + d / T;
+                
+                // Clip
+                if (v < 0) v = 0; else if (v > 1.) v = 1.;
+
+                if (isUpdate) {
+                    cells[ii][jj] = v;
+                } else {
+                    cells[i][j] = cellsOld[i][j]
+                };
+            }
+        }
+    }
+
+    function DrawArray(canvas, arr, max_val) {
+        const nb_colors = COLORS[colorName].length
+        let isAutoCenter = (centerID != CENTER_OFF) && (R != 2);
+        let buf = isAutoCenter ? CANVAS_HIDDEN.img.data : canvas.img.data;
+        let p = 0, rgba;
+        for (let i=0; i<CANVAS_SIZE; i++) {
+            let ii = Math.floor(i / PIXEL);
+            for (let j=0; j<CANVAS_SIZE; j++) {
+                let jj = Math.floor(j / PIXEL);
+
+                let v = arr[ii][jj] * max_val;
+                let c = Math.floor(v * nb_colors)
+                c = Math.max(c, 0);
+                c = Math.min(c, nb_colors - 1);
+                rgba = COLORS[colorName][c];
+                for (let n=0; n<3; n++){
+                    buf[p++] = rgba[n];
+                }
+
+                buf[p++] = 255;
+            }
+        }
+
+        let canvas0 = isAutoCenter ? CANVAS_HIDDEN : canvas;
+        canvas0.ctx.putImageData(canvas0.img, 0, 0);
+
+
+        if (isAutoCenter) {
+            let tX = oldmX * PIXEL;
+            let tY = oldmY * PIXEL;
+            canvas.ctx.save();
+            canvas.ctx.fillStyle = 'rgb(255, 255, 255)'
+            canvas.ctx.fillRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
+
+            canvas.ctx.translate(CANVAS_SIZE / 2, CANVAS_SIZE / 2);
+            canvas.ctx.drawImage(canvas0.can, -tX, -tY, CANVAS_SIZE, CANVAS_SIZE);
+            canvas.ctx.restore();
+        }
+    }
+
+    ///////////////////////////////
     // Kernels
-    ///////////////////////////
+    ///////////////////////////////
+    function setKernel(kernels_params) {
+        let k_id = kernels_params[0]['k_id']
+        let k_q = kernels_params[0]['q']
+        let k_r = kernels_params[0]['r']
+        let tmp_bs = kernels_params[0]['b']
+        let bs
+        if (typeof(tmp_bs) == "string") {
+            bs = []
+            let tmp_bs_arr = tmp_bs.split(',')
+            for (let index = 0; index < tmp_bs_arr.length; index++) {
+                const split = tmp_bs_arr[index].split('/');
+                if (split.length == 2) {
+                    bs.push(parseInt(split[0], 10) / parseInt(split[1], 10))
+                } else {
+                    bs.push(parseFloat(split[0]))
+                }
+            }
+        } else {
+            bs = kernels_params[0]['b']
+        }
+
+        let weight = 0.0;
+        const world_size_center = WORLD_SIZE/2
+        for (let i=0; i<WORLD_SIZE; i++) {
+            for (let j=0; j<WORLD_SIZE; j++) {
+                let ii = ((i + world_size_center) % WORLD_SIZE) - world_size_center;
+                let jj = ((j + world_size_center) % WORLD_SIZE) - world_size_center;
+                let r = Math.sqrt(ii*ii + jj*jj) / R;
+                let v = kernelShell(k_id, k_q, bs, k_r, r);
+                weight += v;
+                kernelRe[i][j] = v;
+                ii = WORLD_SIZE - ((i + WORLD_SIZE/2) % WORLD_SIZE) - 1;
+                jj = ((j + WORLD_SIZE/2) % WORLD_SIZE);
+                kernel[ii][jj] = v;
+            }
+        }
+
+        for (let i=0; i<WORLD_SIZE; i++) {
+            for (let j=0; j<WORLD_SIZE; j++) {
+                kernelRe[i][j] /= weight;
+                kernelIm[i][j] /= weight;
+            }
+        }
+
+        FFT2D(1, kernelRe, kernelIm);
+    }
+
     function kernelShell(k_id, k_q, bs, k_r, dist) {
         let nb_b = bs.length
         let b_dist = nb_b * dist
@@ -483,8 +469,14 @@
     }
 
     ///////////////////////////
-    // Maths
+    // Math
     ///////////////////////////
+    function Round(x) { return Math.round(x * PRECISION) / PRECISION; }
+    function Bound(x, min, max) { let v = Math.round(x * PRECISION) / PRECISION; return v<min ? min : v>max ? max : v; }
+    function Mod(x, n) { return ((x % n) + n) % n; }
+    function Random() { return genrand_real2(); }
+    function RandomInt(min, max) { return Math.floor(Random() * (max + 1 - min) + min); }
+
     function transpose2D(mat) {
         const nb_rows = mat.length;
 
@@ -589,6 +581,9 @@
         }
     }
 
+    ///////////////////////////
+    // Utils
+    ///////////////////////////
     function ClearCells(x) {
         for (let i=0; i<WORLD_SIZE; i++) {
             for (let j=0; j<WORLD_SIZE; j++) {
@@ -599,65 +594,17 @@
         update_fn(false);
     }
 
-    function TransformField(dX, dY, dS, dA, flip) {
-
-        if (dS!=1) {
-            R = Math.round(Bound(R * dS, 2, WORLD_SIZE));
-            get_kernel();
-        }
-
-        if ((dA == 0 || transA == null) && (dS == 1 || transS == null)) {
-            for (let i=0; i<WORLD_SIZE; i++)
-                for (let j=0; j<WORLD_SIZE; j++)
-                    cellsTx[i][j] = cells[i][j];
-        }
-
-        if (dA == 0) {
-            transA = null;
-        } else {
-            if (transA == null) transA = 0;
-            dA = transA = transA + dA;
-        }
-        if (dS == 1) {
-            transS = null;
-        } else {
-            if (transS == null) transS = 1;
-            transS = transS * dS;
-            dS = Round(transS);
-        }
-        for (let i=0; i<WORLD_SIZE; i++)
-            cells[i].fill(0);
-
-        let sin = Math.sin(dA / 180 * π);
-        let cos = Math.cos(dA / 180 * π);
-        let S = (dS<1) ? Math.round(WORLD_SIZE*dS) : WORLD_SIZE;
-        let D = (dS<1) ? Math.round(WORLD_SIZE*(1-dS)/2) : 0;
-        for (let i=D; i<S+D; i++) {
-            for (let j=D; j<S+D; j++) {
-                let ii = Math.round( (- (j-WORLD_SIZE/2)*sin + (i-WORLD_SIZE/2)*cos) / dS + WORLD_SIZE/2 - dY);
-                let jj = Math.round( (+ (j-WORLD_SIZE/2)*cos + (i-WORLD_SIZE/2)*sin) / dS + WORLD_SIZE/2 - dX);
-                ii = Mod(ii, WORLD_SIZE);
-                jj = Mod(jj, WORLD_SIZE);
-                if (flip==Flip_V||flip==Flip_HV||(flip==Mirror_X&&j>S/2)) ii = WORLD_SIZE-1-ii;
-                if (flip==Flip_H||flip==Flip_HV||(flip==Mirror_H&&j>S/2)||(flip==Mirror_X&&j>S/2)) jj = WORLD_SIZE-1-jj;
-                if (flip==Mirror_D&&ii+jj>WORLD_SIZE) { let tmp = ii; ii = WORLD_SIZE-1-jj; jj = WORLD_SIZE-1-tmp; }
-                cells[i][j] = cellsTx[ii][jj];
-            }
-        }
-        update_fn(false);
-    }
-
-    ///////////////////////////
-    // Utils
-    ///////////////////////////
     function ord(letter) {
         return letter.charCodeAt(0);
-
     }
+
     function chr(code){
         return String.fromCharCode(code);
     }
 
+    ///////////////////////////
+    // Colors
+    ///////////////////////////
     function hex_to_palette_rgba(hex_bg_color, hex_colors){
         const steps = Math.floor(254 / (hex_colors.length - 1))
         let palette_rgb_uint8 = [];
@@ -784,7 +731,13 @@
     
         return sum ** gamma;
     }
-    
-    window.leniaEngine = {init, run}
-})()
 
+    ///////////////////////////
+    // Setting public functions
+    ///////////////////////////
+    window.leniaEngine = {
+        init, 
+        run,
+        cells
+    }
+})()
