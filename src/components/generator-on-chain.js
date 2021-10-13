@@ -5,7 +5,7 @@ import artifacts from '../artifacts.json'
 import { useWeb3 } from "./web3-provider"
 import { getEngineCode } from "../utils/sm"
 
-const GeneratorOnChain = ({ scale, lenia_id }) => {
+const GeneratorOnChain = ({ fps, scale, lenia_id }) => {
     const nodeRef = useRef(null);
 
     const { web3Provider, account } = useWeb3()
@@ -39,7 +39,7 @@ const GeneratorOnChain = ({ scale, lenia_id }) => {
             }
 
             window.leniaEngine.init(leniaMetadata);
-            window.leniaEngine.run();
+            window.leniaEngine.run(fps);
         }
     }, [web3Provider, account])
     

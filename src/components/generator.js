@@ -2,7 +2,7 @@ import React, { useRef, useEffect } from "react"
 require('../engine')
 const axios = require('axios');
 
-const Generator = ({ scale, lenia_id }) => {
+const Generator = ({ fps, scale, lenia_id }) => {
     const nodeRef = useRef(null);
 
     useEffect(async () => {
@@ -11,8 +11,9 @@ const Generator = ({ scale, lenia_id }) => {
 
         leniaMetadata["config"]["world_params"]["scale"] = scale
 
+        // fps = 5;
         window.leniaEngine.init(leniaMetadata);
-        window.leniaEngine.run();
+        window.leniaEngine.run(fps);
     })
     
     return (
