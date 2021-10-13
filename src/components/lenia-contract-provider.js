@@ -33,7 +33,7 @@ export const LeniaContractProvider = ({ children }) => {
     }
   }
   
-  useEffect(initContract, [web3Provider, account])
+  useEffect(initContract, [web3Provider])
 
   const initBlockchainData = async () => {
     if (contract) {

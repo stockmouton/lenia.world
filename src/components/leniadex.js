@@ -7,19 +7,30 @@ const axios = require('axios');
 import { useWeb3 } from "./web3-provider"
 import { useLeniaContract } from './lenia-contract-provider'
 
+const LeniaWrapper = styled.div`
+  position: relative;
+`
+
+const LoadingWrapper = styled.div`
+  position: absolute;
+  top: 50%;
+  width: 100%;
+  text-align: center;
+  font-size: 2.6rem;
+`
+
 const StyledSVG = styled.svg`
   display: block;
   margin: auto;
 `
 
 const StyledTooltip = styled.div`
-    opacity: 0;
-    background-color: white
-    border: solid;
-    border-width: 1px;
-    border-radius: 5px;
-    padding: 10px;
-    position: fixed;
+  opacity: 0;
+  background-color: #ffffff;
+  border: 5px solid #000000;
+  color: #000000;
+  padding: 10px;
+  position: fixed;
 `
 
 function getValue(attributes, key) {
@@ -42,10 +53,11 @@ function getValue(attributes, key) {
 const LeniaDex = () => {
   const { account } = useWeb3()
   const { contract, totalLeniaMinted } = useLeniaContract()
+  const [isLoading, setIsLoading] = useState(true)
 
   const nodeRef = useRef(null);
 
-  // var data = replaceVideoURL(all_metadata)
+  // var data = replaceVideoURL(allMetadata)
 
   // set the dimensions and margins of the graph
   const margin = { top: 0, right: 0, bottom: 40, left: 40 }
@@ -63,18 +75,23 @@ const LeniaDex = () => {
 
   useEffect(async () => {
     if (nodeRef.current) {
-      const all_metadata = [];
-      if (contract && totalLeniaMinted > 0) {
+      const allMetadata = [];
+      const totalLeniaSupply = await contract.methods.MAX_SUPPLY().call({ from: account }) || 0
+      console.log(totalLeniaSupply)
+      if (contract) {
         for (let index = 0; index < totalLeniaMinted; index++) {
-          const tokenMetadataURI = await contract.methods.tokenURI(index).call({ from: account })
-          const response = await axios.get(tokenMetadataURI);
-          const tokenMetadata = response.data
-          all_metadata.push(tokenMetadata)
+          const tokenMetadataURI = await contract.methods.tokenURI(index).call()
+          try {
+            const {data} = await axios.get(tokenMetadataURI)
+            allMetadata.push(data)
+          } catch(error) {
+            console.log(error)
+            // It means the metadata for the Lenia has not been uploaded yet, so we just ignore it.
+          }
         }
 
-        const max_key1 = Math.ceil(10 * d3.max(all_metadata, (d) => getValue(d.attributes, key1))) / 10
-        const max_key2 = Math.ceil(10 * d3.max(all_metadata, (d) => getValue(d.attributes, key2))) / 10
-
+        const max_key1 = Math.ceil(10 * d3.max(allMetadata, (d) => getValue(d.attributes, key1))) / 10
+        const max_key2 = Math.ceil(10 * d3.max(allMetadata, (d) => getValue(d.attributes, key2))) / 10
         const svg = d3.select(nodeRef.current)
           .append("g")
           .attr("transform",
@@ -110,20 +127,24 @@ const LeniaDex = () => {
 
 
         const tooltip = d3.select("#leniadex-tooltip")
-        const mouseover = (event, d) =>
+        const mouseover = (event, {animation_url, name, attributes}) => {
           tooltip
             // .html(`
             //     <iframe src="lenia?id=${d.tokenID}" width="256px" height="256px"></iframe>
             // `)
             .html(`
                 <video id="creature_vid" width="256" height="256" preload='auto' autoplay>
-                    <source src="${d.animation_url}" type="video/mp4">
+                    <source src="${animation_url}" type="video/mp4">
                     Your browser does not support the video tag.
                 </video>
+                <div>
+                  <span>Name: ${name}</span><br />
+                  ${attributes.map(a => `<span>${a.trait_type}: ${a.value}</span><br />`)}                  
+                </div>
             `)
             .style("z-index", 1080)
             .style("opacity", 1)
-
+        }
         const mousemove = (event, d) =>
           tooltip
             .style("left", `${event.x + 20}px`)
@@ -138,7 +159,7 @@ const LeniaDex = () => {
         const dotsGroup = svg.append("g")
           .append("g");
         dotsGroup.selectAll("dot")
-          .data(all_metadata)
+          .data(allMetadata)
           .enter()
           .append("circle")
           .attr("cx", function (d) { return scaleX(getValue(d.attributes, 'Robustness')); })
@@ -149,18 +170,28 @@ const LeniaDex = () => {
           .style("opacity", 0.5)
           .style("stroke", "none")
           .style("stroke-width", "0.4px")
+          .style("cursor", "pointer")
           .on("mouseover", mouseover)
           .on("mousemove", mousemove)
           .on("mouseleave", mouseleave)
+        
+        setIsLoading(false)
       }
     }
-  }, [contract, totalLeniaMinted])
+  }, [contract])
 
-  return totalLeniaMinted > 0 && (
+  return (
     <Section id="leniadex">
       <Section.Header><h1>Leniadex</h1></Section.Header>
-      <StyledSVG ref={nodeRef} width="75%" className="leniadex" viewBox={viewbox}></StyledSVG>
-      <StyledTooltip id="leniadex-tooltip"></StyledTooltip>
+      <LeniaWrapper>
+        <StyledSVG ref={nodeRef} width="75%" className="leniadex" viewBox={viewbox}></StyledSVG>
+        <StyledTooltip id="leniadex-tooltip"></StyledTooltip>
+        {isLoading && (
+          <LoadingWrapper>
+            Loading...
+          </LoadingWrapper>
+        )}
+      </LeniaWrapper>
     </Section>
   )
 }

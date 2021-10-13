@@ -34,7 +34,7 @@ module.exports = {
     {
       resolve: `gatsby-plugin-env-variables`,
       options: {
-        allowList: []
+        allowList: ["MAINNET_ALCHEMY_API_KEY", "RINKEBY_ALCHEMY_API_KEY"]
       },
     },
     {

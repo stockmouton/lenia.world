@@ -10,23 +10,17 @@ export const ETHEREUM_HEX_CHAIN_IDS = {
   [ETHEREUM_CHAIN_IDS.HARDHAT]: '0x539',
 }
 
-export const getAllowedChainIds = (isStaging = false) => {
-  if (process.env.NODE_ENV === 'production' && isStaging) return [ETHEREUM_CHAIN_IDS.RINKEBY]
+export const getAllowedChainIds = network => {
+  if (process.env.NODE_ENV === 'production' && network === 'rinkeby') return [ETHEREUM_CHAIN_IDS.RINKEBY]
   if (process.env.NODE_ENV === 'production') return [ETHEREUM_CHAIN_IDS.MAINNET]
   return [ETHEREUM_CHAIN_IDS.HARDHAT, ETHEREUM_CHAIN_IDS.RINKEBY, ETHEREUM_CHAIN_IDS.MAINNET]
 }
 
-export const chainDisplayName = (() => {
-  if (process.env.NODE_ENV === 'production' && isStaging) return 'Rinkeby Testnet'
+export const getChainDisplayName = network => {
+  if (process.env.NODE_ENV === 'production' && network === 'rinkeby') return 'Rinkeby Testnet'
   if (process.env.NODE_ENV === 'production') return 'Ethereum Mainnet'
   return 'localhost:8545, Rinkeby Testnet or Ethereum Mainnet'
-})()
-
-export const networkName = (() => {
-  if (process.env.NODE_ENV === 'production' && isStaging) return 'rinkeby'
-  if (process.env.NODE_ENV === 'production') return 'mainnet'
-  return 'localhost'
-})()
+}
 
 export const getDecimalFromHex = hexString => parseInt(hexString, 16)
 

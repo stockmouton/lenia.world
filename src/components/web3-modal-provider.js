@@ -2,15 +2,24 @@ import React, { createContext, useState, useContext } from 'react'
 import { useWeb3 } from "./web3-provider"
 import Web3Modal from "web3modal"
 import WalletConnectProvider from '@walletconnect/web3-provider'
-import { networkName } from '../utils/wallet'
 import { useEffect } from 'react'
+import { useQueryParam, StringParam } from "use-query-params";
+
 
 const web3ModalContext = createContext({})
+
+const getNetworkName = () => {
+  if (process.env.NODE_ENV === 'production') return 'mainnet'
+  return 'localhost'
+}
 
 export const Web3ModalProvider = ({ children }) => {
   const { initWeb3Provider } = useWeb3()
   const [error, setError] = useState(null)
   const [web3Modal, setWeb3Modal] = useState(null)
+  const [network] = useQueryParam("network", StringParam)
+
+  const networkName = network || getDefaultNetworkName()
 
   const openWeb3Modal = async () => {  
     try {

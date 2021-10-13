@@ -1,7 +1,8 @@
 import React, { createContext, useState, useEffect, useContext } from 'react'
 import Toast from './toast'
-import { getAllowedChainIds, chainDisplayName, getDecimalFromHex, switchChainConnection} from '../utils/wallet'
-import { useQueryParam, BooleanParam } from "use-query-params";
+import { getAllowedChainIds, getChainDisplayName, getDecimalFromHex, switchChainConnection} from '../utils/wallet'
+import { createAlchemyWeb3 } from "@alch/alchemy-web3";
+import { useQueryParam, StringParam } from "use-query-params";
 
 const Web3 = typeof window !== 'undefined' ? require('web3') : null;
 const web3Context = createContext(null)
@@ -12,9 +13,10 @@ export const Web3Provider = ({ children }) => {
   const [provider, setProvider] = useState(null)
   const [chainId, setChainId] = useState(null)
   const [error, setError] = useState(null)
-  const [isStaging] = useQueryParam("staging", BooleanParam)
+  const [network] = useQueryParam("network", StringParam)
 
-  const allowedChainIds = getAllowedChainIds(isStaging)
+  const allowedChainIds = getAllowedChainIds(network)
+  const chainDisplayName = getChainDisplayName(network)
   
   const initAccount = async (web3Provider, isFirstConnection = false) => {
     try {
@@ -79,19 +81,33 @@ export const Web3Provider = ({ children }) => {
     }
   }
 
-  const checkExistingProvider = () => {
+  const initDefaultProvider = async () => {
+    let web3Provider = null
+    try {
+      web3Provider = createAlchemyWeb3(`https://eth-mainnet.alchemyapi.io/${isStaging ? process.env.RINKEBY_ALCHEMY_API_KEY: process.env.MAINNET_ALCHEMY_API_KEY}`)
+      const newChainId = await web3Provider.eth.getChainId()
+      setWeb3Provider(provider)
+      setChainId(newChainId)
+    } catch(error) {
+      return
+    }
+  }
+
+  const initExistingProvider = () => {
     // Check if browser is running Metamask
     let web3Provider
     if (window.ethereum) {
       initWeb3Provider(window.ethereum);
     } else if (window.web3) {
       initWeb3Provider(window.web3.currentProvider);
+    } else {
+      initDefaultProvider()
     }
   };
 
   const handleToastClose = () => setError(null)
 
-  useEffect(checkExistingProvider, []);
+  useEffect(initExistingProvider, []);
 
   return (
     <>
