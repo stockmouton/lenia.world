@@ -44,3 +44,6 @@ deployments/localhost/
 
 # Lenia related
 static/metadata/
+
+# Assembly
+build/

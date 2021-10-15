@@ -11,15 +11,14 @@ const Generator = ({ zoom, fps, scale, lenia_id }) => {
 
         leniaMetadata["config"]["world_params"]["scale"] = scale
 
-        // fps = 5;
         window.leniaEngine.init(leniaMetadata, zoom);
-        window.leniaEngine.run(fps);
+        // window.leniaEngine.run(fps);
+        // window.leniaEngine.render()
     })
     
     return (
         <div ref={nodeRef}>
             <canvas id="CANVAS_CELLS"></canvas>
-            <canvas id="CANVAS_HIDDEN" style={{'display': 'none'}}></canvas>
         </div>
     )
 }

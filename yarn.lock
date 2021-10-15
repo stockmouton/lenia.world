@@ -9,6 +9,11 @@
   dependencies:
     tslib "~2.0.1"
 
+"@assemblyscript/loader@^0.19.17":
+  version "0.19.17"
+  resolved "https://registry.yarnpkg.com/@assemblyscript/loader/-/loader-0.19.17.tgz#53acafdb5a88a6d87ee99689e38b83be2c5c226a"
+  integrity sha512-V2lrYgii5Qy81v4lZq+FeT8X30UcwCkB5aZJ/U/2GHCBxrjiriBLRybr9SI+8Id/H7vMaWcOgq2iBf9PXVaeXQ==
+
 "@babel/code-frame@7.10.4":
   version "7.10.4"
   resolved "https://registry.yarnpkg.com/@babel/code-frame/-/code-frame-7.10.4.tgz#168da1a36e90da68ae8d49c0f1b48c7c6249213a"
@@ -3683,6 +3688,14 @@ asn1@~0.2.3:
   dependencies:
     safer-buffer "~2.1.0"
 
+assemblyscript@^0.19.17:
+  version "0.19.17"
+  resolved "https://registry.yarnpkg.com/assemblyscript/-/assemblyscript-0.19.17.tgz#b1dc9842a024a65eaf1f9943b3094e7c98b9f055"
+  integrity sha512-KY80XCUFaocBR9V+Xx9oaG2ftkO1Da13MDcF6ZB25Nlir8SHPQBzR7nqCqmVHxp5FoE3pAnxJMNmQmS3JiTUTA==
+  dependencies:
+    binaryen "101.0.0-nightly.20210904"
+    long "^4.0.0"
+
 assert-plus@1.0.0, assert-plus@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/assert-plus/-/assert-plus-1.0.0.tgz#f12e0f3c5d77b0b1cdd9146942e4e96c1e4dd525"
@@ -4607,6 +4620,11 @@ binary-extensions@^2.0.0:
   version "2.2.0"
   resolved "https://registry.yarnpkg.com/binary-extensions/-/binary-extensions-2.2.0.tgz#75f502eeaf9ffde42fc98829645be4ea76bd9e2d"
   integrity sha512-jDctJ/IVQbZoJykoeHbhXpOlNBqGNcwXJKJog42E5HDPUwQTSdjCHdihjj0DlnheQ7blbT6dHOafNAiS8ooQKA==
+
+binaryen@101.0.0-nightly.20210904:
+  version "101.0.0-nightly.20210904"
+  resolved "https://registry.yarnpkg.com/binaryen/-/binaryen-101.0.0-nightly.20210904.tgz#58a7990d6d64b16567f376a1fe47d8aea6698b14"
+  integrity sha512-2AvJhErttuoMvgNcYPPpPy7C12PSvDdtZWtEeX/Otm/Vtf4ePvBpT3UIA00hGAh8HNaGr+dzFNstxTUvjNwZTg==
 
 bindings@^1.5.0:
   version "1.5.0"
@@ -11847,6 +11865,11 @@ log-symbols@3.0.0:
   integrity sha512-dSkNGuI7iG3mfvDzUuYZyvk5dD9ocYCYzNU6CYDE6+Xqd+gwme6Z00NS3dUh8mq/73HaEtT7m6W+yUPtU6BZnQ==
   dependencies:
     chalk "^2.4.2"
+
+long@^4.0.0:
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/long/-/long-4.0.0.tgz#9a7b71cfb7d361a194ea555241c92f7468d5bf28"
+  integrity sha512-XsP+KhQif4bjX1kbuSiySJFNAehNxgLb6hPRGJ9QsUr8ajHkuXGdrHmFUTUUXhDwVX2R5bY4JNZEwbUiMhV+MA==
 
 longest-streak@^2.0.0, longest-streak@^2.0.1:
   version "2.0.4"

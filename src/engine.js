@@ -1,4 +1,7 @@
 (() => {
+    // Most problematic functions: FFT1D, transpose2D, complexMatrixDot
+    // Those are problematic because they are called all the time
+
     ///////////////////////////////
     // Globals
     ///////////////////////////////
@@ -10,16 +13,42 @@
     let R = 13;
     let T = 10;
 
-    let RUN_GEN = null;
+    let gf_id = 0;
+    let gf_m = 0.14;
+    let gf_s = 0.015;
+
     let ADD_LENIA = false;
     let INIT_CELLS; let INIT_CELLS_X = 0; let INIT_CELLS_Y = 0;
     let SCALE;
     let ZOOM;
-    let IS_RUNNING = true;
 
-    let CENTER = false;
+    let cells = null;
+    let cellsOld = null;
+    let cellsIm = null;
+
+    let kernel = null;
+    let kernelRe = null;
+    let kernelIm = null;
+
+    let field = null;
+
+    let potentialRe = null;
+    let potentialIm = null;
+
+    let CANVAS_CELLS = null;
+
+    const BUFFER_CELLS_IDX = 0;
+    const BUFFER_CELLS_OLD_IDX = 1;
+    const BUFFER_CELLS_IMAG_IDX = 2;
+    const BUFFER_FIELD_IDX = 3;
+    const BUFFER_POTENTIAL_REAL_IDX = 4;
+    const BUFFER_POTENTIAL_IMAG_IDX = 5;
+    const BUFFER_KERNEL_REAL_IDX = 6;
+    const BUFFER_KERNEL_IMAG_IDX = 7;
+    const BUFFER_CELLS_OUT_IDX = 8;
 
     let WORLD_SIZE = 1;
+    let BUFFER_SIZE = 1;
     let PIXEL = 1;
     let CANVAS_SIZE = 1;
     const COLORS = {
@@ -133,30 +162,12 @@
     };
     let colorName = "msdos";
 
-    let cells = null;
-    let cellsOld = null;
-    let cellsTx = null;
-    let cellsIm = null;
-
-    let kernel = null;
-    let kernelRe = null;
-    let kernelIm = null;
-
-    let potential = null;
-    let potentialRe = null;
-    let potentialIm = null;
-
-    let field = null;
-
-    let CANVAS_CELLS = null;
-    let CANVAS_HIDDEN = null;
-
-    let shiftX, shiftY;
-    let oldmX, oldmY;
-
     ///////////////////////////////
     // Loader
     ///////////////////////////////
+    let roundFn;
+    let complexMatrixDot;
+    let exportsApplyKernel;
     function init(metadata, zoom=1) {
         const config = metadata["config"];
         const attributes = metadata["attributes"];
@@ -186,20 +197,71 @@
         //     update_fn()
         // }
         INIT_CELLS = initCells;
-
         setParameters(
             config["world_params"],
             config["kernels_params"],
             attributes
         );
-        setKernel(config["kernels_params"]);
 
-        let x1 = Math.floor(WORLD_SIZE / 2 - (initCells.shape[2] / 2) * SCALE);
-        let y1 = Math.floor(WORLD_SIZE / 2 - (initCells.shape[1] / 2) * SCALE);
-        initCellsArray(initCells, x1, y1, 0, 0, SCALE, 0);
+        BUFFER_SIZE = WORLD_SIZE**2
+        const byteSize = (BUFFER_SIZE * 9) << 2; // 8 data area & output (4 bytes per cell)
+        const memory = new WebAssembly.Memory({
+            initial: ((byteSize + 0xffff) & ~0xffff) >>> 16
+        });
+        const wasmConfig = {
+            env: {
+                memory
+            },
+            engine: {  // Name of the file
+                WORLD_SIZE  : WORLD_SIZE,
+                GF_ID       : gf_id,
+                GF_M        : gf_m,
+                GF_S        : gf_s,
+                T           : T,
+            },
+            Math
+        };
+        WebAssembly.instantiateStreaming(fetch('optimized.wasm'), wasmConfig)
+            .then( ({ instance }) => {
+                exports = instance.exports
+                console.log(exports)
+                roundFn = exports.round
+                complexMatrixDot = exports.complexMatrixDot
+                exportsApplyKernel = exports.applyKernel
 
-        document.body.addEventListener("keydown", onKeyDown);
-        document.getElementById("CANVAS_CELLS").addEventListener("click", onClick);
+                let buffer = new Float32Array(memory.buffer);
+
+                // Copy init cells
+                let x1 = Math.floor(WORLD_SIZE / 2 - (initCells.shape[2] / 2) * SCALE);
+                let y1 = Math.floor(WORLD_SIZE / 2 - (initCells.shape[1] / 2) * SCALE);
+                copyInitCells(buffer, initCells, x1, y1, 0, 0, SCALE, 0);
+
+                // Copy kernel
+                setKernel(config["kernels_params"]);
+                for (let rowIdx = 0; rowIdx < WORLD_SIZE; rowIdx++) {
+                    buffer.set(kernelRe[rowIdx], BUFFER_KERNEL_REAL_IDX * BUFFER_SIZE + rowIdx * WORLD_SIZE);
+                    buffer.set(kernelIm[rowIdx], BUFFER_KERNEL_IMAG_IDX * BUFFER_SIZE + rowIdx * WORLD_SIZE);
+                }
+
+                fps = 30;
+                update(buffer, fps);
+                render(buffer)
+
+                document.body.addEventListener("keydown", onKeyDown);
+                document.getElementById("CANVAS_CELLS").addEventListener("click", onClick);
+            });
+    }
+
+    function test(subBuffer, jsBuffer) {
+        for (let y = 0; y < WORLD_SIZE; y++) {
+            for (let x = 0; x < WORLD_SIZE; x++) {
+             const bufferVal = subBuffer[y * WORLD_SIZE + x];
+             const val = jsBuffer[y][x];
+             if (Math.abs(bufferVal - val) > 1e-6){
+                 console.log(x,y, bufferVal, val)
+             }
+            }
+        }
     }
 
     function decompressArray(string_cells) {
@@ -223,9 +285,9 @@
             let val_f = val_i / max_val;
             cells_val_l.push(val_f);
         }
-        let cells = createArray(cells_val_l, cells_shape);
+        let cellsMat = createArray(cells_val_l, cells_shape);
 
-        return cells;
+        return cellsMat;
     }
 
     function ch2val(c) {
@@ -321,7 +383,7 @@
         CANVAS_SIZE = Math.round(WORLD_SIZE * PIXEL);
 
         InitAllArrays(WORLD_SIZE);
-        InitAllCanvas(CANVAS_SIZE);
+        CANVAS_CELLS = InitCanvas("CANVAS_CELLS", CANVAS_SIZE);
     }
 
     function InitAllArrays(world_size) {
@@ -329,8 +391,6 @@
         cells = createDataArray(world_size);
         cellsOld = null;
         cellsOld = createDataArray(world_size);
-        cellsTx = null;
-        cellsTx = createDataArray(world_size);
         cellsIm = null;
         cellsIm = createDataArray(world_size);
 
@@ -341,27 +401,20 @@
         kernelIm = null;
         kernelIm = createDataArray(world_size);
 
-        potential = null;
-        potential = createDataArray(world_size);
+        field = null;
+        field = createDataArray(world_size);
+
         potentialRe = null;
         potentialRe = createDataArray(world_size);
         potentialIm = null;
         potentialIm = createDataArray(world_size);
-
-        field = null;
-        field = createDataArray(world_size);
     }
 
     function createDataArray(world_size) {
-        let arr = [];
+        let arr = Array(world_size);
         for (let i = 0; i < world_size; i++)
-            arr.push(new Array(world_size).fill(0));
+            arr[i] = new Float32Array(world_size).fill(0);
         return arr;
-    }
-
-    function InitAllCanvas(canvas_size) {
-        CANVAS_CELLS = InitCanvas("CANVAS_CELLS", canvas_size);
-        CANVAS_HIDDEN = InitCanvas("CANVAS_HIDDEN", canvas_size);
     }
 
     function InitCanvas(id, canvas_size) {
@@ -380,7 +433,7 @@
         };
     }
 
-    function initCellsArray(newCells, x1, y1, x2, y2, scale, angle) {
+    function copyInitCells(buffer, newCells, x1, y1, x2, y2, scale, angle) {
         let arr = newCells.arr[0];
         let h = newCells.shape[1];
         let w = newCells.shape[2];
@@ -399,108 +452,54 @@
                 let j = Math.round(
                     (+(fj - fw / 2) * cos + (fi - fh / 2) * sin) / scale + w / 2
                 );
-                let fii = Mod(fi + fi0, WORLD_SIZE);
-                let fjj = Mod(fj + fj0, WORLD_SIZE);
+                let y = Mod(fi + fi0, WORLD_SIZE);
+                let x = Mod(fj + fj0, WORLD_SIZE);
+
                 let c =
                     i >= 0 && j >= 0 && i < h && j < arr[i].length
                         ? arr[i][j]
                         : 0;
                 let v = c != "" ? parseFloat(c) : 0;
 
-                if (v > 0) cells[fii][fjj] = v;
+                if (v > 0) {
+                    buffer[BUFFER_CELLS_OUT_IDX * BUFFER_SIZE + y * WORLD_SIZE + x] = v
+                    cells[y][x] = v
+                };
             }
         }
     }
 
     ///////////////////////////////
-    // Runner
+    // Renderer
     ///////////////////////////////
-    function run(fps = 30) {
-        fps = parseInt(Math.min(Math.max(fps, 1), 60), 10);
-        let fpsInterval = 1000 / fps;
-        let startTime, now, then, elapsed;
+    function update(buffer, fps) {
+        setTimeout(() => update(buffer, fps), 1000 / fps);
+        // for (let index = 0; index < 5; index++) {
+            // buffer.copyWithin(
+            //     BUFFER_CELLS_IDX * BUFFER_SIZE, // dest
+            //     BUFFER_CELLS_OUT_IDX * BUFFER_SIZE,  // src
+            //     (BUFFER_CELLS_OUT_IDX + 1) * BUFFER_SIZE
+            // );   // copy output to input
+            // exports.update_fn(true);
+            update_fn(true, buffer);
+        // }
+    }
 
-        then = Date.now();
-        startTime = then;
-        function loop() {
+    function render(buffer) {
+        (function loop() {
             window.requestAnimationFrame(loop);
-
-            now = Date.now();
-            elapsed = now - then;
-            if (elapsed > fpsInterval) {
-                then = now - (elapsed % fpsInterval);
-                if (IS_RUNNING) {
-                    if (ADD_LENIA) {
-                        const x = Math.floor(
-                            INIT_CELLS_X / PIXEL - (INIT_CELLS.shape[2] / 2) * SCALE
-                        );
-                        const y = Math.floor(
-                            INIT_CELLS_Y / PIXEL - (INIT_CELLS.shape[1] / 2) * SCALE
-                        );
-                        initCellsArray(INIT_CELLS, x, y, 0, 0, SCALE, 0);
-
-                        ADD_LENIA = false;
-                    }
-                    update_fn();
-                    DrawArray(CANVAS_CELLS, cells, 1);
-
-                    if (RUN_GEN == 0) {
-                        RUN_GEN = null;
-                        IS_RUNNING = false;
-                    }
-                }
-            }
-        }
-        loop();
+            // let outputBuffer = buffer.subarray(
+            //     BUFFER_CELLS_OUT_IDX * BUFFER_SIZE,
+            //     (BUFFER_CELLS_OUT_IDX + 1) * BUFFER_SIZE
+            // )
+            outputBuffer = null
+            DrawArray(CANVAS_CELLS, outputBuffer, 1);
+        })();
     }
 
-    function update_fn(isUpdate) {
-        if (isUpdate == null) isUpdate = true;
-        for (let i = 0; i < WORLD_SIZE; i++)
-            for (let j = 0; j < WORLD_SIZE; j++) cellsOld[i][j] = cells[i][j];
-        for (let i = 0; i < WORLD_SIZE; i++) cellsIm[i].fill(0);
-
-        // f * g = F-1( F(f) dot F(g) )
-        FFT2D(1, cells, cellsIm);
-        ComplexMatrixDot(
-            cells,
-            cellsIm,
-            kernelRe,
-            kernelIm,
-            potentialRe,
-            potentialIm
-        );
-        FFT2D(-1, potentialRe, potentialIm);
-
-        shiftX = CENTER ? Math.floor(mX - WORLD_SIZE / 2) : 0;
-        shiftY = CENTER ? Math.floor(mY - WORLD_SIZE / 2) : 0;
-
-        for (let i = 0; i < WORLD_SIZE; i++) {
-            for (let j = 0; j < WORLD_SIZE; j++) {
-                let ii = CENTER ? Mod(i - shiftY, WORLD_SIZE) : i;
-                let jj = CENTER ? Mod(j - shiftX, WORLD_SIZE) : j;
-
-                let p = (potential[ii][jj] = potentialRe[i][j]);
-                let d = (field[ii][jj] = growthFn(gf_id, gf_m, gf_s, p));
-                let v = cellsOld[i][j] + d / T;
-
-                // Clip
-                if (v < 0) v = 0;
-                else if (v > 1) v = 1;
-
-                if (isUpdate) {
-                    cells[ii][jj] = v;
-                } else {
-                    cells[i][j] = cellsOld[i][j];
-                }
-            }
-        }
-    }
-
-    function DrawArray(canvas, arr, max_val) {
+    function DrawArray(canvas, outputBuffer, max_val) {
         const nb_colors = COLORS[colorName].length;
-        let currentCanvas = CENTER ? CANVAS_HIDDEN : canvas;
-        let buf = currentCanvas.img.data;
+        let buf = canvas.img.data;
 
         let p = 0;
         let rgba;
@@ -508,8 +507,14 @@
             let ii = Math.floor(i / PIXEL);
             for (let j = 0; j < CANVAS_SIZE; j++) {
                 let jj = Math.floor(j / PIXEL);
+                let outBufPos = ii * WORLD_SIZE + jj;
 
-                let v = arr[ii][jj] * max_val;
+                let v;
+                if (outputBuffer == null) {
+                    v = cells[jj][ii] * max_val;
+                } else {
+                    v = outputBuffer[outBufPos] * max_val;
+                }
                 let c = Math.floor(v * nb_colors);
                 c = Math.max(c, 0);
                 c = Math.min(c, nb_colors - 1);
@@ -522,24 +527,68 @@
             }
         }
 
-        currentCanvas.ctx.putImageData(currentCanvas.img, 0, 0);
+        canvas.ctx.putImageData(canvas.img, 0, 0);
+    }
 
-        if (CENTER) {
-            let tX = oldmX * PIXEL;
-            let tY = oldmY * PIXEL;
-            canvas.ctx.save();
-            canvas.ctx.fillStyle = "rgb(255, 255, 255)";
-            canvas.ctx.fillRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
+    function update_fn(isUpdate = true, buffer) {
+        for (let i = 0; i < WORLD_SIZE; i++){
+            for (let j = 0; j < WORLD_SIZE; j++) {
+                cellsOld[i][j] = cells[i][j]
+            };
+        }
+        for (let i = 0; i < WORLD_SIZE; i++) {
+            cellsIm[i].fill(0);
+        }
 
-            canvas.ctx.translate(CANVAS_SIZE / 2, CANVAS_SIZE / 2);
-            canvas.ctx.drawImage(
-                currentCanvas.can,
-                -tX,
-                -tY,
-                CANVAS_SIZE,
-                CANVAS_SIZE
+        // Change cells inplace
+        for (let rowIdx = 0; rowIdx < WORLD_SIZE; rowIdx++) {
+            buffer.set(
+                cells[rowIdx], 
+                BUFFER_CELLS_IDX * BUFFER_SIZE + rowIdx * WORLD_SIZE
             );
-            canvas.ctx.restore();
+            buffer.set(
+                cellsIm[rowIdx], 
+                BUFFER_CELLS_IMAG_IDX * BUFFER_SIZE + rowIdx * WORLD_SIZE
+            );
+        }
+        exportsApplyKernel()
+
+        for (let i = 0; i < WORLD_SIZE; i++) {
+            for (let j = 0; j < WORLD_SIZE; j++) {
+                let p = buffer[BUFFER_POTENTIAL_REAL_IDX * BUFFER_SIZE + i * WORLD_SIZE + j];
+                let g = growthFn(gf_id, gf_m, gf_s, p);
+                field[i][j] = g;
+                let v = cellsOld[i][j] + g / T;
+
+                // Clip
+                if (v < 0) v = 0;
+                else if (v > 1) v = 1;
+
+                if (isUpdate) {
+                    cells[i][j] = v;
+                } else {
+                    cells[i][j] = cellsOld[i][j];
+                }
+            }
+        }
+    }
+    function growthFn(gf_id, gf_m, gf_s, x) {
+        x = Math.abs(x - gf_m);
+        x = x * x;
+
+        let s_2;
+        switch (gf_id) {
+            case 0:
+                s_2 = 9 * gf_s * gf_s;
+                return Math.max(1 - x / s_2, 0) ** 4 * 2 - 1;
+            case 1:
+                s_2 = 2 * gf_s * gf_s;
+                return Math.exp(-x / s_2) * 2 - 1;
+            case 2:
+                s_2 = 2 * gf_s * gf_s;
+                return Math.exp(-x / s_2);
+            case 3:
+                return (x_abs <= gf_s ? 1 : 0) * 2 - 1;
         }
     }
 
@@ -624,35 +673,9 @@
         }
     }
 
-    let gf_id = 0;
-    let gf_m = 0.14;
-    let gf_s = 0.015;
-    function growthFn(gf_id, gf_m, gf_s, x) {
-        x = Math.abs(x - gf_m);
-        x = x * x;
-
-        let s_2;
-        switch (gf_id) {
-            case 0:
-                s_2 = 9 * gf_s * gf_s;
-                return Math.max(1 - x / s_2, 0) ** 4 * 2 - 1;
-            case 1:
-                s_2 = 2 * gf_s * gf_s;
-                return Math.exp(-x / s_2) * 2 - 1;
-            case 2:
-                s_2 = 2 * gf_s * gf_s;
-                return Math.exp(-x / s_2);
-            case 3:
-                return (x_abs <= gf_s ? 1 : 0) * 2 - 1;
-        }
-    }
-
     ///////////////////////////
     // Math
     ///////////////////////////
-    function Round(x) {
-        return Math.round(x * PRECISION) / PRECISION;
-    }
     function Bound(x, min, max) {
         let v = Math.round(x * PRECISION) / PRECISION;
         return v < min ? min : v > max ? max : v;
@@ -665,18 +688,6 @@
     }
     function RandomInt(min, max) {
         return Math.floor(Random() * (max + 1 - min) + min);
-    }
-
-    function transpose2D(mat) {
-        const nb_rows = mat.length;
-
-        for (let i = 0; i < nb_rows; i++) {
-            for (let j = 0; j < i; j++) {
-                const tmp_re = mat[i][j];
-                mat[i][j] = mat[j][i];
-                mat[j][i] = tmp_re;
-            }
-        }
     }
 
     function FFT2D(dir, re2, im2) {
@@ -694,10 +705,22 @@
         }
     }
 
+    function transpose2D(mat) {
+        const nb_rows = mat.length;
+
+        for (let i = 0; i < nb_rows; i++) {
+            for (let j = 0; j < i; j++) {
+                const tmp_re = mat[i][j];
+                mat[i][j] = mat[j][i];
+                mat[j][i] = tmp_re;
+            }
+        }
+    }
+
     function FFT1D(dir, re1, im1) {
         const nb_rows = re1.length;
         const nb_rows_by_2 = nb_rows >> 1;
-        let m = Round(Math.log2(nb_rows));
+        let m = roundFn(Math.log2(nb_rows));
         let j1 = 0;
         for (let j = 0; j < nb_rows - 1; j++) {
             if (j < j1) {
@@ -757,29 +780,6 @@
         }
     }
 
-    function ComplexMatrixDot(
-        leftside_re,
-        leftside_im,
-        rightside_re,
-        rightside_im,
-        output_re,
-        output_im
-    ) {
-        const nb_rows = leftside_re.length;
-        for (let i = 0; i < nb_rows; i++) {
-            for (let j = 0; j < nb_rows; j++) {
-                let a = leftside_re[i][j];
-                let b = leftside_im[i][j];
-                let c = rightside_re[i][j];
-                let d = rightside_im[i][j];
-
-                let t = a * (c + d);
-                output_re[i][j] = t - d * (a + b);
-                output_im[i][j] = t + c * (b - a);
-            }
-        }
-    }
-
     ///////////////////////////
     // Utils
     ///////////////////////////
@@ -792,7 +792,11 @@
     }
 
     function getCells() {
-        return cells;
+        return {real: cells, imag: cellsIm};
+    }
+
+    function getKernel() {
+        return {real: kernelRe, imag: kernelIm};
     }
 
     function ClearCells(x) {
@@ -810,7 +814,7 @@
             ClearCells(0);
         }
     }
-    
+
     function onClick(e) {
         INIT_CELLS_X = e.clientX;
         INIT_CELLS_Y = e.clientY;
@@ -952,7 +956,7 @@
     ///////////////////////////
     window.leniaEngine = {
         init,
-        run,
         getCells,
+        getKernel,
     };
 })();
