@@ -228,6 +228,7 @@
                 roundFn = exports.round
                 complexMatrixDot = exports.complexMatrixDot
                 exportsApplyKernel = exports.applyKernel
+                exportsUpdateFn = exports.update_fn
 
                 let buffer = new Float32Array(memory.buffer);
 
@@ -473,6 +474,17 @@
     // Renderer
     ///////////////////////////////
     function update(buffer, fps) {
+        if (ADD_LENIA) {
+            const x1 = Math.floor(
+                INIT_CELLS_X / PIXEL - (INIT_CELLS.shape[2] / 2) * SCALE
+            );
+            const y1 = Math.floor(
+                INIT_CELLS_Y / PIXEL - (INIT_CELLS.shape[1] / 2) * SCALE
+            );
+            copyInitCells(buffer, INIT_CELLS, y1, x1, 0, 0, SCALE, 0);
+
+            ADD_LENIA = false;
+        }
         setTimeout(() => update(buffer, fps), 1000 / fps);
         // for (let index = 0; index < 5; index++) {
             // buffer.copyWithin(
@@ -805,8 +817,6 @@
                 cells[i][j] = x;
             }
         }
-
-        update_fn(false);
     }
 
     function onKeyDown(e) {
