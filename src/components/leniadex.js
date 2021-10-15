@@ -1,17 +1,33 @@
-import React, { useRef, useEffect, useState } from "react"
+import React, { useEffect, useState } from "react"
 import Section from "./section"
-import * as d3 from 'd3'
 import styled from "styled-components"
-const axios = require('axios');
+import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, Cell, ResponsiveContainer, Label } from 'recharts';
+import axios from "axios"
+import Grid from "./grid"
 
-import { useWeb3 } from "./web3-provider"
-import { useLeniaContract } from './lenia-contract-provider'
+const LENIADEX_STATUSES = {
+  LOADING: "LOADING",
+  LOADING_FAILURE: "LOADING_FAILURE",
+  READY: "READY",
+}
+const ALL_METADATA_URI = "https://ipfs.io/ipfs/QmdGzCErzGgoAmaTLK1qtBoA8CedGcoEGe5H3T4L1SFTds"
+
+const RADAR_CHART_ORDERED_ATTRIBUTES = ["Velocity", "Weight", "Ki", "Robustness", "Avoidance", "Aura", "Spread"]
+
+const capitalize = string =>
+  string.charAt(0).toUpperCase() + string.slice(1)
+
+const normalize = (number, max) => number / max
 
 const LeniaWrapper = styled.div`
   position: relative;
+  height: 640px;
+  display: flex;
+  border: 1px solid #fefe54;
+  box-shadow: 7px 7px 0 rgba(254, 254, 84, 0.15);
 `
 
-const LoadingWrapper = styled.div`
+const OverlayWrapper = styled.div`
   position: absolute;
   top: 50%;
   width: 100%;
@@ -19,182 +35,199 @@ const LoadingWrapper = styled.div`
   font-size: 2.6rem;
 `
 
-const StyledSVG = styled.svg`
-  display: block;
-  margin: auto;
-`
-
-const StyledTooltip = styled.div`
-  opacity: 0;
-  background-color: #ffffff;
-  border: 5px solid #000000;
+const LeniaPortrait = styled.div`
+  background-color: #bbbbbb;
   color: #000000;
   padding: 10px;
-  position: fixed;
+  width: 400px;
+  height: 100%;
 `
 
-function getValue(attributes, key) {
-  for (let i = 0; i < attributes.length; i++) {
-    if (attributes[i]['trait_type'] == key) {
-      return attributes[i]['numerical_value']
-    }
-  }
-}
-// function setValue(attributes, key, value) {
-//   for (let i = 0; i < attributes.length; i++) {
-//     if (attributes[i]['trait_type'] == key) {
-//       return attributes[i]['value'] = value
-//       break
-//     }
-//   }
-// }
+const Video = styled.video`
+  border: 4px solid #232323;
+  border-radius: 5px;
+  color: #ffffff;
+`
+const Screen = styled.div`
+  box-shadow: inset 0 0 1rem #000000;
+  background: #232323;
+  filter: grayscale(100%);
+  color: #ffffff;
+  font-size: 1rem;
+  border-radius: 5px;
+`
 
+const VideoScreen = styled(Screen)`
+  margin-top: 1rem;
+  width: 100%;
+  height: 0;
+  padding: 0 0 100% 0;
+`
+
+const TextScreen = styled(Screen)`
+  box-shadow: inset 0 0 0.6rem #101010;
+  background: #51ae5f;
+  filter: none;
+  padding: 0.5rem;
+  text-align: center;
+`
+
+const EmptyTextScreen = styled(Screen)`
+  min-height: 2.5rem;
+`
+
+const RadarChartWrapper = styled(Screen)`
+  margin-top: 1rem;
+
+  text {
+    fill: #ffffff;
+    font-size: 0.7rem;
+  }
+`
+const Dot = styled.circle`
+  cursor: pointer;
+`
+
+const CustomScatterDot = ({ cx, cy }) => {
+  return (
+    <Dot
+        cx={cx}
+        cy={cy}
+        r={4}
+        stroke='#fefe54'
+        strokeWidth={1}
+        fill={'#8884d8'} 
+    />
+  );
+};
 
 const LeniaDex = () => {
-  const { account } = useWeb3()
-  const { contract } = useLeniaContract()
-  const [isLoading, setIsLoading] = useState(true)
+  const [leniaDexStatus, setLeniaDexStatus] = useState(LENIADEX_STATUSES.LOADING)
+  const [radarData, setRadarData] = useState([])
+  const [scatterData, setScatterData] = useState([])
+  const [displayedLenia, setDisplayedLenia] = useState(null)
 
-  const nodeRef = useRef(null);
-
-  // var data = replaceVideoURL(allMetadata)
-
-  // set the dimensions and margins of the graph
-  const margin = { top: 0, right: 0, bottom: 40, left: 40 }
-  const svgViewWidth = 400
-  const svgViewHeight = 400
-  // Thw viewbox defines the coordinate system visible
-  // Remeber that the SVG y axis goes downward
-  const viewbox = `0, 0, ${svgViewWidth}, ${svgViewHeight}`
-
-  const width = svgViewWidth - margin.left - margin.right
-  const height = svgViewHeight - margin.top - margin.bottom;
-  const blue = "#ffffff"
-  const key1 = "Robustness"
-  const key2 = "Spread"
-
-  const formatIpfsUri = (uri) => {
-    return uri.replace("ipfs://", "https://ipfs.io/ipfs/")
+  const handleMouseOver = lenia => {
+    setDisplayedLenia(radarData[lenia.id])
   }
 
   useEffect(async () => {
-    if (nodeRef.current) {
-      const allMetadata = [];
-      if (contract) {
-        const totalLeniaSupply = await contract.methods.MAX_SUPPLY().call({ from: account }) || 0
-        console.log(totalLeniaSupply)
-        for (let index = 0; index < totalLeniaSupply; index++) {
-          const tokenMetadataURI = await contract.methods.tokenURI(index).call()
-          try {
-            
-            //const {data} = await axios.get(formatIpfsUri(tokenMetadataURI))
-            //allMetadata.push(data)
-          } catch(error) {
-            console.log(error)
-            // It means the metadata for the Lenia has not been uploaded yet, so we just ignore it.
-          }
-        }
+    let allMetadata = [];
 
-        const max_key1 = Math.ceil(10 * d3.max(allMetadata, (d) => getValue(d.attributes, key1))) / 10
-        const max_key2 = Math.ceil(10 * d3.max(allMetadata, (d) => getValue(d.attributes, key2))) / 10
-        const svg = d3.select(nodeRef.current)
-          .append("g")
-          .attr("transform",
-            `translate(${margin.left}, ${margin.top}, ${margin.right}, ${margin.bottom})`);
-
-        // Add X axis
-        const scaleX = d3.scaleLinear()
-          .domain([0, max_key1])
-          .range([margin.left, width]);
-        const xAxis = d3.axisTop(scaleX).ticks(4);
-        const gx = svg.append("g")
-          .call(xAxis)
-          .attr("transform", `translate(0, ${height})`)
-        svg.append("text")
-          .attr("transform",
-            `translate(${margin.left + width / 2}, ${margin.top + height + 20})`)
-          .style("text-anchor", "middle")
-          .text(key1);
-
-        // Add Y axis
-        const scaleY = d3.scaleLinear()
-          .domain([0, max_key2])
-          .range([height, 0]);
-        const yAxis = d3.axisRight(scaleY).ticks(4);  // Print axis numbers on the left
-        const gy = svg.append("g")
-          .call(yAxis)
-          .attr("transform", `translate(${margin.left}, 0)`)
-        svg.append("text")
-          .attr("transform", `rotate(-90) translate(${-height / 2}, ${0})`)
-          .attr("dy", "1em")
-          .style("text-anchor", "middle")
-          .text(key2);
-
-
-        const tooltip = d3.select("#leniadex-tooltip")
-        const mouseover = (event, {animation_url, name, attributes}) => {
-          tooltip
-            // .html(`
-            //     <iframe src="lenia?id=${d.tokenID}" width="256px" height="256px"></iframe>
-            // `)
-            .html(`
-                <video id="creature_vid" width="256" height="256" preload='auto' autoplay>
-                    <source src="${animation_url}" type="video/mp4">
-                    Your browser does not support the video tag.
-                </video>
-                <div>
-                  <span>Name: ${name}</span><br />
-                  ${attributes.map(a => `<span>${a.trait_type}: ${a.value}</span><br />`)}                  
-                </div>
-            `)
-            .style("z-index", 1080)
-            .style("opacity", 1)
-        }
-        const mousemove = (event, d) =>
-          tooltip
-            .style("left", `${event.x + 20}px`)
-            .style("top", `${event.y / 2}px`)
-
-        const mouseleave = (event, d) =>
-          tooltip
-            .style("opacity", 0)
-            .style("z-index", -1)
-
-        // Add dots
-        const dotsGroup = svg.append("g")
-          .append("g");
-        dotsGroup.selectAll("dot")
-          .data(allMetadata)
-          .enter()
-          .append("circle")
-          .attr("cx", function (d) { return scaleX(getValue(d.attributes, 'Robustness')); })
-          .attr("cy", function (d) { return scaleY(getValue(d.attributes, 'Spread')); })
-          .attr("r", 2)
-          .style("fill", blue)
-          // .style("fill", d => z(d.k[0].b))
-          .style("opacity", 0.5)
-          .style("stroke", "none")
-          .style("stroke-width", "0.4px")
-          .style("cursor", "pointer")
-          .on("mouseover", mouseover)
-          .on("mousemove", mousemove)
-          .on("mouseleave", mouseleave)
-        
-        setIsLoading(false)
-      }
+    try {
+      const response = await axios.get(ALL_METADATA_URI)
+      allMetadata = response.data
+    } catch (error) {
+      setLeniaDexStatus(LENIADEX_STATUSES.LOADING_FAILURE)
     }
-  }, [contract])
+
+    if (allMetadata.length > 0) {
+      const scatterData = allMetadata.map(lenia => {
+        const formattedAttributes = lenia.attributes.reduce((acc, attribute) => {
+          acc[attribute.trait_type] = attribute.numerical_value || attribute.value
+          return acc
+        }, {})
+
+        return {
+          ...formattedAttributes,
+          id: lenia.tokenID,
+        }
+      })
+
+      const attributeMax = RADAR_CHART_ORDERED_ATTRIBUTES.reduce((acc, attributeName) => {
+        const max = Math.max(...allMetadata.map(lenia => (lenia.attributes.find(a => a.trait_type === attributeName)).numerical_value))
+        acc[attributeName] = max
+        return acc
+      }, {})
+
+      const radarData = allMetadata.map(lenia => {
+        const numericalAttributes = lenia.attributes.reduce((acc, attribute) => {
+          const allocatedIndex = RADAR_CHART_ORDERED_ATTRIBUTES.findIndex(value => attribute.trait_type === value)
+          if (typeof attribute.numerical_value === 'undefined') {
+            return acc
+          }
+          acc[allocatedIndex] = {
+            ...attribute,
+            normalized_value: normalize(attribute.numerical_value, attributeMax[attribute.trait_type])
+          }
+          return acc
+        }, [])
+
+        return {
+          attributes: numericalAttributes,
+          colorMap: (lenia.attributes.find(attribute => attribute.trait_type === 'Colormap')).value,
+          family: (lenia.attributes.find(attribute => attribute.trait_type === 'Family')).value,
+          id: lenia.tokenID,
+        }
+      })
+
+      setScatterData(scatterData)
+      setRadarData(radarData)
+      setLeniaDexStatus(LENIADEX_STATUSES.READY)
+    }
+  }, [])
 
   return (
     <Section id="leniadex">
       <Section.Header><h1>Leniadex</h1></Section.Header>
       <LeniaWrapper>
-        <StyledSVG ref={nodeRef} width="75%" className="leniadex" viewBox={viewbox}></StyledSVG>
-        <StyledTooltip id="leniadex-tooltip"></StyledTooltip>
-        {isLoading && (
-          <LoadingWrapper>
+        <LeniaPortrait>
+          <Grid md={[1, 2]}>
+            <Grid.Cell>
+              {displayedLenia ? <TextScreen>#{displayedLenia?.id}</TextScreen> : <EmptyTextScreen />}
+            </Grid.Cell>
+            <Grid.Cell>
+              {displayedLenia ? <TextScreen>Family: {capitalize(displayedLenia?.family)}</TextScreen> : <EmptyTextScreen />}
+            </Grid.Cell>
+          </Grid>
+          <VideoScreen>
+            <Video key={displayedLenia?.id} width="100%" height="auto" preload='auto' loop autoPlay muted playsInline={true}>
+              <source src={`https://lenia.world/metadata/${displayedLenia?.id}.mp4`} type="video/mp4" />
+              <p>Couldn't load this Lenia, please use a better browser ;)</p>
+            </Video>
+          </VideoScreen>
+          {displayedLenia ? (
+            <RadarChartWrapper>
+              <RadarChart width={274} height={274} data={displayedLenia?.attributes} innerRadius={0} outerRadius="75%">
+                <PolarGrid />
+                <PolarAngleAxis dataKey="trait_type" />
+                <PolarRadiusAxis domain={[0, 1]} axisLine={false} tick={false} />
+                <Radar dataKey="normalized_value" stroke="#8884d8" fill="#8884d8" fillOpacity={0.6} />
+              </RadarChart>
+            </RadarChartWrapper>
+          ) : <VideoScreen />}
+
+        </LeniaPortrait>
+        <ResponsiveContainer width="100%" height="100%">
+          <ScatterChart
+            width={600}
+            height={600}
+            margin={{
+              left: 0,
+              bottom: 30,
+              right: 20,
+              top: 20,
+            }}
+          >
+            <CartesianGrid />
+            <XAxis type="number" dataKey="Robustness" name="Robustness">
+              <Label position="bottom">Robustness</Label>
+            </XAxis>
+            <YAxis type="number" dataKey="Spread" name="Spread">
+              <Label offset={-15} angle={-90} position="left">Spread</Label>
+            </YAxis>
+            <Scatter name="LeniaDEX" data={scatterData} onMouseOver={handleMouseOver} shape={CustomScatterDot}/>
+          </ScatterChart>
+        </ResponsiveContainer>
+        {leniaDexStatus === LENIADEX_STATUSES.LOADING && (
+          <OverlayWrapper>
             Loading...
-          </LoadingWrapper>
+          </OverlayWrapper>
+        )}
+        {leniaDexStatus === LENIADEX_STATUSES.LOADING_FAILURE && (
+          <OverlayWrapper>
+            My bad fellow Lenia lover, couldn't load the LeniaDEX for you
+          </OverlayWrapper>
         )}
       </LeniaWrapper>
     </Section>

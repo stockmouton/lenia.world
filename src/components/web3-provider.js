@@ -4,6 +4,11 @@ import { getAllowedChainIds, getChainDisplayName, getDecimalFromHex, switchChain
 import { createAlchemyWeb3 } from "@alch/alchemy-web3";
 import { useQueryParam, StringParam } from "use-query-params";
 
+const ALCHEMY_RPC_URLS = {
+  mainnet: `https://eth-mainnet.alchemyapi.io/v2/${process.env.MAINNET_ALCHEMY_API_KEY}`,
+  rinkeby: `https://eth-rinkeby.alchemyapi.io/v2/${process.env.RINKEBY_ALCHEMY_API_KEY}`
+}
+
 const Web3 = typeof window !== 'undefined' ? require('web3') : null;
 const web3Context = createContext(null)
 
@@ -99,9 +104,9 @@ export const Web3Provider = ({ children }) => {
   const initDefaultProvider = async () => {
     let web3Provider = null
     try {
-      web3Provider = createAlchemyWeb3(`https://eth-mainnet.alchemyapi.io/${isStaging ? process.env.RINKEBY_ALCHEMY_API_KEY: process.env.MAINNET_ALCHEMY_API_KEY}`)
+      web3Provider = createAlchemyWeb3(ALCHEMY_RPC_URLS[network] || ALCHEMY_RPC_URLS.mainnet)
       const newChainId = await web3Provider.eth.getChainId()
-      setWeb3Provider(provider)
+      setWeb3Provider(web3Provider)
       setChainId(newChainId)
     } catch(error) {
       return
