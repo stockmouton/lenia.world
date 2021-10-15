@@ -166,8 +166,7 @@
     // Loader
     ///////////////////////////////
     let roundFn;
-    let complexMatrixDot;
-    let exportsApplyKernel;
+    let exportsUpdateFn;
     function init(metadata, zoom=1) {
         const config = metadata["config"];
         const attributes = metadata["attributes"];
@@ -224,10 +223,7 @@
         WebAssembly.instantiateStreaming(fetch('optimized.wasm'), wasmConfig)
             .then( ({ instance }) => {
                 exports = instance.exports
-                console.log(exports)
                 roundFn = exports.round
-                complexMatrixDot = exports.complexMatrixDot
-                exportsApplyKernel = exports.applyKernel
                 exportsUpdateFn = exports.update_fn
 
                 let buffer = new Float32Array(memory.buffer);
@@ -464,16 +460,23 @@
 
                 if (v > 0) {
                     buffer[BUFFER_CELLS_OUT_IDX * BUFFER_SIZE + y * WORLD_SIZE + x] = v
-                    cells[y][x] = v
                 };
             }
         }
+        buffer.copyWithin(
+            BUFFER_CELLS_IDX * BUFFER_SIZE, // dest
+            BUFFER_CELLS_OUT_IDX * BUFFER_SIZE,  // src
+            (BUFFER_CELLS_OUT_IDX + 1) * BUFFER_SIZE
+        );   // copy output to input
     }
 
     ///////////////////////////////
     // Renderer
     ///////////////////////////////
     function update(buffer, fps) {
+        setTimeout(() => update(buffer, fps), 1000 / fps);
+        
+        exportsUpdateFn()
         if (ADD_LENIA) {
             const x1 = Math.floor(
                 INIT_CELLS_X / PIXEL - (INIT_CELLS.shape[2] / 2) * SCALE
@@ -481,35 +484,25 @@
             const y1 = Math.floor(
                 INIT_CELLS_Y / PIXEL - (INIT_CELLS.shape[1] / 2) * SCALE
             );
-            copyInitCells(buffer, INIT_CELLS, y1, x1, 0, 0, SCALE, 0);
+            copyInitCells(buffer, INIT_CELLS, x1, y1, 0, 0, SCALE, 0);
 
             ADD_LENIA = false;
         }
-        setTimeout(() => update(buffer, fps), 1000 / fps);
-        // for (let index = 0; index < 5; index++) {
-            // buffer.copyWithin(
-            //     BUFFER_CELLS_IDX * BUFFER_SIZE, // dest
-            //     BUFFER_CELLS_OUT_IDX * BUFFER_SIZE,  // src
-            //     (BUFFER_CELLS_OUT_IDX + 1) * BUFFER_SIZE
-            // );   // copy output to input
-            // exports.update_fn(true);
-            update_fn(true, buffer);
-        // }
+        buffer.copyWithin(
+            BUFFER_CELLS_IDX * BUFFER_SIZE, // dest
+            BUFFER_CELLS_OUT_IDX * BUFFER_SIZE,  // src
+            (BUFFER_CELLS_OUT_IDX + 1) * BUFFER_SIZE
+        );   
     }
 
     function render(buffer) {
         (function loop() {
             window.requestAnimationFrame(loop);
-            // let outputBuffer = buffer.subarray(
-            //     BUFFER_CELLS_OUT_IDX * BUFFER_SIZE,
-            //     (BUFFER_CELLS_OUT_IDX + 1) * BUFFER_SIZE
-            // )
-            outputBuffer = null
-            DrawArray(CANVAS_CELLS, outputBuffer, 1);
+            DrawArray(CANVAS_CELLS, buffer, 1);
         })();
     }
 
-    function DrawArray(canvas, outputBuffer, max_val) {
+    function DrawArray(canvas, buffer, max_val) {
         const nb_colors = COLORS[colorName].length;
         let buf = canvas.img.data;
 
@@ -519,14 +512,9 @@
             let ii = Math.floor(i / PIXEL);
             for (let j = 0; j < CANVAS_SIZE; j++) {
                 let jj = Math.floor(j / PIXEL);
-                let outBufPos = ii * WORLD_SIZE + jj;
+                let outBufPos = BUFFER_CELLS_OUT_IDX * BUFFER_SIZE + ii * WORLD_SIZE + jj;
 
-                let v;
-                if (outputBuffer == null) {
-                    v = cells[jj][ii] * max_val;
-                } else {
-                    v = outputBuffer[outBufPos] * max_val;
-                }
+                let v = buffer[outBufPos] * max_val;
                 let c = Math.floor(v * nb_colors);
                 c = Math.max(c, 0);
                 c = Math.min(c, nb_colors - 1);
@@ -540,68 +528,6 @@
         }
 
         canvas.ctx.putImageData(canvas.img, 0, 0);
-    }
-
-    function update_fn(isUpdate = true, buffer) {
-        for (let i = 0; i < WORLD_SIZE; i++){
-            for (let j = 0; j < WORLD_SIZE; j++) {
-                cellsOld[i][j] = cells[i][j]
-            };
-        }
-        for (let i = 0; i < WORLD_SIZE; i++) {
-            cellsIm[i].fill(0);
-        }
-
-        // Change cells inplace
-        for (let rowIdx = 0; rowIdx < WORLD_SIZE; rowIdx++) {
-            buffer.set(
-                cells[rowIdx], 
-                BUFFER_CELLS_IDX * BUFFER_SIZE + rowIdx * WORLD_SIZE
-            );
-            buffer.set(
-                cellsIm[rowIdx], 
-                BUFFER_CELLS_IMAG_IDX * BUFFER_SIZE + rowIdx * WORLD_SIZE
-            );
-        }
-        exportsApplyKernel()
-
-        for (let i = 0; i < WORLD_SIZE; i++) {
-            for (let j = 0; j < WORLD_SIZE; j++) {
-                let p = buffer[BUFFER_POTENTIAL_REAL_IDX * BUFFER_SIZE + i * WORLD_SIZE + j];
-                let g = growthFn(gf_id, gf_m, gf_s, p);
-                field[i][j] = g;
-                let v = cellsOld[i][j] + g / T;
-
-                // Clip
-                if (v < 0) v = 0;
-                else if (v > 1) v = 1;
-
-                if (isUpdate) {
-                    cells[i][j] = v;
-                } else {
-                    cells[i][j] = cellsOld[i][j];
-                }
-            }
-        }
-    }
-    function growthFn(gf_id, gf_m, gf_s, x) {
-        x = Math.abs(x - gf_m);
-        x = x * x;
-
-        let s_2;
-        switch (gf_id) {
-            case 0:
-                s_2 = 9 * gf_s * gf_s;
-                return Math.max(1 - x / s_2, 0) ** 4 * 2 - 1;
-            case 1:
-                s_2 = 2 * gf_s * gf_s;
-                return Math.exp(-x / s_2) * 2 - 1;
-            case 2:
-                s_2 = 2 * gf_s * gf_s;
-                return Math.exp(-x / s_2);
-            case 3:
-                return (x_abs <= gf_s ? 1 : 0) * 2 - 1;
-        }
     }
 
     ///////////////////////////////
@@ -811,10 +737,10 @@
         return {real: kernelRe, imag: kernelIm};
     }
 
-    function ClearCells(x) {
+    function ClearCells(buffer, x) {
         for (let i = 0; i < WORLD_SIZE; i++) {
             for (let j = 0; j < WORLD_SIZE; j++) {
-                cells[i][j] = x;
+                buffer[BUFFER_CELLS_IDX * BUFFER_SIZE + i * WORLD_SIZE + j] = x;
             }
         }
     }

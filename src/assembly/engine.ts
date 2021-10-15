@@ -5,15 +5,15 @@ declare const GF_M: f32;
 declare const GF_S: f32;
 declare const T: f32;
 
-const CELLS_IDX = 0;
-const CELLS_OLD_IDX = 1;
-const CELLS_IMAG_IDX = 2;
-const FIELD_IDX = 3;
-const POTENTIAL_REAL_IDX = 4;
-const POTENTIAL_IMAG_IDX = 5;
-const KERNEL_REAL_IDX = 6;
-const KERNEL_IMAG_IDX = 7;
-const CELLS_OUT_IDX = 8;
+const BUFFER_CELLS_IDX = 0;
+const BUFFER_CELLS_OLD_IDX = 1;
+const BUFFER_CELLS_IMAG_IDX = 2;
+const BUFFER_FIELD_IDX = 3;
+const BUFFER_POTENTIAL_REAL_IDX = 4;
+const BUFFER_POTENTIAL_IMAG_IDX = 5;
+const BUFFER_KERNEL_REAL_IDX = 6;
+const BUFFER_KERNEL_IMAG_IDX = 7;
+const BUFFER_CELLS_OUT_IDX = 8;
 
 const PRECISION: f32 = 1000000;
 
@@ -28,13 +28,13 @@ function set(idx: u32, x: u32, y: u32, v: f32): void {
 }
 
 /** Performs one step. Called about 30 times a second from JS. */
-export function update_fn(isUpdate: bool): void {
+export function update_fn(): void {
   for (let i: u32 = 0; i < WORLD_SIZE; i++){
     for (let j: u32 = 0; j < WORLD_SIZE; j++) {
         let x = j;
         let y = i;
-        set(CELLS_OLD_IDX, x, y, get(CELLS_IDX, x, y))
-        set(CELLS_IMAG_IDX, x, y, 0)
+        set(BUFFER_CELLS_OLD_IDX, x, y, get(BUFFER_CELLS_IDX, x, y))
+        set(BUFFER_CELLS_IMAG_IDX, x, y, 0)
     };
   }
 
@@ -43,10 +43,10 @@ export function update_fn(isUpdate: bool): void {
 
   for (let y: u32 = 0; y < WORLD_SIZE; y++) {
       for (let x: u32 = 0; x < WORLD_SIZE; x++) {
-          let p = get(POTENTIAL_REAL_IDX, x, y);
+          let p = get(BUFFER_POTENTIAL_REAL_IDX, x, y);
           let g = growthFn(GF_ID, GF_M, GF_S, p);
-          set(FIELD_IDX, x, y, g)
-          let v = get(CELLS_OLD_IDX, x, y) + g / T;
+          set(BUFFER_FIELD_IDX, x, y, g)
+          let v = get(BUFFER_CELLS_OLD_IDX, x, y) + g / T;
 
           // Clip
           if (v < 0.) {
@@ -55,27 +55,23 @@ export function update_fn(isUpdate: bool): void {
             v = 1
           };
 
-          if (isUpdate) {
-            set(CELLS_OUT_IDX, x, y, v)
-          } else {
-            set(CELLS_OUT_IDX, x, y, get(CELLS_OLD_IDX, x, y))
-          }
+          set(BUFFER_CELLS_OUT_IDX, x, y, v)
       }
   }
 }
 
-export function applyKernel(): void {
+function applyKernel(): void {
   // f * g = F-1( F(f) dot F(g) )
-  FFT2D(1, CELLS_IDX, CELLS_IMAG_IDX);
+  FFT2D(1, BUFFER_CELLS_IDX, BUFFER_CELLS_IMAG_IDX);
   complexMatrixDot(
-    CELLS_IDX,
-    CELLS_IMAG_IDX,
-    KERNEL_REAL_IDX,
-    KERNEL_IMAG_IDX,
-    POTENTIAL_REAL_IDX,
-    POTENTIAL_IMAG_IDX
+    BUFFER_CELLS_IDX,
+    BUFFER_CELLS_IMAG_IDX,
+    BUFFER_KERNEL_REAL_IDX,
+    BUFFER_KERNEL_IMAG_IDX,
+    BUFFER_POTENTIAL_REAL_IDX,
+    BUFFER_POTENTIAL_IMAG_IDX
   );
-  FFT2D(-1, POTENTIAL_REAL_IDX, POTENTIAL_IMAG_IDX);
+  FFT2D(-1, BUFFER_POTENTIAL_REAL_IDX, BUFFER_POTENTIAL_IMAG_IDX);
 }  
 
 function FFT2D(dir: i8, idxReal: u32, idxImag: u32): void {
@@ -167,7 +163,7 @@ function FFT1D(dir: i8, y: u32, idxReal: u32, idxImag: u32): void {
   }
 }
 
-export function complexMatrixDot(
+function complexMatrixDot(
   leftsideIdxReal: u32,
   leftsideIdxImag: u32,
   rightsideIdxReal: u32,
@@ -202,8 +198,8 @@ function growthFn(gf_id: u32, gf_m: f32, gf_s: f32, x: f32): f32 {
   switch (gf_id) {
       case 0:
           s_2 = 9 * gf_s * gf_s;
-          tmp = Math.max(1 - x / s_2, 0) as f32
-          return tmp ** 4 * 2 - 1;
+          tmp = (Math.max(1 - x / s_2, 0) ** 4) as f32
+          return tmp * 2 - 1;
       case 1:
           s_2 = 2 * gf_s * gf_s;
           tmp = Math.exp(-x / s_2) as f32
