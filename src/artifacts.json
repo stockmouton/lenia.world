@@ -1,9 +1,9 @@
 {
-  "name": "localhost",
-  "chainId": "1337",
+  "name": "mainnet",
+  "chainId": "1",
   "contracts": {
     "Lenia": {
-      "address": "0x4Bbbd491a058F4b0AFe3FcB597d9F68a035D433b",
+      "address": "0xE95004C7F061577df60E9e46C1E724cC75b01850",
       "abi": [
         {
           "inputs": [
@@ -1033,7 +1033,7 @@
       ]
     },
     "LeniaDescriptor": {
-      "address": "0x6Cb8d3575258f9b729d5D9F8585F4fa71cB32AB5",
+      "address": "0x9B9a52668EC93427Cbf34d729fbC816C9d0481e6",
       "abi": [
         {
           "inputs": [],
@@ -1247,7 +1247,7 @@
       ]
     },
     "LeniaRoyalties": {
-      "address": "0xCF65CbCC557aa6DB4856674a663eef39DC2ECf9C",
+      "address": "0x2B85971a561E3472A738e4b0ed1299145a20E554",
       "abi": [
         {
           "inputs": [
