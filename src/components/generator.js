@@ -21,7 +21,7 @@ const Generator = ({ zoom, fps, scale, lenia_id }) => {
 
         leniaMetadata["config"]["world_params"]["scale"] = scale
 
-        window.leniaEngine.init(leniaMetadata, zoom);
+        window.leniaEngine.init(leniaMetadata, zoom, fps);
     })
     
     return (

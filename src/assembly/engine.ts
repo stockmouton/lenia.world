@@ -56,7 +56,7 @@ function set(idx: u32, x: u32, y: u32, v: f32): void {
 }
 
 /** Performs one step. Called about 30 times a second from JS. */
-export function update_fn(): void {
+export function updateFn(): void {
   memory.copy((BUFFER_CELLS_OLD_IDX * WORLD_SIZE**2) << 2, (BUFFER_CELLS_IDX * WORLD_SIZE**2) << 2, WORLD_SIZE**2 << 2)
   memory.fill((BUFFER_CELLS_IMAG_IDX * WORLD_SIZE**2) << 2, 0, WORLD_SIZE**2 << 2)
 

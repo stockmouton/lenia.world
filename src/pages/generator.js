@@ -10,7 +10,7 @@ const GeneratorPage = () => {
     const [zoom] = useQueryParam("zoom", NumberParam);
 
     return (
-        <Generator zoom={zoom || 1} fps={fps || 30} scale={scale || 1} lenia_id={id || 0} />
+        <Generator zoom={zoom || 1} fps={fps || 26} scale={scale || 2} lenia_id={id || 0} />
     )
 }
 

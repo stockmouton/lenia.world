@@ -164,7 +164,7 @@
     ///////////////////////////////
     let roundFn;
     let exportsUpdateFn;
-    function init(metadata, zoom=1) {
+    function init(metadata, zoom=1, fps=30) {
         const config = metadata["config"];
         const attributes = metadata["attributes"];
         ZOOM = parseInt(Math.min(Math.max(zoom, 1), 5), 10);
@@ -203,8 +203,15 @@
         BUFFER_SIZE = WORLD_SIZE**2
         nb_buffers = 9 + 1; // 9 image buffers + 1 table buffer
         const byteSize = (BUFFER_SIZE * nb_buffers) << 2;
+        const nb_pages = ((byteSize + 0xffff) & ~0xffff) >>> 16;
+        // Shared memory does not work on Safari
+        // Shared memory are needed for workers
+        // but you need some fancy CORS configuration to make it work.
+        // Overall, it's probably better to look at GPU support.
         const memory = new WebAssembly.Memory({
-            initial: ((byteSize + 0xffff) & ~0xffff) >>> 16
+            initial: nb_pages,
+            // maximum: nb_pages,
+            // shared: true
         });
         const wasmConfig = {
             env: {
@@ -219,14 +226,22 @@
             },
             Math
         };
-        WebAssembly.instantiateStreaming(fetch('optimized.wasm'), wasmConfig)
+        const wasmFilename = 'optimized.wasm';
+        WebAssembly.instantiateStreaming(fetch(wasmFilename), wasmConfig)
         // WebAssembly.instantiateStreaming(fetch('untouched.wasm'), wasmConfig)
             .then( ({ instance }) => {
                 exports = instance.exports
                 roundFn = exports.round
-                exportsUpdateFn = exports.update_fn
+                exportsUpdateFn = exports.updateFn
 
                 let buffer = new Float32Array(memory.buffer);
+
+                // Copy kernel
+                setKernel(config["kernels_params"]);
+                for (let rowIdx = 0; rowIdx < WORLD_SIZE; rowIdx++) {
+                    buffer.set(kernelRe[rowIdx], BUFFER_KERNEL_REAL_IDX * BUFFER_SIZE + rowIdx * WORLD_SIZE);
+                    buffer.set(kernelIm[rowIdx], BUFFER_KERNEL_IMAG_IDX * BUFFER_SIZE + rowIdx * WORLD_SIZE);
+                }
 
                 // Copy init cells
                 // Scale it slowly to ensure stability
@@ -239,14 +254,6 @@
                 let y1 = Math.floor(WORLD_SIZE / 2 - (initCells.shape[1] / 2) * SCALE);
                 copyInitCells(buffer, initCells, x1, y1, 0, 0, SCALE, 0);
 
-                // Copy kernel
-                setKernel(config["kernels_params"]);
-                for (let rowIdx = 0; rowIdx < WORLD_SIZE; rowIdx++) {
-                    buffer.set(kernelRe[rowIdx], BUFFER_KERNEL_REAL_IDX * BUFFER_SIZE + rowIdx * WORLD_SIZE);
-                    buffer.set(kernelIm[rowIdx], BUFFER_KERNEL_IMAG_IDX * BUFFER_SIZE + rowIdx * WORLD_SIZE);
-                }
-
-                fps = 30;
                 update(buffer, fps);
                 render(buffer)
 
