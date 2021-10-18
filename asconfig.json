@@ -1,19 +1,26 @@
 {
     "targets": {
       "debug": {
-        "binaryFile": "build/untouched.wasm",
+        "binaryFile": "static/untouched.wasm",
         "textFile": "build/untouched.wat",
+        "runtime": "stub",
+        "importMemory": true,
+        "use": ["Math=JSMath"],
         "sourceMap": true,
         "debug": true
       },
       "release": {
-        "binaryFile": "build/optimized.wasm",
+        "binaryFile": "static/optimized.wasm",
         "textFile": "build/optimized.wat",
+        "runtime": "stub",
+        "importMemory": true,
+        "use": ["Math=JSMath"],
         "sourceMap": true,
+        "debug": false,
         "optimizeLevel": 3,
         "shrinkLevel": 0,
         "converge": false,
-        "noAssert": false
+        "noAssert": true
       }
     },
     "options": {}

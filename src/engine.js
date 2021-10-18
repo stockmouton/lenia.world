@@ -42,6 +42,7 @@
     const BUFFER_KERNEL_REAL_IDX = 6;
     const BUFFER_KERNEL_IMAG_IDX = 7;
     const BUFFER_CELLS_OUT_IDX = 8;
+    const BUFFER_TABLES_IDX = 9;
 
     let WORLD_SIZE = 1;
     let BUFFER_SIZE = 1;
@@ -192,8 +193,16 @@
             attributes
         );
 
+        const cosTable = new Float32Array(WORLD_SIZE);
+        const sinTable = new Float32Array(WORLD_SIZE);
+        for (let i = 0; i < WORLD_SIZE / 2; i++) {
+            let i_pi_2 = 2. * Math.PI * i;
+            cosTable[i] = Math.cos(i_pi_2 / WORLD_SIZE);
+            sinTable[i] = Math.sin(i_pi_2 / WORLD_SIZE);
+        }
         BUFFER_SIZE = WORLD_SIZE**2
-        const byteSize = (BUFFER_SIZE * 9) << 2; // 8 data area & output (4 bytes per cell)
+        nb_buffers = 9 + 1; // 9 image buffers + 1 table buffer
+        const byteSize = (BUFFER_SIZE * nb_buffers) << 2;
         const memory = new WebAssembly.Memory({
             initial: ((byteSize + 0xffff) & ~0xffff) >>> 16
         });
@@ -247,6 +256,9 @@
                     }
                 });
                 document.getElementById("RENDERING_CANVAS").addEventListener("click", onClick);
+            })
+            .catch( (error) => {
+                console.log(error);
             });
     }
 
@@ -467,26 +479,28 @@
     // Renderer
     ///////////////////////////////
     function update(buffer, fps) {
-        setTimeout(() => update(buffer, fps), 1000 / fps);
-        
-        exportsUpdateFn()
+        (function loop() {
+            setTimeout(loop, 1000 / fps);
+            
+            exportsUpdateFn()
 
-        if (ADD_LENIA) {
-            const x1 = Math.floor(
-                INIT_CELLS_X / PIXEL - (INIT_CELLS.shape[2] / 2) * SCALE
-            );
-            const y1 = Math.floor(
-                INIT_CELLS_Y / PIXEL - (INIT_CELLS.shape[1] / 2) * SCALE
-            );
-            copyInitCells(buffer, INIT_CELLS, x1, y1, 0, 0, SCALE, 0);
+            if (ADD_LENIA) {
+                const x1 = Math.floor(
+                    INIT_CELLS_X / PIXEL - (INIT_CELLS.shape[2] / 2) * SCALE
+                );
+                const y1 = Math.floor(
+                    INIT_CELLS_Y / PIXEL - (INIT_CELLS.shape[1] / 2) * SCALE
+                );
+                copyInitCells(buffer, INIT_CELLS, x1, y1, 0, 0, SCALE, 0);
 
-            ADD_LENIA = false;
-        }
-        buffer.copyWithin(
-            BUFFER_CELLS_IDX * BUFFER_SIZE, // dest
-            BUFFER_CELLS_OUT_IDX * BUFFER_SIZE,  // src
-            (BUFFER_CELLS_OUT_IDX + 1) * BUFFER_SIZE
-        );   
+                ADD_LENIA = false;
+            }
+            buffer.copyWithin(
+                BUFFER_CELLS_IDX * BUFFER_SIZE, // dest
+                BUFFER_CELLS_OUT_IDX * BUFFER_SIZE,  // src
+                (BUFFER_CELLS_OUT_IDX + 1) * BUFFER_SIZE
+            );
+        })();
     }
 
     function render(buffer) {

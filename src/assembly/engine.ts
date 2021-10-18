@@ -14,9 +14,36 @@ const BUFFER_POTENTIAL_IMAG_IDX = 5;
 const BUFFER_KERNEL_REAL_IDX = 6;
 const BUFFER_KERNEL_IMAG_IDX = 7;
 const BUFFER_CELLS_OUT_IDX = 8;
+const BUFFER_TABLES_IDX = 9;
+
+const BUFFER_COS_TABLE_IDX = 0;
+const BUFFER_SIN_TABLE_IDX = 1;
+const BUFFER_RBITS_TABLE_IDX = 2;
 
 const PRECISION: f32 = 1000000;
-const WORLD_SIZE_LOG_2 = round(Math.log2(WORLD_SIZE) as f32);
+const WORLD_SIZE_BY_2 = WORLD_SIZE >> 1;
+
+// Trigonometric tables
+for (let i: u32 = 0; i < WORLD_SIZE / 2; i++) {
+  let i_pi_2 = 2. * Math.PI * i;
+  let cos: f32 = Math.cos(i_pi_2 / WORLD_SIZE) as f32;
+  let sin: f32 = Math.sin(i_pi_2 / WORLD_SIZE) as f32;
+  set(BUFFER_TABLES_IDX, i, BUFFER_COS_TABLE_IDX, cos);
+  set(BUFFER_TABLES_IDX, i, BUFFER_SIN_TABLE_IDX, sin);
+}
+
+let WORLD_SIZE_LOG_2: u32 = 0;
+for (let i: u32 = 0; i < 32; i++) {
+  if (1 << i == WORLD_SIZE){
+    WORLD_SIZE_LOG_2 = i;  
+  }
+}
+
+// reverse bits table
+for (let i: u32 = 0; i < WORLD_SIZE; i++) {
+  let rbitIdx = reverseBits(i, WORLD_SIZE_LOG_2) as f32;
+  set(BUFFER_TABLES_IDX, i, BUFFER_RBITS_TABLE_IDX, rbitIdx);
+}
 
 @inline
 function get(idx: u32, x: u32, y: u32): f32 {
@@ -93,66 +120,60 @@ function transpose2D(idx: u32): void {
 }
 
 function FFT1D(dir: i8, y: u32, idxReal: u32, idxImag: u32): void {
-  const nb_rows = WORLD_SIZE;
-  const nb_rows_by_2 = nb_rows >> 1;
-  let m = WORLD_SIZE_LOG_2;
-  let x1: u32 = 0;
-  for (let x: u32 = 0; x < nb_rows - 1; x++) {
-      if (x < x1) {
-          let tmp = get(idxReal, x, y);
-          set(idxReal, x, y, get(idxReal, x1, y));
-          set(idxReal, x1, y, tmp);
-
-          tmp = get(idxImag, x, y);
-          set(idxImag, x, y, get(idxImag, x1, y));
-          set(idxImag, x1, y, tmp);
-      }
-
-      let x2 = nb_rows_by_2;
-      while (x2 <= x1) {
-          x1 -= x2;
-          x2 >>= 1;
-      }
-
-      x1 += x2;
-  }
-
   /* Compute the FFT */
-  let c1: f32 = -1.0,
-      c2: f32 = 0.0,
-      l2: u32 = 1;
-  for (let l: u32 = 0; l < m; l++) {
-      let l1 = l2;
-      l2 <<= 1;
-      let u1: f32 = 1.0,
-          u2: f32 = 0.0;
-      for (let i: u32 = 0; i < l1; i++) {
-          for (let x = i; x < nb_rows; x += l2) {
-              let x2 = x + l1;
-              let t1 = (u1 * get(idxReal, x2, y) - u2 * get(idxImag, x2, y)) as f32;
-              let t2 = (u1 * get(idxImag, x2, y) + u2 * get(idxReal, x2, y)) as f32;
-              set(idxReal, x2, y, get(idxReal, x, y) - t1);
-              set(idxImag, x2, y, get(idxImag, x, y) - t2);
-              set(idxReal, x, y, get(idxReal, x, y) + t1);
-              set(idxImag, x, y, get(idxImag, x, y) + t2);
-          }
-          let z = u1 * c1 - u2 * c2;
-          u2 = u1 * c2 + u2 * c1;
-          u1 = z;
-      }
-      c2 = (sqrt((1.0 - c1) / 2.0)) as f32;
-      if (dir == 1) c2 = -c2;
-      c1 = (sqrt((1.0 + c1) / 2.0)) as f32;
+  if (dir == -1){
+    FFT1DRadix2(y, idxReal, idxImag)
+
+    let scale_f: f32 = (1.0 / (WORLD_SIZE as f32));
+    for (let x: u32 = 0; x < WORLD_SIZE; x++) {
+      set(idxReal, x, y, get(idxReal, x, y) * scale_f);
+      set(idxImag, x, y, get(idxImag, x, y) * scale_f);
+    }
+  } else {
+    FFT1DRadix2(y, idxImag, idxReal)
   }
 
-  /* Scaling for forward transform */
-  if (dir == -1) {
-      let scale_f = (1.0 / (nb_rows as f32)) as f32;
-      for (let x: u32 = 0; x < nb_rows; x++) {
-          set(idxReal, x, y, get(idxReal, x, y) * scale_f);
-          set(idxImag, x, y, get(idxImag, x, y) * scale_f);
-      }
+}
+
+function FFT1DRadix2(y: u32, idxReal: u32, idxImag: u32): void {
+  for (let x: u32 = 0; x < WORLD_SIZE; x++) {
+		let x1 = get(BUFFER_TABLES_IDX, x, BUFFER_RBITS_TABLE_IDX) as u32;
+		if (x1 > x) {
+			let tmp = get(idxReal, x, y);
+      set(idxReal, x, y, get(idxReal, x1, y));
+      set(idxReal, x1, y, tmp);
+
+      tmp = get(idxImag, x, y);
+      set(idxImag, x, y, get(idxImag, x1, y));
+      set(idxImag, x1, y, tmp);
+		}
+	}
+
+	// Cooley-Tukey decimation-in-time radix-2 FFT
+	for (let size: u32 = 2; size <= WORLD_SIZE; size *= 2) {
+		let halfsize = size / 2;
+		let tablestep = WORLD_SIZE / size;
+		for (let i: u32 = 0; i < WORLD_SIZE; i += size) {
+			for (let x: u32 = i, k = 0; x < i + halfsize; x++, k += tablestep) {
+				let x2 = x + halfsize;
+				let tpre =  get(idxReal, x2, y) * get(BUFFER_TABLES_IDX, k, 0) + get(idxImag, x2, y) * get(BUFFER_TABLES_IDX, k, 1);
+				let tpim = -get(idxReal, x2, y) * get(BUFFER_TABLES_IDX, k, 1) + get(idxImag, x2, y) * get(BUFFER_TABLES_IDX, k, 0);
+				set(idxReal, x2, y, get(idxReal, x, y) - tpre);
+				set(idxImag, x2, y, get(idxImag, x, y) - tpim);
+				set(idxReal, x, y, get(idxReal, x, y) + tpre);
+        set(idxImag, x, y, get(idxImag, x, y) + tpim);
+			}
+		}
+	}
+}
+
+function reverseBits(val: u32, width: u32): u32 {
+  var result = 0;
+  for (var i: u32 = 0; i < width; i++) {
+    result = (result << 1) | (val & 1);
+    val >>>= 1;
   }
+  return result;
 }
 
 function complexMatrixDot(
