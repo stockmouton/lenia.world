@@ -97,7 +97,7 @@
     "sm-verify-royalties": "hardhat verify-royalties --network ${NETWORK:-localhost}",
     "asbuild:untouched": "asc src/assembly/engine.ts --target debug",
     "asbuild:optimized": "asc src/assembly/engine.ts --target release",
-    "asbuild": "yarn asbuild:untouched -O3 --runtime stub --use Math=JSMath --importMemory && yarn asbuild:optimized -O3 --runtime stub --use Math=JSMath --importMemory",
+    "asbuild": "yarn asbuild:untouched -O3 --runtime stub --use Math=JSMath --importMemory && yarn asbuild:optimized -O3 --runtime stub --use Math=JSMath --importMemory && cp build/*.wasm static/.",
     "debug": "ndb"
   },
   "repository": {

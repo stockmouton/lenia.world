@@ -16,6 +16,7 @@ const BUFFER_KERNEL_IMAG_IDX = 7;
 const BUFFER_CELLS_OUT_IDX = 8;
 
 const PRECISION: f32 = 1000000;
+const WORLD_SIZE_LOG_2 = round(Math.log2(WORLD_SIZE) as f32);
 
 @inline
 function get(idx: u32, x: u32, y: u32): f32 {
@@ -29,14 +30,8 @@ function set(idx: u32, x: u32, y: u32, v: f32): void {
 
 /** Performs one step. Called about 30 times a second from JS. */
 export function update_fn(): void {
-  for (let i: u32 = 0; i < WORLD_SIZE; i++){
-    for (let j: u32 = 0; j < WORLD_SIZE; j++) {
-        let x = j;
-        let y = i;
-        set(BUFFER_CELLS_OLD_IDX, x, y, get(BUFFER_CELLS_IDX, x, y))
-        set(BUFFER_CELLS_IMAG_IDX, x, y, 0)
-    };
-  }
+  memory.copy((BUFFER_CELLS_OLD_IDX * WORLD_SIZE**2) << 2, (BUFFER_CELLS_IDX * WORLD_SIZE**2) << 2, WORLD_SIZE**2 << 2)
+  memory.fill((BUFFER_CELLS_IMAG_IDX * WORLD_SIZE**2) << 2, 0, WORLD_SIZE**2 << 2)
 
   // Change cells inplace
   applyKernel()
@@ -50,9 +45,9 @@ export function update_fn(): void {
 
           // Clip
           if (v < 0.) {
-            v = 0;
+            v = 0.;
           } else if (v > 1.) {
-            v = 1
+            v = 1.
           };
 
           set(BUFFER_CELLS_OUT_IDX, x, y, v)
@@ -88,11 +83,8 @@ function FFT2D(dir: i8, idxReal: u32, idxImag: u32): void {
 }
 
 function transpose2D(idx: u32): void {
-  for (let i: u32 = 0; i < WORLD_SIZE; i++) {
-      for (let j: u32 = 0; j < i; j++) {
-          let x = j;
-          let y = i;
-
+  for (let y: u32 = 0; y < WORLD_SIZE; y++) {
+      for (let x: u32 = 0; x < y; x++) {
           const tmp_re = get(idx, x, y);
           set(idx, x, y, get(idx, y, x))
           set(idx, y, x, tmp_re)
@@ -103,7 +95,7 @@ function transpose2D(idx: u32): void {
 function FFT1D(dir: i8, y: u32, idxReal: u32, idxImag: u32): void {
   const nb_rows = WORLD_SIZE;
   const nb_rows_by_2 = nb_rows >> 1;
-  let m = round(Math.log2(nb_rows) as f32);
+  let m = WORLD_SIZE_LOG_2;
   let x1: u32 = 0;
   for (let x: u32 = 0; x < nb_rows - 1; x++) {
       if (x < x1) {
@@ -148,9 +140,9 @@ function FFT1D(dir: i8, y: u32, idxReal: u32, idxImag: u32): void {
           u2 = u1 * c2 + u2 * c1;
           u1 = z;
       }
-      c2 = (Math.sqrt((1.0 - c1) / 2.0)) as f32;
+      c2 = (sqrt((1.0 - c1) / 2.0)) as f32;
       if (dir == 1) c2 = -c2;
-      c1 = (Math.sqrt((1.0 + c1) / 2.0)) as f32;
+      c1 = (sqrt((1.0 + c1) / 2.0)) as f32;
   }
 
   /* Scaling for forward transform */
@@ -190,7 +182,7 @@ function complexMatrixDot(
 }
 
 function growthFn(gf_id: u32, gf_m: f32, gf_s: f32, x: f32): f32 {
-  x = Math.abs(x - gf_m) as f32;
+  x = abs(x - gf_m) as f32;
   x = x * x;
 
   let s_2: f32;
@@ -198,23 +190,23 @@ function growthFn(gf_id: u32, gf_m: f32, gf_s: f32, x: f32): f32 {
   switch (gf_id) {
       case 0:
           s_2 = 9 * gf_s * gf_s;
-          tmp = (Math.max(1 - x / s_2, 0) ** 4) as f32
-          return tmp * 2 - 1;
+          tmp = (max(1. - x / s_2, 0) ** 4) as f32
+          return tmp * 2. - 1.;
       case 1:
           s_2 = 2 * gf_s * gf_s;
           tmp = Math.exp(-x / s_2) as f32
-          return tmp * 2 - 1;
+          return tmp * 2. - 1.;
       case 2:
-          s_2 = 2 * gf_s * gf_s;
+          s_2 = 2. * gf_s * gf_s;
           tmp = Math.exp(-x / s_2) as f32;
           return tmp;
       case 3:
-          return (x <= gf_s ? 1 : 0) * 2 - 1;
+          return (x <= gf_s ? 1. : 0.) * 2. - 1.;
   }
   return 0.
 }
 
 
 export function round(x: f32): u32 {
-  return Math.round(x * PRECISION) / PRECISION as u32;
+  return nearest(x * PRECISION / PRECISION) as u32;
 }

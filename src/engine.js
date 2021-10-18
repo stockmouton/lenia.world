@@ -23,19 +23,15 @@
     let ZOOM;
 
     let cells = null;
-    let cellsOld = null;
     let cellsIm = null;
 
     let kernel = null;
     let kernelRe = null;
     let kernelIm = null;
 
-    let field = null;
-
-    let potentialRe = null;
-    let potentialIm = null;
-
     let CANVAS_CELLS = null;
+    let RENDERING_CANVAS = null;
+    const CANVAS_SCALING = 2. 
 
     const BUFFER_CELLS_IDX = 0;
     const BUFFER_CELLS_OLD_IDX = 1;
@@ -190,12 +186,6 @@
 
         let cellsSt = config["cells"];
         let initCells = decompressArray(cellsSt);
-        // Scale it slowly to ensure stability
-        // console.log(initCells)
-        // if (SCALE > 2) {
-        //     update_fn()
-        // }
-        INIT_CELLS = initCells;
         setParameters(
             config["world_params"],
             config["kernels_params"],
@@ -221,6 +211,7 @@
             Math
         };
         WebAssembly.instantiateStreaming(fetch('optimized.wasm'), wasmConfig)
+        // WebAssembly.instantiateStreaming(fetch('untouched.wasm'), wasmConfig)
             .then( ({ instance }) => {
                 exports = instance.exports
                 roundFn = exports.round
@@ -229,6 +220,12 @@
                 let buffer = new Float32Array(memory.buffer);
 
                 // Copy init cells
+                // Scale it slowly to ensure stability
+                // console.log(initCells)
+                // if (SCALE > 2) {
+                //     update_fn()
+                // }
+                INIT_CELLS = initCells;
                 let x1 = Math.floor(WORLD_SIZE / 2 - (initCells.shape[2] / 2) * SCALE);
                 let y1 = Math.floor(WORLD_SIZE / 2 - (initCells.shape[1] / 2) * SCALE);
                 copyInitCells(buffer, initCells, x1, y1, 0, 0, SCALE, 0);
@@ -244,21 +241,13 @@
                 update(buffer, fps);
                 render(buffer)
 
-                document.body.addEventListener("keydown", onKeyDown);
-                document.getElementById("CANVAS_CELLS").addEventListener("click", onClick);
+                document.body.addEventListener("keydown", (e) => {
+                    if (e.keyCode == 32) {
+                        ClearCells(buffer, 0);
+                    }
+                });
+                document.getElementById("RENDERING_CANVAS").addEventListener("click", onClick);
             });
-    }
-
-    function test(subBuffer, jsBuffer) {
-        for (let y = 0; y < WORLD_SIZE; y++) {
-            for (let x = 0; x < WORLD_SIZE; x++) {
-             const bufferVal = subBuffer[y * WORLD_SIZE + x];
-             const val = jsBuffer[y][x];
-             if (Math.abs(bufferVal - val) > 1e-6){
-                 console.log(x,y, bufferVal, val)
-             }
-            }
-        }
     }
 
     function decompressArray(string_cells) {
@@ -380,7 +369,9 @@
         CANVAS_SIZE = Math.round(WORLD_SIZE * PIXEL);
 
         InitAllArrays(WORLD_SIZE);
-        CANVAS_CELLS = InitCanvas("CANVAS_CELLS", CANVAS_SIZE);
+        CANVAS_CELLS = InitCanvas(null, CANVAS_SIZE);
+        RENDERING_CANVAS = InitCanvas("RENDERING_CANVAS", CANVAS_SIZE * 2)
+        RENDERING_CANVAS.ctx.scale(CANVAS_SCALING, CANVAS_SCALING)
     }
 
     function InitAllArrays(world_size) {
@@ -398,9 +389,6 @@
         kernelIm = null;
         kernelIm = createDataArray(world_size);
 
-        field = null;
-        field = createDataArray(world_size);
-
         potentialRe = null;
         potentialRe = createDataArray(world_size);
         potentialIm = null;
@@ -415,7 +403,12 @@
     }
 
     function InitCanvas(id, canvas_size) {
-        let canvas = document.getElementById(id);
+        let canvas;
+        if (id == null){
+            canvas = document.createElement('canvas');
+        } else {
+            canvas = document.getElementById(id);
+        }
         canvas.width = canvas.height = canvas_size;
         let ctx = canvas.getContext("2d");
         let img = ctx.createImageData(canvas.width, canvas.height);
@@ -477,6 +470,7 @@
         setTimeout(() => update(buffer, fps), 1000 / fps);
         
         exportsUpdateFn()
+
         if (ADD_LENIA) {
             const x1 = Math.floor(
                 INIT_CELLS_X / PIXEL - (INIT_CELLS.shape[2] / 2) * SCALE
@@ -528,6 +522,7 @@
         }
 
         canvas.ctx.putImageData(canvas.img, 0, 0);
+        RENDERING_CANVAS.ctx.drawImage(canvas.can, 0, 0);
     }
 
     ///////////////////////////////
@@ -745,15 +740,10 @@
         }
     }
 
-    function onKeyDown(e) {
-        if (e.keyCode == 32) {
-            ClearCells(0);
-        }
-    }
-
     function onClick(e) {
-        INIT_CELLS_X = e.clientX;
-        INIT_CELLS_Y = e.clientY;
+        let rect = e.target.getBoundingClientRect();
+        INIT_CELLS_X = (e.clientX - rect.left) / CANVAS_SCALING; //x position within the element.
+        INIT_CELLS_Y = (e.clientY - rect.top) / CANVAS_SCALING;  //y position within the element.
         ADD_LENIA = true;
     }
 
