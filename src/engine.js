@@ -129,7 +129,7 @@
             "#2E2B5F",
             "#8B00FF",
         ]),
-        "river-Leaf": hex_to_palette_rgba("80ab82", [
+        "river-leaf": hex_to_palette_rgba("80ab82", [
             "7dcd85",
             "c5d6d8",
             "99f7ab",
@@ -248,15 +248,15 @@
             const angle = 0;
             copyInitCells(buffer, initCells, x1, y1, currentScale, angle);
 
-            const nbStepsForStabilization = 20;
-            for (let index = 0; index < nbStepsForStabilization; index++) {
-                buffer.copyWithin(
-                    BUFFER_CELLS_IDX * BUFFER_SIZE, // dest
-                    BUFFER_CELLS_OUT_IDX * BUFFER_SIZE,  // src
-                    (BUFFER_CELLS_OUT_IDX + 1) * BUFFER_SIZE
-                );
-                exportsUpdateFn()
-            }
+            // const nbStepsForStabilization = 20;
+            // for (let index = 0; index < nbStepsForStabilization; index++) {
+            //     buffer.copyWithin(
+            //         BUFFER_CELLS_IDX * BUFFER_SIZE, // dest
+            //         BUFFER_CELLS_OUT_IDX * BUFFER_SIZE,  // src
+            //         (BUFFER_CELLS_OUT_IDX + 1) * BUFFER_SIZE
+            //     );
+            //     exportsUpdateFn()
+            // }
             initCells = crop(buffer)
             SCALE /= currentScale
         }
