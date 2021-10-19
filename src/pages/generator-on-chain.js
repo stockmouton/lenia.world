@@ -13,7 +13,7 @@ const GeneratorPage = () => {
     return (
         <Web3Provider>
             <Layout>
-            <Generator fps={fps || 30} scale={scale || 1} lenia_id={id || 0} />
+            <GeneratorOnChain fps={fps || 30} scale={scale || 1} lenia_id={id || 0} />
             </Layout>
         </Web3Provider>
     )

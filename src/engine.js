@@ -204,7 +204,7 @@
             },
             Math
         };
-        const wasmFilename = 'optimized.wasm';
+        const wasmFilename = '/optimized.wasm';
         WebAssembly.instantiateStreaming(fetch(wasmFilename), wasmConfig)
         // WebAssembly.instantiateStreaming(fetch('untouched.wasm'), wasmConfig)
             .then( ({ instance }) => {
@@ -290,7 +290,7 @@
             "arr": [[]],
             "shape": [1, bounds.ym - bounds.y, bounds.xm - bounds.x]
         } 
-        console.log(bounds)
+
         for (let y = bounds.y; y < bounds.ym; y++) {
             let subarray = new Float32Array(cells.shape[2])
             for (let x = bounds.x, i = 0; x < bounds.xm; x++, i++) {
