@@ -177,6 +177,12 @@
             size_power2 = 9;
         }
         resizeAll(size_power2, ZOOM - 1);
+        
+        setParameters(
+            metadata["config"]["world_params"], 
+            metadata["config"]["kernels_params"], 
+            metadata["attributes"]
+        );
 
         BUFFER_SIZE = WORLD_SIZE**2
         nb_buffers = 9 + 1; // 9 image buffers + 1 table buffer
@@ -229,8 +235,6 @@
     function initWithProgressiveScaling(metadata, buffer, exports) {
         const config = metadata["config"]
         const attributes = metadata["attributes"]
-
-        setParameters(config["world_params"], config["kernels_params"], attributes);
 
         let cellsSt = config["cells"];
         let initCells = decompressArray(cellsSt);
@@ -375,7 +379,7 @@
         for (let i = 0; i < nb_channels; i++) {
             let channel = new Array(nb_rows);
             for (let j = 0; j < nb_rows; j++) {
-                let row = new Array(nb_cols);
+                let row = new Float32Array(nb_cols);
                 for (let k = 0; k < nb_cols; k++) {
                     row[k] =
                         flat_data[i * (nb_rows + nb_cols) + j * nb_cols + k];
