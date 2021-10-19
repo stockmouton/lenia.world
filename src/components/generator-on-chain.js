@@ -5,7 +5,7 @@ import artifacts from '../artifacts.json'
 import { useWeb3 } from "./web3-provider"
 import { getEngineCode } from "../utils/sm"
 
-const GeneratorOnChain = ({ lenia_id }) => {
+const GeneratorOnChain = ({ fps, scale, lenia_id }) => {
     const nodeRef = useRef(null);
 
     const { web3Provider, account } = useWeb3()
@@ -24,6 +24,7 @@ const GeneratorOnChain = ({ lenia_id }) => {
             
             const response = await axios.get(`metadata/${lenia_id}.json`);
             const leniaMetadata = response.data
+            leniaMetadata["config"]["world_params"]["scale"] = scale
             // const engine = getEngineCode(web3Provider, contract, account)
             // const lenia_metadata_json = await contract.methods.getMetadata(lenia_id).call({ from: account })
             // const lenia_cells = await contract.methods.getLeniaCells(lenia_id).call({ from: account })
@@ -38,7 +39,7 @@ const GeneratorOnChain = ({ lenia_id }) => {
             }
 
             window.leniaEngine.init(leniaMetadata);
-            window.leniaEngine.run();
+            window.leniaEngine.run(fps);
         }
     }, [web3Provider, account])
     

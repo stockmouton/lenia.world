@@ -1,0 +1,33 @@
+{
+    "targets": {
+      "debug": {
+        "binaryFile": "static/untouched.wasm",
+        "textFile": "build/untouched.wat",
+        "runtime": "stub",
+        "importMemory": true,
+        "maximumMemory-coment": 40,
+        "sharedMemory-coment": true,
+        "enable-comment": ["threads"],
+        "use": ["Math=JSMath"],
+        "sourceMap": true,
+        "debug": true
+      },
+      "release": {
+        "binaryFile": "static/optimized.wasm",
+        "textFile": "build/optimized.wat",
+        "runtime": "stub",
+        "importMemory": true,
+        "maximumMemory-coment": 40,
+        "sharedMemory-coment": true,
+        "enable-comment": ["threads"],
+        "use": ["Math=JSMath"],
+        "sourceMap": true,
+        "debug": false,
+        "optimizeLevel": 3,
+        "shrinkLevel": 0,
+        "converge": false,
+        "noAssert": true
+      }
+    },
+    "options": {}
+}

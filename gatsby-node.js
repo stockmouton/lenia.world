@@ -26,5 +26,8 @@ exports.onCreateWebpackConfig = ({ stage, loaders, actions }) => {
         process: 'process/browser'
       }),
     ],
+    experiments: {
+      asyncWebAssembly: true,
+    }
   })
 }

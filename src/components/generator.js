@@ -1,8 +1,18 @@
 import React, { useRef, useEffect } from "react"
+import styled from "styled-components"
 require('../engine')
 const axios = require('axios');
 
-const Generator = ({ scale, lenia_id }) => {
+// const wasmModule = require('../../build/optimized.wasm')
+
+const StyledDiv = styled.div`
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+`
+
+const Generator = ({ zoom, fps, scale, lenia_id }) => {
     const nodeRef = useRef(null);
 
     useEffect(async () => {
@@ -11,17 +21,13 @@ const Generator = ({ scale, lenia_id }) => {
 
         leniaMetadata["config"]["world_params"]["scale"] = scale
 
-        window.leniaEngine.init(leniaMetadata);
-        window.leniaEngine.run();
+        window.leniaEngine.init(leniaMetadata, zoom, fps);
     })
     
     return (
-        <div ref={nodeRef}>
-            <canvas id="CANVAS_CELLS"></canvas>
-            <canvas id="CANVAS_FIELD"></canvas>
-            <canvas id="CANVAS_POTENTIAL"></canvas>
-            <canvas id="CANVAS_HIDDEN" style={{'display': 'none'}}></canvas>
-        </div>
+        <StyledDiv ref={nodeRef}>
+            <canvas id="RENDERING_CANVAS"></canvas>
+        </StyledDiv>
     )
 }
 
