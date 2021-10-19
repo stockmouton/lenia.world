@@ -96,7 +96,7 @@ function applyKernel(): void {
   FFT2D(-1, BUFFER_POTENTIAL_REAL_IDX, BUFFER_POTENTIAL_IMAG_IDX);
 }  
 
-function FFT2D(dir: i8, idxReal: u32, idxImag: u32): void {
+export function FFT2D(dir: i8, idxReal: u32, idxImag: u32): void {
   for (let y: u32 = 0; y < WORLD_SIZE; y++) {
     FFT1D(dir, y, idxReal, idxImag);
   }

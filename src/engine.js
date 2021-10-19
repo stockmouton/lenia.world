@@ -25,7 +25,6 @@
     let cells = null;
     let cellsIm = null;
 
-    let kernel = null;
     let kernelRe = null;
     let kernelIm = null;
 
@@ -165,41 +164,20 @@
     let roundFn;
     let exportsUpdateFn;
     function init(metadata, zoom=1, fps=30) {
-        const config = metadata["config"];
-        const attributes = metadata["attributes"];
         ZOOM = parseInt(Math.min(Math.max(zoom, 1), 5), 10);
 
-        let scale = config["world_params"]["scale"];
-        SCALE = parseInt(Math.min(Math.max(scale, 1), 10), 10);
+        let scale = metadata["config"]["world_params"]["scale"];
+        SCALE = parseInt(Math.min(Math.max(scale, 1), 4), 10);
         let size_power2;
         if (SCALE <= 1) {
             size_power2 = 7;
         } else if (SCALE <= 2) {
             size_power2 = 8;
-        } else if (SCALE <= 4) {
-            size_power2 = 9;
-        } else if (SCALE <= 8) {
-            size_power2 = 10;
         } else {
-            size_power2 = 11;
+            size_power2 = 9;
         }
         resizeAll(size_power2, ZOOM - 1);
 
-        let cellsSt = config["cells"];
-        let initCells = decompressArray(cellsSt);
-        setParameters(
-            config["world_params"],
-            config["kernels_params"],
-            attributes
-        );
-
-        const cosTable = new Float32Array(WORLD_SIZE);
-        const sinTable = new Float32Array(WORLD_SIZE);
-        for (let i = 0; i < WORLD_SIZE / 2; i++) {
-            let i_pi_2 = 2. * Math.PI * i;
-            cosTable[i] = Math.cos(i_pi_2 / WORLD_SIZE);
-            sinTable[i] = Math.sin(i_pi_2 / WORLD_SIZE);
-        }
         BUFFER_SIZE = WORLD_SIZE**2
         nb_buffers = 9 + 1; // 9 image buffers + 1 table buffer
         const byteSize = (BUFFER_SIZE * nb_buffers) << 2;
@@ -231,42 +209,97 @@
         // WebAssembly.instantiateStreaming(fetch('untouched.wasm'), wasmConfig)
             .then( ({ instance }) => {
                 exports = instance.exports
+
                 roundFn = exports.round
                 exportsUpdateFn = exports.updateFn
-
                 let buffer = new Float32Array(memory.buffer);
 
-                // Copy kernel
-                setKernel(config["kernels_params"]);
-                for (let rowIdx = 0; rowIdx < WORLD_SIZE; rowIdx++) {
-                    buffer.set(kernelRe[rowIdx], BUFFER_KERNEL_REAL_IDX * BUFFER_SIZE + rowIdx * WORLD_SIZE);
-                    buffer.set(kernelIm[rowIdx], BUFFER_KERNEL_IMAG_IDX * BUFFER_SIZE + rowIdx * WORLD_SIZE);
-                }
-
-                // Copy init cells
-                // Scale it slowly to ensure stability
-                // console.log(initCells)
-                // if (SCALE > 2) {
-                //     update_fn()
-                // }
-                INIT_CELLS = initCells;
-                let x1 = Math.floor(WORLD_SIZE / 2 - (initCells.shape[2] / 2) * SCALE);
-                let y1 = Math.floor(WORLD_SIZE / 2 - (initCells.shape[1] / 2) * SCALE);
-                copyInitCells(buffer, initCells, x1, y1, 0, 0, SCALE, 0);
+                initWithProgressiveScaling(metadata, buffer, exports)
 
                 update(buffer, fps);
                 render(buffer)
 
-                document.body.addEventListener("keydown", (e) => {
-                    if (e.keyCode == 32) {
-                        ClearCells(buffer, 0);
-                    }
-                });
-                document.getElementById("RENDERING_CANVAS").addEventListener("click", onClick);
+                setListener(buffer)
             })
             .catch( (error) => {
                 console.log(error);
             });
+    }
+
+    function initWithProgressiveScaling(metadata, buffer, exports) {
+        const config = metadata["config"]
+        const attributes = metadata["attributes"]
+
+        setParameters(config["world_params"], config["kernels_params"], attributes);
+
+        let cellsSt = config["cells"];
+        let initCells = decompressArray(cellsSt);
+        let initDone = false
+        while (SCALE > 1 || !initDone) {
+            initDone = true
+            let currentScale = Math.min(SCALE, 2.)
+        
+            if (SCALE != 1) {
+                R = Math.round(Bound(R * currentScale, 2, WORLD_SIZE));
+            }
+            setKernel(buffer, exports.FFT2D, config["kernels_params"]);
+            let x1 = Math.floor(WORLD_SIZE / 2 - (initCells.shape[2] / 2) * SCALE);
+            let y1 = Math.floor(WORLD_SIZE / 2 - (initCells.shape[1] / 2) * SCALE);
+            const angle = 0;
+            copyInitCells(buffer, initCells, x1, y1, currentScale, angle);
+
+            const nbStepsForStabilization = 20;
+            for (let index = 0; index < nbStepsForStabilization; index++) {
+                buffer.copyWithin(
+                    BUFFER_CELLS_IDX * BUFFER_SIZE, // dest
+                    BUFFER_CELLS_OUT_IDX * BUFFER_SIZE,  // src
+                    (BUFFER_CELLS_OUT_IDX + 1) * BUFFER_SIZE
+                );
+                exportsUpdateFn()
+            }
+            initCells = crop(buffer)
+            SCALE /= currentScale
+        }
+
+        INIT_CELLS = initCells
+    }
+
+    function setListener(buffer){
+        document.body.addEventListener("keydown", (e) => {
+            if (e.keyCode == 32) {
+                ClearCells(buffer, 0);
+            }
+        });
+        document.getElementById("RENDERING_CANVAS").addEventListener("click", onClick);
+    }
+
+    function crop(buffer){
+        let bounds = {'x': WORLD_SIZE, 'y': WORLD_SIZE, 'xm': 0, 'ym': 0}
+        for (let y = 0; y < WORLD_SIZE; y++) {
+            for (let x = 0; x < WORLD_SIZE; x++) {
+                let v = buffer[BUFFER_CELLS_OUT_IDX * BUFFER_SIZE + y * WORLD_SIZE + x]
+                if(v > 0) {
+                    bounds.x = Math.min(x, bounds.x)
+                    bounds.y = Math.min(y, bounds.y)
+                    bounds.xm = Math.max(x, bounds.xm)
+                    bounds.ym = Math.max(y, bounds.ym)
+                }
+            }
+        }
+        let cells = {
+            "arr": [[]],
+            "shape": [1, bounds.ym - bounds.y, bounds.xm - bounds.x]
+        } 
+        console.log(bounds)
+        for (let y = bounds.y; y < bounds.ym; y++) {
+            let subarray = new Float32Array(cells.shape[2])
+            for (let x = bounds.x, i = 0; x < bounds.xm; x++, i++) {
+                subarray[i] = buffer[BUFFER_CELLS_OUT_IDX * BUFFER_SIZE + y * WORLD_SIZE + x]
+            }
+            cells.arr[0].push(subarray)
+        }
+        
+        return cells
     }
 
     function decompressArray(string_cells) {
@@ -376,10 +409,6 @@
         gf_id = kernels_params[0]["gf_id"];
         gf_m = kernels_params[0]["m"];
         gf_s = kernels_params[0]["s"];
-
-        if (SCALE != 1) {
-            R = Math.round(Bound(R * SCALE, 2, WORLD_SIZE));
-        }
     }
 
     function resizeAll(size_power2, zoom_power2=0) {
@@ -389,7 +418,7 @@
 
         InitAllArrays(WORLD_SIZE);
         CANVAS_CELLS = InitCanvas(null, CANVAS_SIZE);
-        RENDERING_CANVAS = InitCanvas("RENDERING_CANVAS", CANVAS_SIZE * 2)
+        RENDERING_CANVAS = InitCanvas("RENDERING_CANVAS", CANVAS_SIZE * CANVAS_SCALING)
         RENDERING_CANVAS.ctx.scale(CANVAS_SCALING, CANVAS_SCALING)
     }
 
@@ -401,8 +430,6 @@
         cellsIm = null;
         cellsIm = createDataArray(world_size);
 
-        kernel = null;
-        kernel = createDataArray(world_size);
         kernelRe = null;
         kernelRe = createDataArray(world_size);
         kernelIm = null;
@@ -442,7 +469,7 @@
         };
     }
 
-    function copyInitCells(buffer, newCells, x1, y1, x2, y2, scale, angle) {
+    function copyInitCells(buffer, newCells, x1, y1, scale, angle) {
         let arr = newCells.arr[0];
         let h = newCells.shape[1];
         let w = newCells.shape[2];
@@ -451,8 +478,6 @@
         let cos = Math.cos((angle / 180) * π);
         let fh = (Math.abs(h * cos) + Math.abs(w * sin) + 1) * scale - 1;
         let fw = (Math.abs(w * cos) + Math.abs(h * sin) + 1) * scale - 1;
-        let fi0 = y2 <= 0 ? y1 : RandomInt(y1, y2 - fh);
-        let fj0 = x2 <= 0 ? x1 : RandomInt(x1, x2 - fw);
         for (let fi = 0; fi < fh; fi++) {
             for (let fj = 0; fj < fw; fj++) {
                 let i = Math.round(
@@ -461,25 +486,16 @@
                 let j = Math.round(
                     (+(fj - fw / 2) * cos + (fi - fh / 2) * sin) / scale + w / 2
                 );
-                let y = Mod(fi + fi0, WORLD_SIZE);
-                let x = Mod(fj + fj0, WORLD_SIZE);
+                let x = Mod(fj + x1, WORLD_SIZE);
+                let y = Mod(fi + y1, WORLD_SIZE);
 
-                let c =
-                    i >= 0 && j >= 0 && i < h && j < arr[i].length
-                        ? arr[i][j]
-                        : 0;
-                let v = c != "" ? parseFloat(c) : 0;
-
-                if (v > 0) {
-                    buffer[BUFFER_CELLS_OUT_IDX * BUFFER_SIZE + y * WORLD_SIZE + x] = v
+                let inBounds = (i >= 0 && j >= 0 && i < h && j < arr[i].length)
+                let c = inBounds ? arr[i][j] : 0.;
+                if (c > 0) {
+                    buffer[BUFFER_CELLS_OUT_IDX * BUFFER_SIZE + y * WORLD_SIZE + x] = c
                 };
             }
         }
-        buffer.copyWithin(
-            BUFFER_CELLS_IDX * BUFFER_SIZE, // dest
-            BUFFER_CELLS_OUT_IDX * BUFFER_SIZE,  // src
-            (BUFFER_CELLS_OUT_IDX + 1) * BUFFER_SIZE
-        );   // copy output to input
     }
 
     ///////////////////////////////
@@ -489,24 +505,24 @@
         (function loop() {
             setTimeout(loop, 1000 / fps);
             
-            exportsUpdateFn()
-
-            if (ADD_LENIA) {
-                const x1 = Math.floor(
-                    INIT_CELLS_X / PIXEL - (INIT_CELLS.shape[2] / 2) * SCALE
-                );
-                const y1 = Math.floor(
-                    INIT_CELLS_Y / PIXEL - (INIT_CELLS.shape[1] / 2) * SCALE
-                );
-                copyInitCells(buffer, INIT_CELLS, x1, y1, 0, 0, SCALE, 0);
-
-                ADD_LENIA = false;
-            }
             buffer.copyWithin(
                 BUFFER_CELLS_IDX * BUFFER_SIZE, // dest
                 BUFFER_CELLS_OUT_IDX * BUFFER_SIZE,  // src
                 (BUFFER_CELLS_OUT_IDX + 1) * BUFFER_SIZE
             );
+            exportsUpdateFn()
+
+            if (ADD_LENIA) {
+                const x1 = Math.floor(
+                    INIT_CELLS_X / PIXEL - (INIT_CELLS.shape[2] / 2) / SCALE
+                );
+                const y1 = Math.floor(
+                    INIT_CELLS_Y / PIXEL - (INIT_CELLS.shape[1] / 2) / SCALE
+                );
+                copyInitCells(buffer, INIT_CELLS, x1, y1, SCALE, 0);
+
+                ADD_LENIA = false;
+            }
         })();
     }
 
@@ -549,7 +565,7 @@
     ///////////////////////////////
     // Kernels
     ///////////////////////////////
-    function setKernel(kernels_params) {
+    function setKernel(buffer, fft2dFn, kernels_params) {
         let k_id = kernels_params[0]["k_id"];
         let k_q = kernels_params[0]["q"];
         let k_r = kernels_params[0]["r"];
@@ -584,18 +600,19 @@
                 kernelRe[i][j] = v;
                 ii = WORLD_SIZE - ((i + WORLD_SIZE / 2) % WORLD_SIZE) - 1;
                 jj = (j + WORLD_SIZE / 2) % WORLD_SIZE;
-                kernel[ii][jj] = v;
             }
         }
 
         for (let i = 0; i < WORLD_SIZE; i++) {
             for (let j = 0; j < WORLD_SIZE; j++) {
                 kernelRe[i][j] /= weight;
-                kernelIm[i][j] /= weight;
             }
         }
 
-        FFT2D(1, kernelRe, kernelIm);
+        for (let rowIdx = 0; rowIdx < WORLD_SIZE; rowIdx++) {
+            buffer.set(kernelRe[rowIdx], BUFFER_KERNEL_REAL_IDX * BUFFER_SIZE + rowIdx * WORLD_SIZE);
+        }
+        fft2dFn(1, BUFFER_KERNEL_REAL_IDX, BUFFER_POTENTIAL_IMAG_IDX)
     }
 
     function kernelShell(k_id, k_q, bs, k_r, dist) {
@@ -644,96 +661,6 @@
         return Math.floor(Random() * (max + 1 - min) + min);
     }
 
-    function FFT2D(dir, re2, im2) {
-        const nb_rows = re2.length;
-
-        for (let i = 0; i < nb_rows; i++) {
-            FFT1D(dir, re2[i], im2[i]);
-        }
-
-        transpose2D(re2);
-        transpose2D(im2);
-
-        for (let i = 0; i < nb_rows; i++) {
-            FFT1D(dir, re2[i], im2[i]);
-        }
-    }
-
-    function transpose2D(mat) {
-        const nb_rows = mat.length;
-
-        for (let i = 0; i < nb_rows; i++) {
-            for (let j = 0; j < i; j++) {
-                const tmp_re = mat[i][j];
-                mat[i][j] = mat[j][i];
-                mat[j][i] = tmp_re;
-            }
-        }
-    }
-
-    function FFT1D(dir, re1, im1) {
-        const nb_rows = re1.length;
-        const nb_rows_by_2 = nb_rows >> 1;
-        let m = roundFn(Math.log2(nb_rows));
-        let j1 = 0;
-        for (let j = 0; j < nb_rows - 1; j++) {
-            if (j < j1) {
-                let tmp = re1[j];
-                re1[j] = re1[j1];
-                re1[j1] = tmp;
-
-                tmp = im1[j];
-                im1[j] = im1[j1];
-                im1[j1] = tmp;
-            }
-
-            let j2 = nb_rows_by_2;
-            while (j2 <= j1) {
-                j1 -= j2;
-                j2 >>= 1;
-            }
-
-            j1 += j2;
-        }
-
-        /* Compute the FFT */
-        let c1 = -1.0,
-            c2 = 0.0,
-            l2 = 1;
-        for (let l = 0; l < m; l++) {
-            let l1 = l2;
-            l2 <<= 1;
-            let u1 = 1.0,
-                u2 = 0.0;
-            for (let i = 0; i < l1; i++) {
-                for (let j = i; j < nb_rows; j += l2) {
-                    let j2 = j + l1;
-                    let t1 = u1 * re1[j2] - u2 * im1[j2];
-                    let t2 = u1 * im1[j2] + u2 * re1[j2];
-                    re1[j2] = re1[j] - t1;
-                    im1[j2] = im1[j] - t2;
-                    re1[j] += t1;
-                    im1[j] += t2;
-                }
-                let z = u1 * c1 - u2 * c2;
-                u2 = u1 * c2 + u2 * c1;
-                u1 = z;
-            }
-            c2 = Math.sqrt((1.0 - c1) / 2.0);
-            if (dir == 1) c2 = -c2;
-            c1 = Math.sqrt((1.0 + c1) / 2.0);
-        }
-
-        /* Scaling for forward transform */
-        if (dir == -1) {
-            let scale_f = 1.0 / nb_rows;
-            for (let j = 0; j < nb_rows; j++) {
-                re1[j] *= scale_f;
-                im1[j] *= scale_f;
-            }
-        }
-    }
-
     ///////////////////////////
     // Utils
     ///////////////////////////
@@ -756,7 +683,7 @@
     function ClearCells(buffer, x) {
         for (let i = 0; i < WORLD_SIZE; i++) {
             for (let j = 0; j < WORLD_SIZE; j++) {
-                buffer[BUFFER_CELLS_IDX * BUFFER_SIZE + i * WORLD_SIZE + j] = x;
+                buffer[BUFFER_CELLS_OUT_IDX * BUFFER_SIZE + i * WORLD_SIZE + j] = x;
             }
         }
     }
@@ -904,6 +831,5 @@
     window.leniaEngine = {
         init,
         getCells,
-        getKernel,
     };
 })();
