@@ -1,7 +1,9 @@
 import React, { useRef, useEffect } from "react"
 import styled from "styled-components"
-require('../engine')
 const axios = require('axios');
+if (typeof window !== 'undefined') {
+    require('../engine')
+}
 
 // const wasmModule = require('../../build/optimized.wasm')
 
@@ -16,7 +18,7 @@ const Generator = ({ zoom, fps, scale, lenia_id }) => {
     const nodeRef = useRef(null);
 
     useEffect(async () => {
-        const response = await axios.get(`metadata/${lenia_id}.json`);
+        const response = await axios.get(`/metadata/${lenia_id}.json`);
         let leniaMetadata = response.data
 
         leniaMetadata["config"]["world_params"]["scale"] = scale
