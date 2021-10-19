@@ -21,7 +21,6 @@ const BUFFER_SIN_TABLE_IDX = 1;
 const BUFFER_RBITS_TABLE_IDX = 2;
 
 const PRECISION: f32 = 1000000;
-const WORLD_SIZE_BY_2 = WORLD_SIZE >> 1;
 
 // Trigonometric tables
 for (let i: u32 = 0; i < WORLD_SIZE / 2; i++) {
