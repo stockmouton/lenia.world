@@ -16,6 +16,15 @@ Menu.Item = styled.li`
   margin-left: 0;
 `
 
+Menu.Divider = styled(Menu.Item)`
+  width: calc(100% + 15px);
+  margin: 9px -7.5px;
+  height: 0;
+  overflow: hidden;
+  background-color: #e5e5e5;
+  border-bottom: 1px solid #000000;
+`
+
 Menu.Link = styled(Link)`
   color: #000000;
   margin-right: -10px;
@@ -30,11 +39,36 @@ Menu.Link = styled(Link)`
 `
 
 const MenuButton = styled(Menu.Link)`
-  :hover, :focus {
-    background: #aa5500;
+  ${({cta}) => (cta ? `
+    background: #000000;
     color: #bbbbbb;
-  }
+    text-align: center;
+
+    :before {
+      content: "< ";
+      float: left;
+    }
+  
+    :after {
+      content: ">";
+      float: right;
+    }
+
+    :hover, :focus {
+      color: #ffffff;
+      background: #555555;
+    }
+  ` : `
+    :hover, :focus {
+      background: #aa5500;
+      color: #bbbbbb;
+    }
+  `)}
+    ${({selected}) => (selected ? `
+      background: #aa5500;
+      color: #bbbbbb;
+    ` : '')}
 `
-Menu.Button = props => <MenuButton {...props} href="#" role="button" /> 
+Menu.Button = props => <MenuButton {...props} href="#!" role="button" /> 
 
 export default Menu
