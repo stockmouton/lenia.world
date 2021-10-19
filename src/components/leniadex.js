@@ -372,7 +372,7 @@ const LeniaDex = () => {
               </Grid.Cell>
             </Grid>
             <VideoScreen>
-              <Video key={displayedLenia?.id} width="100%" height="auto" preload='auto' loop autoPlay muted playsInline={true}>
+              <Video key={displayedLenia?.id} width={274} height={274} preload='auto' loop autoPlay muted playsInline={true}>
                 <source src={`https://lenia.world/metadata/${displayedLenia?.id}.mp4`} type="video/mp4" />
                 <p>Couldn't load this Lenia, please use a better browser ;)</p>
               </Video>
