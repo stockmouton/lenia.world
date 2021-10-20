@@ -91,9 +91,8 @@
 
     function initWithProgressiveScaling(metadata, buffer, exports) {
         const config = metadata["config"]
-        const attributes = metadata["attributes"]
 
-        let R = metadata["config"]["world_params"]["R"];
+        let R = config["world_params"]["R"];
 
         let cellsSt = config["cells"];
         let initCells = decompressArray(cellsSt);
@@ -107,9 +106,11 @@
             }
             setKernel(buffer, exports.FFT2D, R, config["kernels_params"]);
 
-            let x1 = Math.floor(WORLD_SIZE / 2 - (initCells.shape[2] / 2) * SCALE);
-            let y1 = Math.floor(WORLD_SIZE / 2 - (initCells.shape[1] / 2) * SCALE);
+            console.log(R, initCells.shape)
+            let x1 = Math.floor(WORLD_SIZE / 2 - (initCells.shape[2] / 2) * currentScale);
+            let y1 = Math.floor(WORLD_SIZE / 2 - (initCells.shape[1] / 2) * currentScale);
             const angle = 0;
+            clearCells(buffer, 0)
             copyInitCells(buffer, initCells, x1, y1, currentScale, angle);
 
             const nbStepsForStabilization = 20;
@@ -131,7 +132,7 @@
     function setListener(buffer){
         document.body.addEventListener("keydown", (e) => {
             if (e.keyCode == 32) {
-                ClearCells(buffer, 0);
+                clearCells(buffer, 0);
             }
         });
         document.getElementById("RENDERING_CANVAS").addEventListener("click", onClick);
@@ -430,10 +431,13 @@
             }
         }
 
+        
         for (let rowIdx = 0; rowIdx < WORLD_SIZE; rowIdx++) {
             buffer.set(kernelRe[rowIdx], BUFFER_KERNEL_REAL_IDX * BUFFER_SIZE + rowIdx * WORLD_SIZE);
+            const tmpArr = new Float32Array(WORLD_SIZE).fill(0)
+            buffer.set(tmpArr, BUFFER_KERNEL_IMAG_IDX * BUFFER_SIZE + rowIdx * WORLD_SIZE);
         }
-        fft2dFn(1, BUFFER_KERNEL_REAL_IDX, BUFFER_POTENTIAL_IMAG_IDX)
+        fft2dFn(1, BUFFER_KERNEL_REAL_IDX, BUFFER_KERNEL_IMAG_IDX)
     }
 
     function kernelShell(k_id, k_q, bs, k_r, dist) {
@@ -489,7 +493,7 @@
         return String.fromCharCode(code);
     }
 
-    function ClearCells(buffer, x) {
+    function clearCells(buffer, x) {
         for (let i = 0; i < WORLD_SIZE; i++) {
             for (let j = 0; j < WORLD_SIZE; j++) {
                 buffer[BUFFER_CELLS_OUT_IDX * BUFFER_SIZE + i * WORLD_SIZE + j] = x;

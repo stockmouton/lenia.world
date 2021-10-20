@@ -5,7 +5,7 @@ if (typeof window !== 'undefined') {
     require('../engine')
 }
 
-// const wasmModule = require('../../build/optimized.wasm')
+// const wasmModule = require('../../static/optimized.wasm')
 
 const StyledDiv = styled.div`
   position: absolute;
