@@ -44,7 +44,7 @@ const IndexPage = () => {
                 </Lead>
                 <SoldOutButton />
               </Jumbotron>
-              {isStaging && <LeniaDex />}
+              <LeniaDex />
               <Section id="niftty-gritty">
                 <Section.Header><h1>N(i)FTty-gritty</h1></Section.Header>
                 <article>
