@@ -133,8 +133,13 @@ function FFT1DRadix2(y: u32, idxReal: u32, idxImag: u32): void {
 		for (let i: u32 = 0; i < WORLD_SIZE; i += size) {
 			for (let x: u32 = i, k = 0; x < i + halfsize; x++, k += tablestep) {
 				let x2 = x + halfsize;
-				let tpre =  get(idxReal, x2, y) * get(BUFFER_TABLES_IDX, k, 0) + get(idxImag, x2, y) * get(BUFFER_TABLES_IDX, k, 1);
-				let tpim = -get(idxReal, x2, y) * get(BUFFER_TABLES_IDX, k, 1) + get(idxImag, x2, y) * get(BUFFER_TABLES_IDX, k, 0);
+
+        let cos = get(BUFFER_TABLES_IDX, k, 0)
+        let sin = get(BUFFER_TABLES_IDX, k, 1)
+
+				let tpre =  get(idxReal, x2, y) * cos + get(idxImag, x2, y) * sin;
+				let tpim =  get(idxImag, x2, y) * cos - get(idxReal, x2, y) * sin;
+
 				set(idxReal, x2, y, get(idxReal, x, y) - tpre);
 				set(idxImag, x2, y, get(idxImag, x, y) - tpim);
 				set(idxReal, x, y, get(idxReal, x, y) + tpre);

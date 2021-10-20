@@ -42,6 +42,25 @@ function setx4(idx: u32, x: u32, y: u32, vec: v128): void {
   v128.store((idx * WORLD_SIZE**2 + y * WORLD_SIZE + x) << 2, vec)
 }
 
+@inline
+function getx4v(idx: u32, x: u32, y: u32): v128 {
+  let vec = v128.splat<f32>(0.);
+  vec = f32x4.replace_lane(vec, 0, get(idx, x, y))
+  vec = f32x4.replace_lane(vec, 1, get(idx, x, y + 1))
+  vec = f32x4.replace_lane(vec, 2, get(idx, x, y + 2))
+  vec = f32x4.replace_lane(vec, 3, get(idx, x, y + 3))
+
+  return vec
+}
+
+@inline
+function setx4v(idx: u32, x: u32, y: u32, vec: v128): void {
+  set(idx, x, y, f32x4.extract_lane(vec, 0))
+  set(idx, x, y + 1, f32x4.extract_lane(vec, 1))
+  set(idx, x, y + 2, f32x4.extract_lane(vec, 2))
+  set(idx, x, y + 3, f32x4.extract_lane(vec, 3))
+}
+
 /** Performs one step. Called about 30 times a second from JS. */
 export function updateFn(): void {
   memory.copy((BUFFER_CELLS_OLD_IDX * WORLD_SIZE**2) << 2, (BUFFER_CELLS_IDX * WORLD_SIZE**2) << 2, WORLD_SIZE**2 << 2)
@@ -83,14 +102,14 @@ function applyKernel(): void {
 }  
 
 export function FFT2D(dir: i8, idxReal: u32, idxImag: u32): void {
-  for (let y: u32 = 0; y < WORLD_SIZE; y++) {
+  for (let y: u32 = 0; y < WORLD_SIZE; y += 4) {
     FFT1D(dir, y, idxReal, idxImag);
   }
 
   transpose2D(idxReal);
   transpose2D(idxImag);
 
-  for (let y: u32 = 0; y < WORLD_SIZE; y++) {
+  for (let y: u32 = 0; y < WORLD_SIZE; y += 4) {
     FFT1D(dir, y, idxReal, idxImag);
   }
 }
@@ -111,9 +130,9 @@ function FFT1D(dir: i8, y: u32, idxReal: u32, idxImag: u32): void {
     FFT1DRadix2(y, idxReal, idxImag)
 
     let scale_f = v128.splat<f32>(1.0 / (WORLD_SIZE as f32));
-    for (let x: u32 = 0; x < WORLD_SIZE; x +=4) {
-      setx4(idxReal, x, y, f32x4.mul(getx4(idxReal, x, y), scale_f));
-      setx4(idxImag, x, y, f32x4.mul(getx4(idxImag, x, y), scale_f));
+    for (let x: u32 = 0; x < WORLD_SIZE; x++) {
+      setx4v(idxReal, x, y, f32x4.mul(getx4v(idxReal, x, y), scale_f));
+      setx4v(idxImag, x, y, f32x4.mul(getx4v(idxImag, x, y), scale_f));
     }
   } else {
     FFT1DRadix2(y, idxImag, idxReal)
@@ -122,18 +141,20 @@ function FFT1D(dir: i8, y: u32, idxReal: u32, idxImag: u32): void {
 }
 
 function FFT1DRadix2(y: u32, idxReal: u32, idxImag: u32): void {
+  // Create SIMD get/set functions on y and used them here
   for (let x: u32 = 0; x < WORLD_SIZE; x++) {
-		let x1 = get(BUFFER_TABLES_IDX, x, BUFFER_RBITS_TABLE_IDX) as u32;
-		if (x1 > x) {
-			let tmp = get(idxReal, x, y);
-      set(idxReal, x, y, get(idxReal, x1, y));
-      set(idxReal, x1, y, tmp);
+    let x1 = get(BUFFER_TABLES_IDX, x, BUFFER_RBITS_TABLE_IDX) as u32;
+    if (x1 > x) {
+      let tmp = getx4v(idxReal, x, y);
+      setx4v(idxReal, x, y, getx4v(idxReal, x1, y));
+      setx4v(idxReal, x1, y, tmp);
 
-      tmp = get(idxImag, x, y);
-      set(idxImag, x, y, get(idxImag, x1, y));
-      set(idxImag, x1, y, tmp);
-		}
-	}
+      tmp = getx4v(idxImag, x, y);
+      setx4v(idxImag, x, y, getx4v(idxImag, x1, y));
+      setx4v(idxImag, x1, y, tmp);
+    }
+  }
+  
 
 	// Cooley-Tukey decimation-in-time radix-2 FFT
 	for (let size: u32 = 2; size <= WORLD_SIZE; size *= 2) {
@@ -142,12 +163,17 @@ function FFT1DRadix2(y: u32, idxReal: u32, idxImag: u32): void {
 		for (let i: u32 = 0; i < WORLD_SIZE; i += size) {
 			for (let x: u32 = i, k = 0; x < i + halfsize; x++, k += tablestep) {
 				let x2 = x + halfsize;
-				let tpre =  get(idxReal, x2, y) * get(BUFFER_TABLES_IDX, k, 0) + get(idxImag, x2, y) * get(BUFFER_TABLES_IDX, k, 1);
-				let tpim = -get(idxReal, x2, y) * get(BUFFER_TABLES_IDX, k, 1) + get(idxImag, x2, y) * get(BUFFER_TABLES_IDX, k, 0);
-				set(idxReal, x2, y, get(idxReal, x, y) - tpre);
-				set(idxImag, x2, y, get(idxImag, x, y) - tpim);
-				set(idxReal, x, y, get(idxReal, x, y) + tpre);
-        set(idxImag, x, y, get(idxImag, x, y) + tpim);
+
+        let cos = v128.splat<f32>(get(BUFFER_TABLES_IDX, k, 0));
+        let sin = v128.splat<f32>(get(BUFFER_TABLES_IDX, k, 1));
+
+				let tpre = f32x4.add(f32x4.mul(getx4v(idxReal, x2, y), cos), f32x4.mul(getx4v(idxImag, x2, y), sin));
+				let tpim = f32x4.sub(f32x4.mul(getx4v(idxImag, x2, y), cos), f32x4.mul(getx4v(idxReal, x2, y), sin));
+
+				setx4v(idxReal, x2, y, f32x4.sub(getx4v(idxReal, x, y), tpre));
+				setx4v(idxImag, x2, y, f32x4.sub(getx4v(idxImag, x, y), tpim));
+				setx4v(idxReal, x, y, f32x4.add(getx4v(idxReal, x, y), tpre));
+        setx4v(idxImag, x, y, f32x4.add(getx4v(idxImag, x, y), tpim));
 			}
 		}
 	}
