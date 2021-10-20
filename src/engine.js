@@ -1,4 +1,5 @@
-(() => {
+window.leniaEngine = {}
+window.leniaEngine.init = (WASMPath, WASMKey, metadata, zoom=1, fps=30) => {
     // Most problematic functions: FFT1D, transpose2D, complexMatrixDot
     // Those are problematic because they are called all the time
 
@@ -35,7 +36,7 @@
     // Loader
     ///////////////////////////////
     let exportsUpdateFn;
-    function init(metadata, zoom=1, fps=30) {
+    function init(metadata, zoom, fps) {
         zoom = parseInt(Math.min(Math.max(zoom - 1, 0), 5), 10);
         PIXEL_SIZE = 1 << zoom;
         
@@ -46,7 +47,7 @@
             env: {
                 memory
             },
-            engine: {  // Name of the file
+            'engine-simd': {  // Name of the file
                 GF_ID       : metadata["config"]["kernels_params"][0]["gf_id"],
                 GF_M        : metadata["config"]["kernels_params"][0]["m"],
                 GF_S        : metadata["config"]["kernels_params"][0]["s"],
@@ -54,9 +55,7 @@
             },
             Math
         };
-        const wasmFilename = '/optimized.wasm';
-        WebAssembly.instantiateStreaming(fetch(wasmFilename), wasmConfig)
-        // WebAssembly.instantiateStreaming(fetch('untouched.wasm'), wasmConfig)
+        WebAssembly.instantiateStreaming(fetch(WASMPath), wasmConfig)
             .then( ({ instance }) => {
                 exports = instance.exports
 
@@ -74,6 +73,7 @@
                 console.log(error);
             });
     }
+    init(metadata, zoom, fps)
 
     function initWithProgressiveScaling(buffer, metadata, exports) {
         const config = metadata["config"]
@@ -790,7 +790,5 @@
     ///////////////////////////
     // Setting public functions
     ///////////////////////////
-    window.leniaEngine = {
-        init
-    };
-})();
+    
+};

@@ -1,5 +1,6 @@
 import React, { useRef, useEffect } from "react"
 import styled from "styled-components"
+import { simd } from 'wasm-feature-detect';
 const axios = require('axios');
 if (typeof window !== 'undefined') {
     require('../engine')
@@ -17,13 +18,21 @@ const StyledDiv = styled.div`
 const Generator = ({ zoom, fps, scale, lenia_id }) => {
     const nodeRef = useRef(null);
 
-    useEffect(async () => {
+    useEffect(async () => {    
+        const hasSIMD = await simd();
+        const WASMPath = hasSIMD
+            ? '/optimized-simd.wasm'
+            : '/optimized.wasm'
+        const WASMKey = hasSIMD
+            ? 'engine-simd'
+            : 'engine'
+
         const response = await axios.get(`/metadata/${lenia_id}.json`);
         let leniaMetadata = response.data
 
         leniaMetadata["config"]["world_params"]["scale"] = scale
 
-        window.leniaEngine.init(leniaMetadata, zoom, fps);
+        window.leniaEngine.init(WASMPath, WASMKey, leniaMetadata, zoom, fps);
     })
     
     return (
