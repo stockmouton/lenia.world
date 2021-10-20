@@ -70,7 +70,7 @@ const Body = styled.div`
   height: 602px;
   display: flex;
 
-  @media (min-width: 602px) {
+  @media (min-width: 430px) {
     height: 754px;
   }
 
