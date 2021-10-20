@@ -199,8 +199,8 @@ library LeniaDescriptor {
         pure
         returns (string memory)
     {
-        string[10] memory colormaps = [
-            "Black White", "Carmine Blue", "Carmine Green", "Cinnamon", "Golden", "Msdos", "Rainbow", "Rainbow_transparent", "Salvia", "White Black"
+        string[14] memory colormaps = [
+            "Alizarin", "Black White", "Carmine Blue", "Cinnamon", "City", "Golden", "Laurel", "Msdos", "Pink Beach", "Rainbow", "River Leaf", "Salvia", "Summer", "White Black"
         ];
 
         return colormaps[index];
