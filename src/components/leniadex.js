@@ -9,8 +9,12 @@ import NavBar from "./navbar";
 import MenuTrigger from "./menu-trigger"
 import FilterMenu from "./leniadex/filter-menu";
 import AxisMenu from "./leniadex/axis-menu";
+import LeniaList from "./leniadex/lenia-list"
 import Link from "./link";
 import STATIC_NOISE_IMAGE from "../images/static-noise.gif"
+import { createMediaQuery, BREAKPOINTS, gridBreakpoints } from "../global-styles"
+import { useMediaQuery } from 'beautiful-react-hooks'; 
+import TextInput from "./text-input";
 
 const LENIADEX_STATUSES = {
   LOADING: "LOADING",
@@ -55,17 +59,33 @@ const Wrapper = styled.div`
   box-shadow: 7px 7px 0 rgba(254, 254, 84, 0.15);
 `
 
+const SearchInput = styled(TextInput)`
+  width: 40px;
+  height: 27px;
+  font-size: 0.9rem;
+  padding: 0 3px;
+`
+
 const Body = styled.div`
-  height: 720px;
+  height: 602px;
   display: flex;
+
+  @media (min-width: 602px) {
+    height: 754px;
+  }
+
+  ${createMediaQuery(BREAKPOINTS.sm, 'height: 696px;')}
 `
 
 const LeniaPortrait = styled.div`
   background-color: #bbbbbb;
   color: #000000;
   padding: 10px;
-  width: 400px;
+  max-width: 300px;
   height: 100%;
+
+  ${createMediaQuery(BREAKPOINTS.sm, 'max-width: 250px;')}
+  ${createMediaQuery(BREAKPOINTS.md, 'max-width: 300px;')}
 `
 
 const LeniaMap = styled.div`
@@ -88,6 +108,23 @@ const Video = styled.video`
   border: 4px solid #232323;
   border-radius: 5px;
   color: #ffffff;
+  width: 200px;
+  height: 200px;
+
+  @media (min-width: 430px) {
+    width: 274px;
+    height: 274px;
+  }
+
+  ${createMediaQuery(BREAKPOINTS.sm, `
+    width: 230px;
+    height: 230px;
+  `)}
+
+  ${createMediaQuery(BREAKPOINTS.md, `
+    width: 274px;
+    height: 274px;
+  `)}
 `
 const Screen = styled.div`
   box-shadow: inset 0 0 1rem #000000;
@@ -108,13 +145,28 @@ const VideoScreen = styled(Screen)`
 const TextScreen = styled(Screen)`
   box-shadow: inset 0 0 0.6rem #101010;
   background: #00aaaa;
-  filter: none;
   padding: 0.5rem;
   text-align: center;
 `
 
 const EmptyTextScreen = styled(Screen)`
   min-height: 2.5rem;
+`
+
+const LinkScreen = styled(Link)`
+  display: block;
+  background-image: url(${STATIC_NOISE_IMAGE});
+  background-size: cover;
+  box-shadow: inset 0 0 0.6rem #101010;
+  background: #00aaaa;
+  font-size: 1rem;
+  border-radius: 5px;
+  padding: 0.5rem;
+  text-align: center;
+  
+  :hover {
+    background: #aa5500;
+  }
 `
 
 const RadarChartWrapper = styled(Screen)`
@@ -126,6 +178,7 @@ const RadarChartWrapper = styled(Screen)`
     font-size: 0.7rem;
   }
 `
+
 const Dot = styled.circle`
   cursor: pointer;
 `
@@ -174,6 +227,10 @@ const LeniaDex = () => {
   const [colormapFilters, setColormapFilters] = useState([])
   const [inputValue, setInputValue] = useState('')
   const [scatterRenderKey, setScatterRenderKey] = useState(0)
+  const isAboveMobile = useMediaQuery(`(min-width: 430px)`);
+  const isUnderSm = useMediaQuery(`(max-width: ${gridBreakpoints.sm - 1}px)`);
+  const isAboveSm = useMediaQuery(`(min-width: ${gridBreakpoints.sm}px)`);
+  const isAboveMd = useMediaQuery(`(min-width: ${gridBreakpoints.md}px)`);
 
   const handleXAxisMenuClick = attribute => {
     if (attribute === yAxis) {
@@ -201,7 +258,7 @@ const LeniaDex = () => {
     setHoveredDot(null)
   }
 
-  const handleDotClick = lenia => {
+  const handleLeniaClick = lenia => {
     setDisplayedLenia(radarData[lenia.id])
     audio.play();
   }
@@ -290,15 +347,6 @@ const LeniaDex = () => {
     }
   }, [])
 
-  const getDisplayedFiltersContent = (filters) => {
-    const displayedFilters = filters.filter((_, i) => i < 3)
-    const otherFilters = filters.filter((_, i) => i >= 3)
-    if (otherFilters.length > 0) {
-      return `${displayedFilters.join(', ')} and ${otherFilters.length} more`
-    }
-    return displayedFilters.join(', ')
-  }
-
   useEffect(() => {
     if (allScatterData.length === 0) return
 
@@ -314,13 +362,29 @@ const LeniaDex = () => {
     setScatterRenderKey(counter => counter + 1)
   }, [familyFilters, colormapFilters, inputValue])
 
+  const getDisplayedFiltersContent = (filters) => {
+    const displayedFilters = filters.filter((_, i) => i < 3)
+    const otherFilters = filters.filter((_, i) => i >= 3)
+    if (otherFilters.length > 0) {
+      return `${displayedFilters.join(', ')} and ${otherFilters.length} more`
+    }
+    return displayedFilters.join(', ')
+  }
+
+  const getRadarChartDimension = () => {
+    if (isAboveMd) return 274
+    if (isAboveSm) return 230
+    if (isAboveMobile) return 274
+    return 200
+  }
+
   return (
     <Section id="leniadex">
       <Section.Header><h1>Leniadex</h1></Section.Header>
       <Wrapper>
         <NavBar>
           <NavBar.List>
-            <NavBar.Item>
+            <NavBar.Item.AboveSm>
               <MenuTrigger
                 menu={
                   <AxisMenu items={NUMERICAL_ATTRIBUTES.filter(attribute => attribute !== xAxis)} onItemClick={handleXAxisMenuClick} />
@@ -328,8 +392,8 @@ const LeniaDex = () => {
               >
                 X Axis: {xAxis} ▼
               </MenuTrigger>
-            </NavBar.Item>
-            <NavBar.Item>
+            </NavBar.Item.AboveSm>
+            <NavBar.Item.AboveSm>
               <MenuTrigger
                 menu={
                   <AxisMenu items={NUMERICAL_ATTRIBUTES.filter(attribute => attribute !== yAxis)} onItemClick={handleYAxisMenuClick} />
@@ -337,7 +401,7 @@ const LeniaDex = () => {
               >
                 Y Axis: {yAxis} ▼
               </MenuTrigger>
-            </NavBar.Item>
+            </NavBar.Item.AboveSm>
             <NavBar.Item>
               <MenuTrigger
                 menu={
@@ -357,7 +421,7 @@ const LeniaDex = () => {
               </MenuTrigger>
             </NavBar.Item>
             <NavBar.Item>
-              <NavBar.Text><label>Search by ID: <input type="text" onChange={handleInputChange} value={inputValue} /></label></NavBar.Text>
+              <NavBar.Text><label>Search by ID:<SearchInput onChange={handleInputChange} value={inputValue} /></label></NavBar.Text>
             </NavBar.Item>
           </NavBar.List>
         </NavBar>
@@ -372,14 +436,14 @@ const LeniaDex = () => {
               </Grid.Cell>
             </Grid>
             <VideoScreen>
-              <Video key={displayedLenia?.id} width={274} height={274} preload='auto' loop autoPlay muted playsInline={true}>
+              <Video key={displayedLenia?.id} preload='auto' loop autoPlay muted playsInline={true}>
                 <source src={`https://lenia.world/metadata/${displayedLenia?.id}.mp4`} type="video/mp4" />
                 <p>Couldn't load this Lenia, please use a better browser ;)</p>
               </Video>
             </VideoScreen>
             {displayedLenia ? (
               <RadarChartWrapper>
-                <RadarChart width={274} height={274} data={displayedLenia?.attributes} innerRadius={0} outerRadius="75%">
+                <RadarChart width={getRadarChartDimension()} height={getRadarChartDimension()} data={displayedLenia?.attributes} innerRadius={0} outerRadius="75%">
                   <PolarGrid />
                   <PolarAngleAxis dataKey="trait_type" />
                   <PolarRadiusAxis domain={[0, 1]} axisLine={false} tick={false} />
@@ -388,59 +452,64 @@ const LeniaDex = () => {
               </RadarChartWrapper>
             ) : <VideoScreen />}
             {displayedLenia?.id ? (
-              <TextScreen>
-                <Link href={`https://opensea.io/assets/0xe95004c7f061577df60e9e46c1e724cc75b01850/${displayedLenia?.id}`}>View on Opensea</Link>
-              </TextScreen>
+              <LinkScreen href={`https://opensea.io/assets/0xe95004c7f061577df60e9e46c1e724cc75b01850/${displayedLenia?.id}`}>
+                View on Opensea
+              </LinkScreen>
             ) : <EmptyTextScreen />}
           </LeniaPortrait>
-          <LeniaMap>
-            <ScatterResults>{filteredScatterData.length} results</ScatterResults>
-            <ResponsiveContainer width="100%" height="90%">
-              <ScatterChart
-                width={600}
-                height={600}
-                margin={{
-                  left: 0,
-                  bottom: 30,
-                  right: 20,
-                  top: 20,
-                }}
-              >
-                <CartesianGrid stroke="#ffffff" />
-                <XAxis type="number" dataKey={xAxis} stroke="#ffffff" domain={NUMERICAL_ATTRIBUTE_DOMAINS[xAxis]}>
-                  <Label position="bottom" fill="#ffffff">{xAxis.toUpperCase()}</Label>
-                </XAxis>
-                <YAxis type="number" dataKey={yAxis} stroke="#ffffff" domain={NUMERICAL_ATTRIBUTE_DOMAINS[yAxis]}>
-                  <Label offset={-15} angle={-90} position="left" fill="#ffffff">{yAxis.toUpperCase()}</Label>
-                </YAxis>
-                <Scatter key={scatterRenderKey} data={filteredScatterData} onMouseOver={handleDotMouseOver} onMouseLeave={handleDotMouseLeave} onClick={handleDotClick} shape={CustomScatterDot}>
-                  {filteredScatterData.map((entry) => (
-                    <Cell
-                      key={displayedLenia?.id}
-                      radius={entry?.id === hoveredDot || entry?.id === displayedLenia?.id ? 8 : 4}
-                      fill={entry?.id === displayedLenia?.id ? "#d33122" : "#fffde3"}
-                    />
-                  ))}
-                </Scatter>
-              </ScatterChart>
-            </ResponsiveContainer>
-            {(familyFilters.length > 0 || colormapFilters.length > 0) && (
-              <AppliedFilters>
-                {familyFilters.length > 0 && `Displayed Families: ${getDisplayedFiltersContent(familyFilters)}`}<br />
-                {colormapFilters.length > 0 && `Displayed Colormaps: ${getDisplayedFiltersContent(colormapFilters)}`}
-              </AppliedFilters>
-            )}
-            {leniaDexStatus === LENIADEX_STATUSES.LOADING && (
-              <OverlayWrapper>
-                Loading...
-              </OverlayWrapper>
-            )}
-            {leniaDexStatus === LENIADEX_STATUSES.LOADING_FAILURE && (
-              <OverlayWrapper>
-                My bad fellow Lenia lover, couldn't load the LeniaDEX for you
-              </OverlayWrapper>
-            )}
-          </LeniaMap>
+          {isAboveSm && (
+            <LeniaMap>
+              <ScatterResults>{filteredScatterData.length} results</ScatterResults>
+              <ResponsiveContainer width="100%" height="90%">
+                <ScatterChart
+                  width={600}
+                  height={600}
+                  margin={{
+                    left: 0,
+                    bottom: 30,
+                    right: 20,
+                    top: 20,
+                  }}
+                >
+                  <CartesianGrid stroke="#ffffff" />
+                  <XAxis type="number" dataKey={xAxis} stroke="#ffffff" domain={NUMERICAL_ATTRIBUTE_DOMAINS[xAxis]} tick={{fontSize: '0.9rem'}}>
+                    <Label position="bottom" fill="#ffffff">{xAxis.toUpperCase()}</Label>
+                  </XAxis>
+                  <YAxis type="number" dataKey={yAxis} stroke="#ffffff" domain={NUMERICAL_ATTRIBUTE_DOMAINS[yAxis]} tick={{fontSize: '0.9rem'}}>
+                    <Label offset={-15} angle={-90} position="left" fill="#ffffff">{yAxis.toUpperCase()}</Label>
+                  </YAxis>
+                  <Scatter key={scatterRenderKey} data={filteredScatterData} onMouseOver={handleDotMouseOver} onMouseLeave={handleDotMouseLeave} onClick={handleLeniaClick} shape={CustomScatterDot}>
+                    {filteredScatterData.map((entry) => (
+                      <Cell
+                        key={displayedLenia?.id}
+                        radius={entry?.id === hoveredDot || entry?.id === displayedLenia?.id ? 8 : 4}
+                        fill={entry?.id === displayedLenia?.id ? "#d33122" : "#fffde3"}
+                      />
+                    ))}
+                  </Scatter>
+                </ScatterChart>
+              </ResponsiveContainer>
+              {(familyFilters.length > 0 || colormapFilters.length > 0) && (
+                <AppliedFilters>
+                  {familyFilters.length > 0 && `Displayed Families: ${getDisplayedFiltersContent(familyFilters)}`}<br />
+                  {colormapFilters.length > 0 && `Displayed Colormaps: ${getDisplayedFiltersContent(colormapFilters)}`}
+                </AppliedFilters>
+              )}
+              {leniaDexStatus === LENIADEX_STATUSES.LOADING && (
+                <OverlayWrapper>
+                  Loading...
+                </OverlayWrapper>
+              )}
+              {leniaDexStatus === LENIADEX_STATUSES.LOADING_FAILURE && (
+                <OverlayWrapper>
+                  My bad fellow Lenia lover, couldn't load the LeniaDEX for you
+                </OverlayWrapper>
+              )}
+            </LeniaMap>
+          )}
+          {isUnderSm && (
+            <LeniaList items={filteredScatterData} onItemClick={handleLeniaClick} />
+          )}
         </Body>
       </Wrapper>
     </Section>

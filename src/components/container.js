@@ -3,7 +3,6 @@ import { gridGutterWidth, spaceWidth, createMediaQueries } from "../global-style
 
 // Define the maximum width of container for different screen sizes.
 const containerMaxWidths = {
-  sm: '95%',
   lg: `${spaceWidth * 12 * 10}px`,
 }
 

@@ -103,6 +103,7 @@ NavBar.Banner = styled.div`
 
 NavBar.Text = styled.div`
   color: #000000;
+  padding: 0 10px;
 `
 
 export default NavBar
