@@ -20,8 +20,6 @@ const BUFFER_COS_TABLE_IDX = 0;
 const BUFFER_SIN_TABLE_IDX = 1;
 const BUFFER_RBITS_TABLE_IDX = 2;
 
-const PRECISION: f32 = 1000000;
-
 // Trigonometric tables
 for (let i: u32 = 0; i < WORLD_SIZE / 2; i++) {
   let i_pi_2 = 2. * Math.PI * i;
@@ -184,19 +182,22 @@ function complexMatrixDot(
   outputIdxImag: u32
 ): void {
 
-  for (let i: u32 = 0; i < WORLD_SIZE; i++) {
-      for (let j: u32 = 0; j < WORLD_SIZE; j++) {
-        let x = j;
-        let y = i;
+  for (let y: u32 = 0; y < WORLD_SIZE; y++) {
+      for (let x: u32 = 0; x < WORLD_SIZE; x++) {
+        let ls_r = get(leftsideIdxReal, x, y);
+        let ls_i = get(leftsideIdxImag, x, y);
+        let rs_r = get(rightsideIdxReal, x, y);
+        let rs_i = get(rightsideIdxImag, x, y);
 
-        let a = get(leftsideIdxReal, x, y);
-        let b = get(leftsideIdxImag, x, y);
-        let c = get(rightsideIdxReal, x, y);
-        let d = get(rightsideIdxImag, x, y);
+        let t0 = ls_r * (rs_r + rs_i);
+        let t1 = rs_i * (ls_r + ls_i)
+        let t2 = rs_r * (ls_i - ls_r)
 
-        let t = a * (c + d);
-        set(outputIdxReal, x, y, t - d * (a + b));
-        set(outputIdxImag, x, y, t + c * (b - a));
+        let o_r = t0 - t1;
+        let o_i = t0 + t2;
+
+        set(outputIdxReal, x, y, o_r);
+        set(outputIdxImag, x, y, o_i);
       }
   }
 }
@@ -224,9 +225,4 @@ function growthFn(gf_id: u32, gf_m: f32, gf_s: f32, x: f32): f32 {
           return (x <= gf_s ? 1. : 0.) * 2. - 1.;
   }
   return 0.
-}
-
-
-export function round(x: f32): u32 {
-  return nearest(x * PRECISION / PRECISION) as u32;
 }
