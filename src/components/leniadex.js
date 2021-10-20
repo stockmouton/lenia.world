@@ -210,9 +210,12 @@ const CustomScatterDot = ({ cx, cy, radius, fill }) => {
   );
 };
 
-const audio = new Audio(CHANNEL_CHANGE);
-audio.volume = 0.05
-audio.playbackRate = 4
+const audio = typeof window !== 'undefined' ? new window.Audio(CHANNEL_CHANGE) : null;
+if (audio) {
+  audio.volume = 0.05
+  audio.playbackRate = 4
+}
+
 
 const LeniaDex = () => {
   const [leniaDexStatus, setLeniaDexStatus] = useState(LENIADEX_STATUSES.LOADING)

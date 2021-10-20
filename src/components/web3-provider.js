@@ -1,7 +1,6 @@
 import React, { createContext, useState, useEffect, useContext } from 'react'
 import Toast from './toast'
 import { getAllowedChainIds, getChainDisplayName, getDecimalFromHex, switchChainConnection} from '../utils/wallet'
-import { createAlchemyWeb3 } from "@alch/alchemy-web3";
 import { useQueryParam, StringParam } from "use-query-params";
 
 const ALCHEMY_RPC_URLS = {
@@ -10,6 +9,7 @@ const ALCHEMY_RPC_URLS = {
 }
 
 const Web3 = typeof window !== 'undefined' ? require('web3') : null;
+const createAlchemyWeb3 = typeof window !== 'undefined' ? require("@alch/alchemy-web3").createAlchemyWeb3 : null 
 const web3Context = createContext(null)
 
 export const Web3Provider = ({ children }) => {
