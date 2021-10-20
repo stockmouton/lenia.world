@@ -28,7 +28,7 @@
     let SCALE;
     let WORLD_SIZE = 1;
     let BUFFER_SIZE = 1;
-    let PIXEL = 1;
+    let PIXEL_SIZE = 1;
     let CANVAS_SIZE = 1;
 
     ///////////////////////////////
@@ -36,15 +36,17 @@
     ///////////////////////////////
     let exportsUpdateFn;
     function init(metadata, zoom=1, fps=30) {
-        setGlobals(metadata["config"]["world_params"]["scale"], zoom - 1);
+        zoom = parseInt(Math.min(Math.max(zoom - 1, 0), 5), 10);
+        PIXEL_SIZE = 1 << zoom;
+        
+        metadata["config"]["world_params"]["scale"] = parseInt(Math.min(Math.max(metadata["config"]["world_params"]["scale"], 1), 4), 10);
 
-        const memory = createWASMMemory()
+        const memory = createWASMMemory(metadata["config"]["world_params"]["scale"])
         const wasmConfig = {
             env: {
                 memory
             },
             engine: {  // Name of the file
-                WORLD_SIZE  : WORLD_SIZE,
                 GF_ID       : metadata["config"]["kernels_params"][0]["gf_id"],
                 GF_M        : metadata["config"]["kernels_params"][0]["m"],
                 GF_S        : metadata["config"]["kernels_params"][0]["s"],
@@ -61,7 +63,7 @@
                 exportsUpdateFn = exports.updateFn
                 let buffer = new Float32Array(memory.buffer);
 
-                initWithProgressiveScaling(metadata, buffer, exports)
+                initWithProgressiveScaling(buffer, metadata, exports)
 
                 update(buffer, fps);
                 render(buffer, metadata["attributes"])
@@ -73,40 +75,26 @@
             });
     }
 
-    function createWASMMemory(){
-        BUFFER_SIZE = WORLD_SIZE**2
-        nb_buffers = 9 + 1; // 9 image buffers + 1 table buffer
-        const byteSize = (BUFFER_SIZE * nb_buffers) << 2;
-        const nb_pages = ((byteSize + 0xffff) & ~0xffff) >>> 16;
-        // Shared memory does not work on Safari
-        // Shared memory are needed for workers
-        // but you need some fancy CORS configuration to make it work.
-        // Overall, it's probably better to look at GPU support.
-        return new WebAssembly.Memory({
-            initial: nb_pages,
-            // maximum: nb_pages,
-            // shared: true
-        });
-    }
-
-    function initWithProgressiveScaling(metadata, buffer, exports) {
+    function initWithProgressiveScaling(buffer, metadata, exports) {
         const config = metadata["config"]
 
         let R = config["world_params"]["R"];
 
+        SCALE = 1.
         let cellsSt = config["cells"];
         let initCells = decompressArray(cellsSt);
         let initDone = false
-        while (SCALE > 1 || !initDone) {
+        let scale = config["world_params"]["scale"]
+        while (scale > 1 || !initDone) {
             initDone = true
-            let currentScale = Math.min(SCALE, 2.)
-        
-            if (SCALE != 1) {
-                R = Math.round(R * currentScale);
-            }
+            let currentScale = Math.min(scale, 2.)
+
+            setGlobals(SCALE * currentScale)
+            exports.setWorldSize(WORLD_SIZE)
+
+            R = Math.round(R * currentScale);
             setKernel(buffer, exports.FFT2D, R, config["kernels_params"]);
 
-            console.log(R, initCells.shape)
             let x1 = Math.floor(WORLD_SIZE / 2 - (initCells.shape[2] / 2) * currentScale);
             let y1 = Math.floor(WORLD_SIZE / 2 - (initCells.shape[1] / 2) * currentScale);
             const angle = 0;
@@ -123,7 +111,7 @@
                 exportsUpdateFn()
             }
             initCells = crop(buffer)
-            SCALE /= currentScale
+            scale /= currentScale
         }
 
         INIT_CELLS = initCells
@@ -231,26 +219,6 @@
         return arr_data;
     }
 
-    function setGlobals(scale, zoom) {
-        zoom = parseInt(Math.min(Math.max(zoom, 0), 5), 10);
-        SCALE = parseInt(Math.min(Math.max(scale, 1), 4), 10);
-        let size_power2;
-        if (SCALE <= 1) {
-            size_power2 = 7;
-        } else if (SCALE <= 2) {
-            size_power2 = 8;
-        } else {
-            size_power2 = 9;
-        }
-        WORLD_SIZE = 1 << size_power2;
-        PIXEL = 1 << zoom;
-        CANVAS_SIZE = Math.round(WORLD_SIZE * PIXEL);
-
-        CANVAS_CELLS = InitCanvas(null, CANVAS_SIZE);
-        RENDERING_CANVAS = InitCanvas("RENDERING_CANVAS", CANVAS_SIZE * CANVAS_SCALING)
-        RENDERING_CANVAS.ctx.scale(CANVAS_SCALING, CANVAS_SCALING)
-    }
-
     function createDataArray(world_size) {
         let arr = Array(world_size);
         for (let i = 0; i < world_size; i++)
@@ -324,12 +292,12 @@
 
             if (ADD_LENIA) {
                 const x1 = Math.floor(
-                    INIT_CELLS_X / PIXEL - (INIT_CELLS.shape[2] / 2) / SCALE
+                    INIT_CELLS_X / PIXEL_SIZE - (INIT_CELLS.shape[2] / 2) / SCALE
                 );
                 const y1 = Math.floor(
-                    INIT_CELLS_Y / PIXEL - (INIT_CELLS.shape[1] / 2) / SCALE
+                    INIT_CELLS_Y / PIXEL_SIZE - (INIT_CELLS.shape[1] / 2) / SCALE
                 );
-                copyInitCells(buffer, INIT_CELLS, x1, y1, SCALE, 0);
+                copyInitCells(buffer, INIT_CELLS, x1, y1, 1, 0);
 
                 ADD_LENIA = false;
             }
@@ -360,9 +328,9 @@
         let p = 0;
         let rgba;
         for (let i = 0; i < CANVAS_SIZE; i++) {
-            let ii = Math.floor(i / PIXEL);
+            let ii = Math.floor(i / PIXEL_SIZE);
             for (let j = 0; j < CANVAS_SIZE; j++) {
-                let jj = Math.floor(j / PIXEL);
+                let jj = Math.floor(j / PIXEL_SIZE);
                 let outBufPos = BUFFER_CELLS_OUT_IDX * BUFFER_SIZE + ii * WORLD_SIZE + jj;
 
                 let v = buffer[outBufPos] * max_val;
@@ -485,6 +453,48 @@
     ///////////////////////////
     // Utils
     ///////////////////////////
+    function setGlobals(scale) {
+        SCALE = parseInt(Math.min(Math.max(scale, 1), 4), 10);
+        WORLD_SIZE = computeWorldSize(SCALE);
+        BUFFER_SIZE = WORLD_SIZE**2;
+        CANVAS_SIZE = Math.round(WORLD_SIZE * PIXEL_SIZE);
+
+        CANVAS_CELLS = InitCanvas(null, CANVAS_SIZE);
+        RENDERING_CANVAS = InitCanvas("RENDERING_CANVAS", CANVAS_SIZE * CANVAS_SCALING)
+        RENDERING_CANVAS.ctx.scale(CANVAS_SCALING, CANVAS_SCALING)
+    }
+
+    function createWASMMemory(scale){
+        const worldSize = computeWorldSize(scale)
+        const bufferSize = worldSize**2
+
+        const nb_buffers = 9 + 1; // 9 image buffers + 1 table buffer
+        const byteSize = (bufferSize * nb_buffers) << 2;
+        const nb_pages = ((byteSize + 0xffff) & ~0xffff) >>> 16;
+        // Shared memory does not work on Safari
+        // Shared memory are needed for workers
+        // but you need some fancy CORS configuration to make it work.
+        // Overall, it's probably better to look at GPU support.
+        return new WebAssembly.Memory({
+            initial: nb_pages,
+            // maximum: nb_pages,
+            // shared: true
+        });
+    }
+    
+    function computeWorldSize(scale) {
+        let size_power2;
+        if (scale <= 1) {
+            size_power2 = 7;
+        } else if (scale <= 2) {
+            size_power2 = 8;
+        } else {
+            size_power2 = 9;
+        }
+
+        return 1 << size_power2
+    }
+
     function ord(letter) {
         return letter.charCodeAt(0);
     }

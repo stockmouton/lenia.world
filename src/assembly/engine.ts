@@ -1,9 +1,10 @@
 // Configuration imported from JS
-declare const WORLD_SIZE: u32;
 declare const GF_ID: u32;
 declare const GF_M: f32;
 declare const GF_S: f32;
 declare const T: f32;
+
+let WORLD_SIZE: u32;
 
 const BUFFER_CELLS_IDX = 0;
 const BUFFER_CELLS_OLD_IDX = 1;
@@ -20,27 +21,6 @@ const BUFFER_COS_TABLE_IDX = 0;
 const BUFFER_SIN_TABLE_IDX = 1;
 const BUFFER_RBITS_TABLE_IDX = 2;
 
-// Trigonometric tables
-for (let i: u32 = 0; i < WORLD_SIZE / 2; i++) {
-  let i_pi_2 = 2. * Math.PI * i;
-  let cos: f32 = Math.cos(i_pi_2 / WORLD_SIZE) as f32;
-  let sin: f32 = Math.sin(i_pi_2 / WORLD_SIZE) as f32;
-  set(BUFFER_TABLES_IDX, i, BUFFER_COS_TABLE_IDX, cos);
-  set(BUFFER_TABLES_IDX, i, BUFFER_SIN_TABLE_IDX, sin);
-}
-
-let WORLD_SIZE_LOG_2: u32 = 0;
-for (let i: u32 = 0; i < 32; i++) {
-  if (1 << i == WORLD_SIZE){
-    WORLD_SIZE_LOG_2 = i;  
-  }
-}
-
-// reverse bits table
-for (let i: u32 = 0; i < WORLD_SIZE; i++) {
-  let rbitIdx = reverseBits(i, WORLD_SIZE_LOG_2) as f32;
-  set(BUFFER_TABLES_IDX, i, BUFFER_RBITS_TABLE_IDX, rbitIdx);
-}
 
 @inline
 function get(idx: u32, x: u32, y: u32): f32 {
@@ -225,4 +205,30 @@ function growthFn(gf_id: u32, gf_m: f32, gf_s: f32, x: f32): f32 {
           return (x <= gf_s ? 1. : 0.) * 2. - 1.;
   }
   return 0.
+}
+
+export function setWorldSize(worldSize: u32): void {
+  WORLD_SIZE = worldSize
+
+    // Trigonometric tables
+  for (let i: u32 = 0; i < WORLD_SIZE / 2; i++) {
+    let i_pi_2 = 2. * Math.PI * i;
+    let cos: f32 = Math.cos(i_pi_2 / WORLD_SIZE) as f32;
+    let sin: f32 = Math.sin(i_pi_2 / WORLD_SIZE) as f32;
+    set(BUFFER_TABLES_IDX, i, BUFFER_COS_TABLE_IDX, cos);
+    set(BUFFER_TABLES_IDX, i, BUFFER_SIN_TABLE_IDX, sin);
+  }
+
+  let WORLD_SIZE_LOG_2: u32 = 0;
+  for (let i: u32 = 0; i < 32; i++) {
+    if (1 << i == WORLD_SIZE){
+      WORLD_SIZE_LOG_2 = i;  
+    }
+  }
+
+  // reverse bits table
+  for (let i: u32 = 0; i < WORLD_SIZE; i++) {
+    let rbitIdx = reverseBits(i, WORLD_SIZE_LOG_2) as f32;
+    set(BUFFER_TABLES_IDX, i, BUFFER_RBITS_TABLE_IDX, rbitIdx);
+  }
 }
