@@ -5,14 +5,18 @@ import NavBar from "./navbar"
 import Dropdown from "./dropdown";
 import Menu from "./menu"
 import Toast from './toast'
-import { allowedChainIds, chainDisplayName } from '../utils/wallet'
- 
+import { getAllowedChainIds, getChainDisplayName } from '../utils/wallet'
+import { useQueryParam, StringParam } from "use-query-params";
 
 const WalletConnectorButton = () => {
-  const { resetWeb3Provider, account, chainId } = useWeb3()
+  const { resetWeb3Provider, account, chainId, provider } = useWeb3()
   const { web3Modal, openWeb3Modal } = useWeb3Modal()
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const [error, setError] = useState(null)
+  const [network] = useQueryParam("network", StringParam)
+
+  const allowedChainIds = getAllowedChainIds(network)
+  const chainDisplayName = getChainDisplayName(network)
 
   const handleDisconnect = async () => {
     try {

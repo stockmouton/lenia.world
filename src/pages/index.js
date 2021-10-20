@@ -44,6 +44,7 @@ const IndexPage = () => {
                 </Lead>
                 <SoldOutButton />
               </Jumbotron>
+              {isStaging && <LeniaDex />}
               <Section id="niftty-gritty">
                 <Section.Header><h1>N(i)FTty-gritty</h1></Section.Header>
                 <article>
@@ -76,7 +77,6 @@ const IndexPage = () => {
                   </ul>
                 </article>
               </Section>
-              {isStaging && <LeniaDex />}
               <Section id="why-though">
                 <Section.Header><h1>Why Though?</h1></Section.Header>
                 <article>

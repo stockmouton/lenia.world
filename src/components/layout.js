@@ -2,10 +2,11 @@ import React from "react"
 import PropTypes from "prop-types"
 import styled from "styled-components"
 import { StaticImage } from "gatsby-plugin-image"
-import MenuButton from "./menu-button"
+import MenuTrigger from "./menu-trigger"
 import 'sanitize.css';
 import GlobalStyles, {createMediaQuery, BREAKPOINTS} from "../global-styles";
 import NavBar from "./navbar";
+import NavMenu from "./nav-menu"
 import WalletConnectorButton from "./wallet-connector-button";
 import Footer from "./footer";
 import { EtherscanLogo, DiscordLogo, GithubLogo, OpenseaLogo, TwitterLogo } from "./brand-logo"
@@ -28,12 +29,27 @@ const BrandName = styled.span`
   ${createMediaQuery(BREAKPOINTS.md, 'display: inline')}
 `
 
+const MenuButtonText = styled.span`
+  display: none;
+
+  ${createMediaQuery(BREAKPOINTS.sm, 'display: inline')}
+`
+
+const NavBarWrapper = styled.nav`
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: 0;
+  z-index: 1030;
+  height: 27px;
+`
+
 const Layout = ({ children }) => {
   return (
     <>
       <GlobalStyles />
-      <NavBar>
-        <NavBar.Wrapper>
+      <NavBarWrapper>
+        <NavBar>
           <NavBar.Brand href="#home">
             <StaticImage
               src="../images/logo.png"
@@ -46,7 +62,9 @@ const Layout = ({ children }) => {
           </NavBar.Brand>
           <NavBar.List>
             <NavBar.Item.UnderSm>
-              <MenuButton />
+              <MenuTrigger menu={<NavMenu />}>
+                ☰ <MenuButtonText>Menu</MenuButtonText>
+              </MenuTrigger>
             </NavBar.Item.UnderSm>
             <NavBar.Item.AboveSm>
               <NavBar.Link href="https://twitter.com/lenia_nft">
@@ -82,8 +100,8 @@ const Layout = ({ children }) => {
               <WalletConnectorButton />
             </NavBar.Item>
           </NavBar.List>
-        </NavBar.Wrapper>
-      </NavBar>
+        </NavBar>
+      </NavBarWrapper>
         
       <Main id="home">{children}</Main>
       <Footer />

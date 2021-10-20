@@ -4,16 +4,7 @@ import Link from "./link"
 import Button from "./button"
 import { createMediaQuery, BREAKPOINTS, COLORS } from "../global-styles"
 
-const NavBar = styled.nav`
-  position: fixed;
-  top: 0;
-  right: 0;
-  left: 0;
-  z-index: 1030;
-  height: 27px;
-`
-
-NavBar.Wrapper = styled.div`
+const NavBar = styled.div`
   background: #bbbbbb;
   height: 100%;
 `
@@ -35,12 +26,18 @@ NavBar.Brand = styled(Link)`
 
 NavBar.List = styled.ul`
   position: relative;
-  right: 0;
   display: block;
-  float: left;
   margin: 0;
+  padding: 0;
   list-style: none;
   height: 100%;
+
+  ::after { 
+    content: " ";
+    display: block; 
+    height: 0; 
+    clear: both;
+  }
 `
 
 NavBar.Item = styled.li`
@@ -102,6 +99,11 @@ NavBar.Banner = styled.div`
   color: #ffffff;
   width: 100%;
   padding: 0 1rem;
+`
+
+NavBar.Text = styled.div`
+  color: #000000;
+  padding: 0 10px;
 `
 
 export default NavBar

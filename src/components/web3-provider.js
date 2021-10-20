@@ -1,8 +1,15 @@
 import React, { createContext, useState, useEffect, useContext } from 'react'
 import Toast from './toast'
-import { allowedChainIds, chainDisplayName, getDecimalFromHex, switchChainConnection} from '../utils/wallet'
+import { getAllowedChainIds, getChainDisplayName, getDecimalFromHex, switchChainConnection} from '../utils/wallet'
+import { useQueryParam, StringParam } from "use-query-params";
+
+const ALCHEMY_RPC_URLS = {
+  mainnet: `https://eth-mainnet.alchemyapi.io/v2/${process.env.MAINNET_ALCHEMY_API_KEY}`,
+  rinkeby: `https://eth-rinkeby.alchemyapi.io/v2/${process.env.RINKEBY_ALCHEMY_API_KEY}`
+}
 
 const Web3 = typeof window !== 'undefined' ? require('web3') : null;
+const createAlchemyWeb3 = typeof window !== 'undefined' ? require("@alch/alchemy-web3").createAlchemyWeb3 : null 
 const web3Context = createContext(null)
 
 export const Web3Provider = ({ children }) => {
@@ -11,7 +18,11 @@ export const Web3Provider = ({ children }) => {
   const [provider, setProvider] = useState(null)
   const [chainId, setChainId] = useState(null)
   const [error, setError] = useState(null)
+  const [network] = useQueryParam("network", StringParam)
 
+  const allowedChainIds = getAllowedChainIds(network)
+  const chainDisplayName = getChainDisplayName(network)
+  
   const initAccount = async (web3Provider, isFirstConnection = false) => {
     try {
       const accounts = await web3Provider.eth.getAccounts()
@@ -21,6 +32,17 @@ export const Web3Provider = ({ children }) => {
       setError(error)
     }
   }
+
+  // We cannot force a disconnect with providers in general, just clear the cache (they should be user-initiated)
+  // so we will pretend that users stay actually disconnected next time they come back on the page.
+  const markUserDisconnected = () =>
+    window.localStorage.setItem('isUserConnected', false)
+
+  const markUserConnected = () =>
+    window.localStorage.setItem('isUserConnected', true)
+
+  const isUserMarkedConnected = () => 
+    window.localStorage.getItem('isUserConnected') || false
 
   const initWeb3Provider = async provider => {
     try {
@@ -33,6 +55,8 @@ export const Web3Provider = ({ children }) => {
         return
       }
 
+      markUserConnected()
+
       setWeb3Provider(web3Provider)
       setProvider(provider)
       setChainId(newChainId)
@@ -40,7 +64,7 @@ export const Web3Provider = ({ children }) => {
 
       provider.on("accountsChanged", accounts => {
         if (accounts.length == 0) {
-          setError(new Error('There is no existing account present.'))
+          setError(new Error('You have been disconnected!'))
           resetWeb3()
           return;
         }
@@ -68,6 +92,8 @@ export const Web3Provider = ({ children }) => {
         setProvider(null)
       }
 
+      markUserDisconnected()
+
       setAccount('')
       setWeb3Provider(null)
     } catch (error) {
@@ -75,19 +101,37 @@ export const Web3Provider = ({ children }) => {
     }
   }
 
-  const checkExistingProvider = () => {
-    // Check if browser is running Metamask
-    let web3Provider
-    if (window.ethereum) {
-      initWeb3Provider(window.ethereum);
-    } else if (window.web3) {
-      initWeb3Provider(window.web3.currentProvider);
+  const initDefaultProvider = async () => {
+    let web3Provider = null
+    try {
+      web3Provider = createAlchemyWeb3(ALCHEMY_RPC_URLS[network] || ALCHEMY_RPC_URLS.mainnet)
+      const newChainId = await web3Provider.eth.getChainId()
+      setWeb3Provider(web3Provider)
+      setChainId(newChainId)
+    } catch(error) {
+      return
     }
+  }
+
+  const initExistingProvider = () => {
+    let isWalletConnected = false
+    if (isUserMarkedConnected()) {
+      // Check if browser is running Metamask
+      if (window.ethereum) {
+        initWeb3Provider(window.ethereum);
+        isWalletConnected = true
+      } else if (window.web3) {
+        initWeb3Provider(window.web3.currentProvider);
+        isWalletConnected = true
+      }
+    }
+    
+    if (!isWalletConnected) initDefaultProvider()
   };
 
   const handleToastClose = () => setError(null)
 
-  useEffect(checkExistingProvider, []);
+  useEffect(initExistingProvider, []);
 
   return (
     <>
