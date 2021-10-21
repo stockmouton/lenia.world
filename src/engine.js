@@ -292,10 +292,10 @@ window.leniaEngine.init = (WASMPath, WASMKey, metadata, zoom=1, fps=30) => {
 
             if (ADD_LENIA) {
                 const x1 = Math.floor(
-                    INIT_CELLS_X / PIXEL_SIZE - (INIT_CELLS.shape[2] / 2) / SCALE
+                    INIT_CELLS_X / PIXEL_SIZE - (INIT_CELLS.shape[2] / 2)
                 );
                 const y1 = Math.floor(
-                    INIT_CELLS_Y / PIXEL_SIZE - (INIT_CELLS.shape[1] / 2) / SCALE
+                    INIT_CELLS_Y / PIXEL_SIZE - (INIT_CELLS.shape[1] / 2)
                 );
                 copyInitCells(buffer, INIT_CELLS, x1, y1, 1, 0);
 
