@@ -43,17 +43,17 @@ window.leniaEngine.init = (WASMPath, WASMKey, metadata, zoom=1, fps=30) => {
         metadata["config"]["world_params"]["scale"] = parseInt(Math.min(Math.max(metadata["config"]["world_params"]["scale"], 1), 4), 10);
 
         const memory = createWASMMemory(metadata["config"]["world_params"]["scale"])
-        const wasmConfig = {
+        let wasmConfig = {
             env: {
                 memory
             },
-            'engine-simd': {  // Name of the file
-                GF_ID       : metadata["config"]["kernels_params"][0]["gf_id"],
-                GF_M        : metadata["config"]["kernels_params"][0]["m"],
-                GF_S        : metadata["config"]["kernels_params"][0]["s"],
-                T           : metadata["config"]["world_params"]["T"],
-            },
             Math
+        };
+        wasmConfig[WASMKey] = {  // Name of the file
+            GF_ID       : metadata["config"]["kernels_params"][0]["gf_id"],
+            GF_M        : metadata["config"]["kernels_params"][0]["m"],
+            GF_S        : metadata["config"]["kernels_params"][0]["s"],
+            T           : metadata["config"]["world_params"]["T"],
         };
         WebAssembly.instantiateStreaming(fetch(WASMPath), wasmConfig)
             .then( ({ instance }) => {
@@ -323,7 +323,7 @@ window.leniaEngine.init = (WASMPath, WASMKey, metadata, zoom=1, fps=30) => {
 
     function DrawArray(canvas, buffer, max_val, colorName) {
         const nb_colors = COLORS[colorName].length;
-        let buf = canvas.img.data;
+        let imgData = canvas.img.data;
 
         let p = 0;
         let rgba;
@@ -340,13 +340,13 @@ window.leniaEngine.init = (WASMPath, WASMKey, metadata, zoom=1, fps=30) => {
                 rgba = COLORS[colorName][c];
 
                 for (let n = 0; n < 3; n++) {
-                    buf[p++] = rgba[n];
+                    imgData[p++] = rgba[n];
                 }
-                buf[p++] = 255;
+                imgData[p++] = 255;
             }
         }
-
         canvas.ctx.putImageData(canvas.img, 0, 0);
+
         RENDERING_CANVAS.ctx.drawImage(canvas.can, 0, 0);
     }
 

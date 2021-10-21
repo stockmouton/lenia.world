@@ -69,20 +69,19 @@ export function updateFn(): void {
   // Change cells inplace
   applyKernel()
 
+  const GF_MSplat = v128.splat<f32>(GF_M)
+  const GF_SSplat = v128.splat<f32>(GF_S)
+  const TSplat = v128.splat<f32>(T)
   for (let y: u32 = 0; y < WORLD_SIZE; y++) {
-      for (let x: u32 = 0; x < WORLD_SIZE; x++) {
-          let p = get(BUFFER_POTENTIAL_REAL_IDX, x, y);
-          let g = growthFn(GF_ID, GF_M, GF_S, p);
-          let v = get(BUFFER_CELLS_OLD_IDX, x, y) + g / T;
+      for (let x: u32 = 0; x < WORLD_SIZE; x += 4) {
+          let p = getx4(BUFFER_POTENTIAL_REAL_IDX, x, y);
+          let g = growthFn(GF_ID, GF_MSplat, GF_SSplat, p);
+          let v = f32x4.add(getx4(BUFFER_CELLS_OLD_IDX, x, y),  f32x4.div(g, TSplat));
 
           // Clip
-          if (v < 0.) {
-            v = 0.;
-          } else if (v > 1.) {
-            v = 1.
-          };
+          v = f32x4.min(f32x4.max(v, v128.splat<f32>(0.)), v128.splat<f32>(1.))
 
-          set(BUFFER_CELLS_OUT_IDX, x, y, v)
+          setx4(BUFFER_CELLS_OUT_IDX, x, y, v)
       }
   }
 }
@@ -217,29 +216,21 @@ function complexMatrixDot(
   }
 }
 
-function growthFn(gf_id: u32, gf_m: f32, gf_s: f32, x: f32): f32 {
-  x = abs(x - gf_m) as f32;
-  x = x * x;
+function growthFn(gf_id: u32, gf_m: v128, gf_s: v128, x: v128): v128 {
+  x = f32x4.abs(f32x4.sub(x, gf_m));
+  x = f32x4.mul(x, x);
 
-  let s_2: f32;
-  let tmp: f32;
   switch (gf_id) {
       case 0:
-          s_2 = 9 * gf_s * gf_s;
-          tmp = (max(1. - x / s_2, 0) ** 4) as f32
-          return tmp * 2. - 1.;
-      case 1:
-          s_2 = 2 * gf_s * gf_s;
-          tmp = Math.exp(-x / s_2) as f32
-          return tmp * 2. - 1.;
-      case 2:
-          s_2 = 2. * gf_s * gf_s;
-          tmp = Math.exp(-x / s_2) as f32;
-          return tmp;
-      case 3:
-          return (x <= gf_s ? 1. : 0.) * 2. - 1.;
+        let gf_s_2 = f32x4.mul(gf_s, gf_s)
+        let d = f32x4.mul(v128.splat<f32>(9.), gf_s_2);
+        let out = f32x4.div(x, d)
+        out = f32x4.sub(v128.splat<f32>(1.), out)
+        out = f32x4.max(out, v128.splat<f32>(0.))
+        out = f32x4.mul(f32x4.mul(f32x4.mul(out, out), out), out)
+        return f32x4.sub(f32x4.mul(out, v128.splat<f32>(2.)), v128.splat<f32>(1.));
   }
-  return 0.
+  return v128.splat<f32>(0.)
 }
 
 export function setWorldSize(worldSize: u32): void {
