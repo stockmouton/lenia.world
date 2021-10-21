@@ -27,6 +27,20 @@
         "shrinkLevel": 0,
         "converge": false,
         "noAssert": true
+      },
+      "release-simd": {
+        "binaryFile": "static/optimized-simd.wasm",
+        "textFile": "build/optimized-simd.wat",
+        "runtime": "stub",
+        "importMemory": true,
+        "enable": ["simd"],
+        "use": ["Math=JSMath"],
+        "sourceMap": true,
+        "debug": false,
+        "optimizeLevel": 3,
+        "shrinkLevel": 0,
+        "converge": false,
+        "noAssert": true
       }
     },
     "options": {}
