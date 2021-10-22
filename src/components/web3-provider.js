@@ -35,14 +35,16 @@ export const Web3Provider = ({ children }) => {
 
   // We cannot force a disconnect with providers in general, just clear the cache (they should be user-initiated)
   // so we will pretend that users stay actually disconnected next time they come back on the page.
-  const markUserDisconnected = () =>
+  const markUserDisconnected = () => {
     window.localStorage.setItem('isUserConnected', false)
+  }
 
-  const markUserConnected = () =>
+  const markUserConnected = () =>{
     window.localStorage.setItem('isUserConnected', true)
+  }
 
   const isUserMarkedConnected = () => 
-    window.localStorage.getItem('isUserConnected') || false
+    window.localStorage.getItem('isUserConnected') == "true"
 
   const initWeb3Provider = async provider => {
     try {
@@ -64,8 +66,8 @@ export const Web3Provider = ({ children }) => {
 
       provider.on("accountsChanged", accounts => {
         if (accounts.length == 0) {
+          resetWeb3Provider()
           setError(new Error('You have been disconnected!'))
-          resetWeb3()
           return;
         }
         setAccount(accounts[0])
