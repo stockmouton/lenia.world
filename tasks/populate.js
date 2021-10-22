@@ -1,5 +1,6 @@
 const UglifyJS = require("uglify-js");
 const fs = require('fs');
+const path = require('path');
 const pako = require('pako');
 const prompt = require('prompt');
 
@@ -14,17 +15,31 @@ task("set-engine", "Set the engine in the smart contract")
         'should the data be stored on the log',
         types.bool
     ).addOptionalParam(
-        'enginePath',
+        'jsenginePath',
         'The path to the engine JS code',
         'src/engine.js',
         types.string,
-    ).setAction( async ({ onlog, enginePath }, hre) => {
+    ).addOptionalParam(
+        'wasmSourcePath',
+        'The path to the WASM core code',
+        'static/optimized.wasm',
+        types.string,
+    ).addOptionalParam(
+        'wasmSimdSourcePath',
+        'The path to the WASM SIMD core code',
+        'static/optimized-simd.wasm',
+        types.string,
+    ).setAction( async ({ onlog, jsenginePath, wasmSourcePath, wasmSimdSourcePath }, hre) => {
         if (hre.hardhatArguments.network == null) {
             throw new Error('Please add the missing --network <localhost|rinkeby|mainnet> argument')
         }
 
         onlog = !!onlog
         console.log(`we are about to push data inside the ${onlog ? 'chain logs' : 'chain directly'}`)
+        console.log('Paths:');
+        console.log(`   - ${jsenginePath}`);
+        console.log(`   - ${wasmSourcePath}`);
+        console.log(`   - ${wasmSimdSourcePath}`);
         console.log('Is this ok? [y/N]')
         const { ok } = await prompt.get(['ok']);
         if (ok !== 'y') {
@@ -41,16 +56,21 @@ task("set-engine", "Set the engine in the smart contract")
         const LeniaDeployment = await hre.deployments.get('Lenia')
         const lenia = LeniaContractFactory.attach(LeniaDeployment.address)
         
-        const engineFullpath = rootFolder + '/' + enginePath;
-        const engineCode = fs.readFileSync(engineFullpath, 'utf-8')
-        const result = UglifyJS.minify([engineCode]);
-        const gzipEngine = pako.deflate(result.code);
+        const engineCode = fs.readFileSync(path.join(rootFolder, jsenginePath), 'utf-8')
+        const engineCodeMinified = UglifyJS.minify([engineCode]).code;
+
+        const wasmSource = fs.readFileSync(path.join(rootFolder, wasmSourcePath), 'utf-8')
+        const wasmSimdSource = fs.readFileSync(path.join(rootFolder, wasmSimdSourcePath), 'utf-8')
+
+        const finalString = [wasmSource, wasmSimdSource, engineCodeMinified].join("%%")
+
+        const gzipFullEngine = pako.deflate(finalString);
         
         if (onlog === true) {
-            const logEngineTx = await lenia.logEngine(gzipEngine)
+            const logEngineTx = await lenia.logEngine(gzipFullEngine)
             await lenia.setEngine(logEngineTx.hash)
         } else {
-            await lenia.setEngine(gzipEngine)
+            await lenia.setEngine(gzipFullEngine)
         }
     
         const contractEngine = await lenia.getEngine();
