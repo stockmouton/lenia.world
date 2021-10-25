@@ -41,7 +41,7 @@ module.exports = {
       accounts: allPrivateKeys
     },
     rinkeby: {
-      url: `https://eth-rinkeby.alchemyapi.io/v2/${process.env.ALCHEMY_API_KEY}`,
+      url: `https://eth-rinkeby.alchemyapi.io/v2/${process.env.RINKEBY_ALCHEMY_API_KEY}`,
       accounts: [process.env.DAO_PK, process.env.ADMIN1_PK, process.env.ADMIN2_PK, process.env.ADMIN3_PK]
     },
     mainnet: {
