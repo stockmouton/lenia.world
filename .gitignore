@@ -38,8 +38,8 @@ public
 
 # Hardhat related
 artifacts/
+!src/artifacts
 cache/
-src/artifacts.json
 deployments/localhost/
 
 # Lenia related

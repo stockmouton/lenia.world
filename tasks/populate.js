@@ -1,11 +1,11 @@
 const UglifyJS = require("uglify-js");
 const fs = require('fs');
+const path = require('path');
 const pako = require('pako');
 const prompt = require('prompt');
 
 const { decodeContractMetdata, attrsMap, traitTypeAttrsMap } = require('../test/utils')
 const leniaUtils = require('../src/utils/sm');
-const { bool } = require("prop-types");
 const rootFolder = __dirname + '/..'
 
 task("set-engine", "Set the engine in the smart contract")
@@ -14,17 +14,31 @@ task("set-engine", "Set the engine in the smart contract")
         'should the data be stored on the log',
         types.bool
     ).addOptionalParam(
-        'enginePath',
+        'jsenginePath',
         'The path to the engine JS code',
         'src/engine.js',
         types.string,
-    ).setAction( async ({ onlog, enginePath }, hre) => {
+    ).addOptionalParam(
+        'wasmSourcePath',
+        'The path to the WASM core code',
+        'static/optimized.wasm',
+        types.string,
+    ).addOptionalParam(
+        'wasmSimdSourcePath',
+        'The path to the WASM SIMD core code',
+        'static/optimized-simd.wasm',
+        types.string,
+    ).setAction( async ({ onlog, jsenginePath, wasmSourcePath, wasmSimdSourcePath }, hre) => {
         if (hre.hardhatArguments.network == null) {
             throw new Error('Please add the missing --network <localhost|rinkeby|mainnet> argument')
         }
 
         onlog = !!onlog
         console.log(`we are about to push data inside the ${onlog ? 'chain logs' : 'chain directly'}`)
+        console.log('Paths:');
+        console.log(`   - ${jsenginePath}`);
+        console.log(`   - ${wasmSourcePath}`);
+        console.log(`   - ${wasmSimdSourcePath}`);
         console.log('Is this ok? [y/N]')
         const { ok } = await prompt.get(['ok']);
         if (ok !== 'y') {
@@ -41,16 +55,13 @@ task("set-engine", "Set the engine in the smart contract")
         const LeniaDeployment = await hre.deployments.get('Lenia')
         const lenia = LeniaContractFactory.attach(LeniaDeployment.address)
         
-        const engineFullpath = rootFolder + '/' + enginePath;
-        const engineCode = fs.readFileSync(engineFullpath, 'utf-8')
-        const result = UglifyJS.minify([engineCode]);
-        const gzipEngine = pako.deflate(result.code);
-        
+        const gzipFullEngine = compressAllEngineCode(rootFolder, jsenginePath, wasmSourcePath, wasmSimdSourcePath)
         if (onlog === true) {
-            const logEngineTx = await lenia.logEngine(gzipEngine)
+            const logEngineTx = await lenia.logEngine(gzipFullEngine)
+            await logEngineTx.wait()
             await lenia.setEngine(logEngineTx.hash)
         } else {
-            await lenia.setEngine(gzipEngine)
+            await lenia.setEngine(gzipFullEngine)
         }
     
         const contractEngine = await lenia.getEngine();
@@ -75,8 +86,39 @@ task("get-engine", "Set the engine in the smart contract",  async (taskArgs, hre
     const LeniaDeployment = await hre.deployments.get('Lenia')
     const lenia = LeniaContractFactory.attach(LeniaDeployment.address)
     
-    const contractEngine = await leniaUtils.getEngineCode(hre.ethers.provider, lenia)
-    console.log(contractEngine)
+    const files = await leniaUtils.getEngineCode(hre.ethers.provider, lenia)
+
+    const WASMSource = files[0]
+    const WASMSimdSource = files[1]
+    const engineCodeMinified = files[2].toString('utf-8')
+
+    let wasmConfig = {
+        env: {
+            'memory': new WebAssembly.Memory({initial: 10})
+        },
+        engine:{  // Name of the file
+            GF_ID       : 0,
+            GF_M        : 1.,
+            GF_S        : 1.,
+            T           : 10,
+        },
+        Math
+    };
+    await WebAssembly.instantiate(WASMSource, wasmConfig)
+    wasmConfig = {
+        env: {
+            'memory': new WebAssembly.Memory({initial: 10})
+        },
+        'engine-simd':{  // Name of the file
+            GF_ID       : 0,
+            GF_M        : 1.,
+            GF_S        : 1.,
+            T           : 10,
+        },
+        Math
+    };
+    await WebAssembly.instantiate(WASMSimdSource, wasmConfig)
+    console.log(engineCodeMinified)
 })
 
 task("set-leniaparams", "Set all metadata in the contract")
@@ -87,7 +129,7 @@ task("set-leniaparams", "Set all metadata in the contract")
     ).addOptionalParam(
         'metadataPath',
         'The path to the metadata containing the cells',
-        'metadata/fake/all_metadata.json',
+        'static/metadata/all_metadata.json',
         types.string,
     ).setAction( async ({ onlog, metadataPath }, hre ) => {
         if (hre.hardhatArguments.network == null) {
@@ -119,19 +161,22 @@ task("set-leniaparams", "Set all metadata in the contract")
             let element = metadata[index];
             const m = element.config.kernels_params[0].m.toFixed(9)
             const s = element.config.kernels_params[0].s.toFixed(9)
-            const gzipCells = pako.deflate(element.config.cells);
-            
+
+            // Because of a bug in the code, we need to hack ourselves to push all the lenia metadata on chain.
+            // Instead of storing the cells, we just store the full JSON here
+            // const gzipCells = pako.deflate(element.config.cells);
+            const fullmetadataGZIP = pako.deflate(JSON.stringify(element));
+            let setLeniaParamsTx;
             if (onlog === true) {
                 const logLeniaParamsTx = await lenia.logLeniaParams(
-                    m, s, gzipCells
+                    m, s, fullmetadataGZIP
                 )
-                await lenia.setLeniaParams(index, "", "", logLeniaParamsTx.hash)
+                await logLeniaParamsTx.wait()
+                setLeniaParamsTx = await lenia.setLeniaParams(index, "", "", logLeniaParamsTx.hash)
             } else {
-                await lenia.setLeniaParams(
-                    index, m, s, gzipCells
-                )
+                setLeniaParamsTx = await lenia.setLeniaParams(index, m, s, fullmetadataGZIP)
             }
-            
+            await setLeniaParamsTx.wait()
         }
         console.log('done!')
     })
@@ -244,25 +289,40 @@ task("get-metadata", "Get a Lenia metadata")
     })
 
 task("populate-all", "Full populate the contract")
-    .addOptionalParam(
-        'enginePath',
+    .addParam(
+        'onlog',
+        'should the data be stored on the log',
+        types.bool
+    ).addOptionalParam(
+        'jsenginePath',
         'The path to the engine JS code',
         'src/engine.js',
+        types.string,
+    ).addOptionalParam(
+        'wasmSourcePath',
+        'The path to the WASM core code',
+        'static/optimized.wasm',
+        types.string,
+    ).addOptionalParam(
+        'wasmSimdSourcePath',
+        'The path to the WASM SIMD core code',
+        'static/optimized-simd.wasm',
         types.string,
     )
     .addOptionalParam(
         'metadataPath',
         'The path to the metadata containing the cells',
-        'metadata/fake/all_metadata.json',
+        'static/metadata/all_metadata.json',
         types.string,
     )
-    .setAction( async ( {enginePath, metadataPath}, hre ) => {
+    .setAction( async ( {onlog, jsenginePath, wasmSourcePath, wasmSimdSourcePath, metadataPath}, hre ) => {
         if (hre.hardhatArguments.network == null) {
             throw new Error('Please add the missing --network <localhost> argument')
         }
-        if(hre.hardhatArguments.network != 'localhost') {
-            throw new Error('This task only work for localhost')
+        if(hre.hardhatArguments.network != 'localhost' && hre.hardhatArguments.network != 'rinkeby') {
+            throw new Error('This task only work for localhost or Rinkeby testnet')
         }
+        onlog = !!onlog
         const accounts = await hre.ethers.getSigners()
 
         const LeniaDescriptorLibraryDeployment = await hre.deployments.get('LeniaDescriptor')
@@ -275,12 +335,18 @@ task("populate-all", "Full populate the contract")
         const LeniaDeployment = await hre.deployments.get('Lenia')
         const lenia = LeniaContractFactory.attach(LeniaDeployment.address)
         
-        const engineFullpath = rootFolder + '/' + enginePath;
+        const engineFullpath = path.join(rootFolder, jsenginePath)
         console.log(`Setting the engine at ${engineFullpath}`)
-        const engineCode = fs.readFileSync(engineFullpath, 'utf-8')
-        const result = UglifyJS.minify([engineCode]);
-        const gzipEngine = pako.deflate(result.code);
-        await lenia.setEngine(gzipEngine)
+        const gzipFullEngine = compressAllEngineCode(rootFolder, jsenginePath, wasmSourcePath, wasmSimdSourcePath)
+        let engineTx;
+        if (onlog === true) {
+            const logEngineTx = await lenia.logEngine(gzipFullEngine)
+            await logEngineTx.wait()
+            engineTx = await lenia.setEngine(logEngineTx.hash)
+        } else {
+            engineTx = await lenia.setEngine(gzipFullEngine)
+        }
+        engineTx.wait()
         console.log('Setting the engine: Done')
 
         const metadataFullpath = rootFolder + '/' + metadataPath
@@ -290,9 +356,20 @@ task("populate-all", "Full populate the contract")
             let element = metadata[index];
             const m = element.config.kernels_params[0].m.toFixed(9)
             const s = element.config.kernels_params[0].s.toFixed(9)
-            const gzipCells = pako.deflate(element.config.cells);
-
-            await lenia.setLeniaParams(index, m, s, gzipCells);
+            const fullmetadataGZIP = pako.deflate(JSON.stringify(element));
+            let metadataTx;
+            if (onlog === true) {
+                const logLeniaParamsTx = await lenia.logLeniaParams(
+                    m, s, fullmetadataGZIP
+                )
+                await logLeniaParamsTx.wait()
+                metadataTx = await lenia.setLeniaParams(index, "", "", logLeniaParamsTx.hash)
+            } else {
+                metadataTx = await lenia.setLeniaParams(
+                    index, m, s, fullmetadataGZIP
+                )
+            }
+            await metadataTx.wait()
         }
         console.log('Setting all lenia Parameters: Done')
 
@@ -300,6 +377,7 @@ task("populate-all", "Full populate the contract")
         if (!isSaleActive) {
             console.log('Starting sales')
             const setSaleStartTx = await lenia.toggleSaleStatus();
+            await setSaleStartTx.wait()
             isSaleActive = await lenia.isSaleActive()
             if (!isSaleActive) {
                 throw new Error('Sale did not activate')
@@ -309,6 +387,7 @@ task("populate-all", "Full populate the contract")
         
         console.log('Claiming Reserved')
         const claimReservedTx = await lenia.claimReserved(11, accounts[0].address);
+        await claimReservedTx.wait()
         console.log('Claiming Reserved: Done')
 
         console.log('Minting everything')
@@ -317,11 +396,38 @@ task("populate-all", "Full populate the contract")
         const contractPrice = await lenia.getPrice()
         console.log(maxSupply, totalSupply);
         for (let index = 0; index < maxSupply - totalSupply; index++) {
-            await lenia.mint({
+            const mintTx = await lenia.mint({
                 value: contractPrice
             })
+            await mintTx.wait()
         }
         console.log('Minting Everything: Done')
 
         console.log('if you want assets to be update, you need to launch the reveal script now.');
     })
+
+
+
+function compressAllEngineCode(rootFolder, jsenginePath, wasmSourcePath, wasmSimdSourcePath) {
+    const engineCode = fs.readFileSync(path.join(rootFolder, jsenginePath), 'utf-8')
+    const engineCodeMinified = UglifyJS.minify([engineCode]).code;
+    const engineCodeMinifiedBuffer = Buffer.from(engineCodeMinified)
+    const wasmSource = fs.readFileSync(path.join(rootFolder, wasmSourcePath))
+    const wasmSimdSource = fs.readFileSync(path.join(rootFolder, wasmSimdSourcePath))
+    
+    const metadataBuffer = Buffer.allocUnsafe(4 * 4);
+    metadataBuffer.writeUInt32LE(3, 0)
+    metadataBuffer.writeUInt32LE(wasmSource.length, 4)
+    metadataBuffer.writeUInt32LE(wasmSimdSource.length, 8)
+    metadataBuffer.writeUInt32LE(engineCodeMinifiedBuffer.length, 12)
+
+    const finalBuffer = Buffer.concat([
+        metadataBuffer,
+        wasmSource, 
+        wasmSimdSource, 
+        engineCodeMinifiedBuffer
+    ])
+    const gzipFullEngine = pako.deflate(finalBuffer);
+
+    return gzipFullEngine
+}

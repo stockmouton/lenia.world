@@ -1,5 +1,5 @@
 window.leniaEngine = {}
-window.leniaEngine.init = (WASMPath, WASMKey, metadata, zoom=1, fps=30) => {
+window.leniaEngine.init = (WASMSource, WASMKey, metadata, zoom=1, fps=30) => {
     // Most problematic functions: FFT1D, transpose2D, complexMatrixDot
     // Those are problematic because they are called all the time
 
@@ -55,7 +55,8 @@ window.leniaEngine.init = (WASMPath, WASMKey, metadata, zoom=1, fps=30) => {
             GF_S        : metadata["config"]["kernels_params"][0]["s"],
             T           : metadata["config"]["world_params"]["T"],
         };
-        WebAssembly.instantiateStreaming(fetch(WASMPath), wasmConfig)
+        // const module = WebAssembly.compile(WASMSource)
+        WebAssembly.instantiate(WASMSource, wasmConfig)
             .then( ({ instance }) => {
                 exports = instance.exports
 

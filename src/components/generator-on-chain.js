@@ -1,56 +1,79 @@
 import React, { useRef, useEffect, useState } from "react"
-const axios = require('axios');
+import styled from "styled-components"
+import { simd } from 'wasm-feature-detect';
 
-import artifacts from '../artifacts.json'
+import Toast from './toast'
+import { useLeniaContract } from './lenia-contract-provider'
 import { useWeb3 } from "./web3-provider"
-import { getEngineCode } from "../utils/sm"
+import { getEngineCode, getLeniaParameters } from "../utils/sm"
 
-const GeneratorOnChain = ({ fps, scale, lenia_id }) => {
+const StyledDiv = styled.div`
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+`
+
+const GeneratorOnChain = ({ zoom, fps, scale, lenia_id }) => {
     const nodeRef = useRef(null);
 
     const { web3Provider, account } = useWeb3()
-    const [contract, setContract] = useState(null)
+    const { contract } = useLeniaContract()
+    const [ error, setError ] = useState(null)
+
+    let updated = useRef(false);
+    let contractSet = useRef(false);
 
     useEffect(async () => {
-        const contract = web3Provider ? new web3Provider.eth.Contract(artifacts.contracts.Lenia.abi, artifacts.contracts.Lenia.address) : null
-        
-        if (contract) {
-            setContract(contract)
+        if (!updated.current) {
+            updated.current = true
+            return
+        }
+        if (!web3Provider || !account) {
+            setError(new Error("You must connect your account on the homepage before being able to use the generator on chain"))
+            return
+        }
 
-            const totalLeniaMinted = await contract.methods.totalSupply().call({ from: account })
-            if (lenia_id > totalLeniaMinted) {
-                lenia_id = 0;
+        if (contract) {
+            if (contractSet.current) {
+                return
+            } else {
+                contractSet.current = true
             }
-            
-            const response = await axios.get(`metadata/${lenia_id}.json`);
-            const leniaMetadata = response.data
-            leniaMetadata["config"]["world_params"]["scale"] = scale
-            // const engine = getEngineCode(web3Provider, contract, account)
-            // const lenia_metadata_json = await contract.methods.getMetadata(lenia_id).call({ from: account })
-            // const lenia_cells = await contract.methods.getLeniaCells(lenia_id).call({ from: account })
-            // const lenia_metadata = JSON.parse(lenia_metadata_json)
-            // lenia_metadata["config"]["cells"] = lenia_cells
-            
-            const engine = getEngineCode(web3Provider, contract, account)
+
+            lenia_id = Math.max(Math.min(lenia_id, 201), 0)                
+
+            const hasSIMD = await simd();
+            const WASMKey = hasSIMD
+                ? 'engine-simd'
+                : 'engine'
+            const [WASMSource, WASMSIMDSource, engineBytes] = await getEngineCode(web3Provider, contract)
+            const WASMByteCode = hasSIMD ? WASMSIMDSource : WASMSource
+            const engine = engineBytes.toString('utf-8')
             if (typeof engine === 'string' && engine.length > 0) {
                 var script = document.createElement('script');
                 script.innerHTML = engine
                 document.body.appendChild(script);
             }
 
-            window.leniaEngine.init(leniaMetadata);
-            window.leniaEngine.run(fps);
+            const leniaMetadata = await getLeniaParameters(web3Provider, contract, lenia_id)
+            leniaMetadata["config"]["world_params"]["scale"] = scale
+            
+            window.leniaEngine.init(WASMByteCode, WASMKey, leniaMetadata, zoom, fps);
         }
-    }, [web3Provider, account])
+    }, [web3Provider, contract])
     
+    const handleToastClose = () => {
+        setError(null)
+    }
 
     return (
-        <div ref={nodeRef}>
-            <canvas id="CANVAS_CELLS"></canvas>
-            <canvas id="CANVAS_FIELD"></canvas>
-            <canvas id="CANVAS_POTENTIAL"></canvas>
-            <canvas id="CANVAS_HIDDEN" style={{'display': 'none'}}></canvas>
-        </div>
+        <>
+            <StyledDiv ref={nodeRef}>
+                <canvas id="RENDERING_CANVAS"></canvas>
+            </StyledDiv>
+            {error && <Toast type="error" onClose={handleToastClose}>{error?.message}</Toast>}
+        </>
     )
 }
 

@@ -1,6 +1,9 @@
 import React, { createContext, useState, useContext, useEffect } from 'react'
+import { useQueryParam, StringParam } from "use-query-params";
 import { useWeb3 } from "./web3-provider"
-import artifacts from '../artifacts.json'
+import artifactsMain from '../artifacts/main.json'
+import artifactsRinkeby from '../artifacts/rinkeby.json'
+import artifactsLocalhost from '../artifacts/localhost.json'
 
 const leniaContractContext = createContext(null)
 
@@ -10,6 +13,11 @@ export const SALE_STATUSES = {
   PUBLIC: 'PUBLIC',
 }
 
+const getArtifacts = function(network) {
+  if (process?.env.NODE_ENV === 'production' && network === 'rinkeby') return artifactsRinkeby
+  if (process?.env.NODE_ENV === 'production') return artifactsMain
+  return artifactsLocalhost
+}
 const getSaleStatus = (isPresaleActive, isSaleActive) => {
   if (isSaleActive) return SALE_STATUSES.PUBLIC
   if (isPresaleActive) return SALE_STATUSES.PRESALE
@@ -23,12 +31,16 @@ export const LeniaContractProvider = ({ children }) => {
   const [totalLeniaMinted, setTotalLeniaMinted] = useState(0)
   const [saleStatus, setSaleStatus] = useState(SALE_STATUSES.NOT_STARTED)
   const [isEligibleForPresale, setIsEligibleForPresale] = useState(false)
+
+  const [network] = useQueryParam("network", StringParam)
   
   const initContract = () => {
     try {
+      const artifacts = getArtifacts(network)
       const contract = web3Provider ? new web3Provider.eth.Contract(artifacts.contracts.Lenia.abi, artifacts.contracts.Lenia.address) : null
       setContract(contract)
     } catch(error) {
+      console.log(error)
       // Contract is not deployed or the wrong artifact is being imported
     }
   }
