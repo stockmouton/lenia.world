@@ -58,13 +58,23 @@ task("set-engine", "Set the engine in the smart contract")
         
         const engineCode = fs.readFileSync(path.join(rootFolder, jsenginePath), 'utf-8')
         const engineCodeMinified = UglifyJS.minify([engineCode]).code;
-
-        const wasmSource = fs.readFileSync(path.join(rootFolder, wasmSourcePath), 'utf-8')
-        const wasmSimdSource = fs.readFileSync(path.join(rootFolder, wasmSimdSourcePath), 'utf-8')
-
-        const finalString = [wasmSource, wasmSimdSource, engineCodeMinified].join("%%")
-
-        const gzipFullEngine = pako.deflate(finalString);
+        const engineCodeMinifiedBuffer = Buffer.from(engineCodeMinified)
+        const wasmSource = fs.readFileSync(path.join(rootFolder, wasmSourcePath))
+        const wasmSimdSource = fs.readFileSync(path.join(rootFolder, wasmSimdSourcePath))
+        
+        const metadataBuffer = Buffer.allocUnsafe(4 * 4);
+        metadataBuffer.writeUInt32LE(3, 0)
+        metadataBuffer.writeUInt32LE(wasmSource.length, 4)
+        metadataBuffer.writeUInt32LE(wasmSimdSource.length, 8)
+        metadataBuffer.writeUInt32LE(engineCodeMinifiedBuffer.length, 12)
+        console.log(engineCodeMinified)
+        const finalBuffer = Buffer.concat([
+            metadataBuffer,
+            wasmSource, 
+            wasmSimdSource, 
+            engineCodeMinifiedBuffer
+        ])
+        const gzipFullEngine = pako.deflate(finalBuffer);
         
         if (onlog === true) {
             const logEngineTx = await lenia.logEngine(gzipFullEngine)
@@ -95,8 +105,39 @@ task("get-engine", "Set the engine in the smart contract",  async (taskArgs, hre
     const LeniaDeployment = await hre.deployments.get('Lenia')
     const lenia = LeniaContractFactory.attach(LeniaDeployment.address)
     
-    const contractEngine = await leniaUtils.getEngineCode(hre.ethers.provider, lenia)
-    console.log(contractEngine)
+    const files = await leniaUtils.getEngineCode(hre.ethers.provider, lenia)
+
+    const WASMSource = files[0]
+    const WASMSimdSource = files[1]
+    const engineCodeMinified = files[2].toString('utf-8')
+
+    let wasmConfig = {
+        env: {
+            'memory': new WebAssembly.Memory({initial: 10})
+        },
+        engine:{  // Name of the file
+            GF_ID       : 0,
+            GF_M        : 1.,
+            GF_S        : 1.,
+            T           : 10,
+        },
+        Math
+    };
+    await WebAssembly.instantiate(WASMSource, wasmConfig)
+    wasmConfig = {
+        env: {
+            'memory': new WebAssembly.Memory({initial: 10})
+        },
+        'engine-simd':{  // Name of the file
+            GF_ID       : 0,
+            GF_M        : 1.,
+            GF_S        : 1.,
+            T           : 10,
+        },
+        Math
+    };
+    await WebAssembly.instantiate(WASMSimdSource, wasmConfig)
+    console.log(engineCodeMinified)
 })
 
 task("set-leniaparams", "Set all metadata in the contract")
@@ -107,7 +148,7 @@ task("set-leniaparams", "Set all metadata in the contract")
     ).addOptionalParam(
         'metadataPath',
         'The path to the metadata containing the cells',
-        'metadata/fake/all_metadata.json',
+        'static/metadata/all_metadata.json',
         types.string,
     ).setAction( async ({ onlog, metadataPath }, hre ) => {
         if (hre.hardhatArguments.network == null) {
@@ -265,18 +306,28 @@ task("get-metadata", "Get a Lenia metadata")
 
 task("populate-all", "Full populate the contract")
     .addOptionalParam(
-        'enginePath',
+        'jsenginePath',
         'The path to the engine JS code',
         'src/engine.js',
+        types.string,
+    ).addOptionalParam(
+        'wasmSourcePath',
+        'The path to the WASM core code',
+        'static/optimized.wasm',
+        types.string,
+    ).addOptionalParam(
+        'wasmSimdSourcePath',
+        'The path to the WASM SIMD core code',
+        'static/optimized-simd.wasm',
         types.string,
     )
     .addOptionalParam(
         'metadataPath',
         'The path to the metadata containing the cells',
-        'metadata/fake/all_metadata.json',
+        'static/metadata/all_metadata.json',
         types.string,
     )
-    .setAction( async ( {enginePath, metadataPath}, hre ) => {
+    .setAction( async ( {jsenginePath, wasmSourcePath, wasmSimdSourcePath, metadataPath}, hre ) => {
         if (hre.hardhatArguments.network == null) {
             throw new Error('Please add the missing --network <localhost> argument')
         }
@@ -295,12 +346,15 @@ task("populate-all", "Full populate the contract")
         const LeniaDeployment = await hre.deployments.get('Lenia')
         const lenia = LeniaContractFactory.attach(LeniaDeployment.address)
         
-        const engineFullpath = rootFolder + '/' + enginePath;
+        const engineFullpath = path.join(rootFolder, jsenginePath)
         console.log(`Setting the engine at ${engineFullpath}`)
         const engineCode = fs.readFileSync(engineFullpath, 'utf-8')
-        const result = UglifyJS.minify([engineCode]);
-        const gzipEngine = pako.deflate(result.code);
-        await lenia.setEngine(gzipEngine)
+        const engineCodeMinified = UglifyJS.minify([engineCode]).code;
+        const wasmSource = fs.readFileSync(path.join(rootFolder, wasmSourcePath), 'utf-8')
+        const wasmSimdSource = fs.readFileSync(path.join(rootFolder, wasmSimdSourcePath), 'utf-8')
+        const finalString = [wasmSource, wasmSimdSource, engineCodeMinified].join("%%")
+        const gzipFullEngine = pako.deflate(finalString);
+        await lenia.setEngine(gzipFullEngine)
         console.log('Setting the engine: Done')
 
         const metadataFullpath = rootFolder + '/' + metadataPath
