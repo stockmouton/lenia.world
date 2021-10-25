@@ -7,6 +7,7 @@ const prompt = require('prompt');
 const { decodeContractMetdata, attrsMap, traitTypeAttrsMap } = require('../test/utils')
 const leniaUtils = require('../src/utils/sm');
 const { bool } = require("prop-types");
+const { JsonParam } = require("serialize-query-params");
 const rootFolder = __dirname + '/..'
 
 task("set-engine", "Set the engine in the smart contract")
@@ -67,7 +68,7 @@ task("set-engine", "Set the engine in the smart contract")
         metadataBuffer.writeUInt32LE(wasmSource.length, 4)
         metadataBuffer.writeUInt32LE(wasmSimdSource.length, 8)
         metadataBuffer.writeUInt32LE(engineCodeMinifiedBuffer.length, 12)
-        console.log(engineCodeMinified)
+
         const finalBuffer = Buffer.concat([
             metadataBuffer,
             wasmSource, 
@@ -180,16 +181,20 @@ task("set-leniaparams", "Set all metadata in the contract")
             let element = metadata[index];
             const m = element.config.kernels_params[0].m.toFixed(9)
             const s = element.config.kernels_params[0].s.toFixed(9)
-            const gzipCells = pako.deflate(element.config.cells);
+
+            // Because of a bug in the code, we need to hack ourselves to push all the lenia metadata on chain.
+            // Instead of storing the cells, we just store the full JSON here
+            // const gzipCells = pako.deflate(element.config.cells);
+            const fullmetadataGZIP = pako.deflate(JSON.stringify(element));
             
             if (onlog === true) {
                 const logLeniaParamsTx = await lenia.logLeniaParams(
-                    m, s, gzipCells
+                    m, s, fullmetadataGZIP
                 )
                 await lenia.setLeniaParams(index, "", "", logLeniaParamsTx.hash)
             } else {
                 await lenia.setLeniaParams(
-                    index, m, s, gzipCells
+                    index, m, s, fullmetadataGZIP
                 )
             }
             

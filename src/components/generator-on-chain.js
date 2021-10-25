@@ -4,7 +4,7 @@ import { simd } from 'wasm-feature-detect';
 
 import { useLeniaContract } from './lenia-contract-provider'
 import { useWeb3 } from "./web3-provider"
-import { getEngineCode } from "../utils/sm"
+import { getEngineCode, getLeniaParameters } from "../utils/sm"
 
 const StyledDiv = styled.div`
   position: absolute;
@@ -33,24 +33,15 @@ const GeneratorOnChain = ({ zoom, fps, scale, lenia_id }) => {
             const [WASMSource, WASMSIMDSource, engineBytes] = await getEngineCode(web3Provider, contract, account)
             const WASMByteCode = hasSIMD ? WASMSIMDSource : WASMSource
             const engine = engineBytes.toString('utf-8')
-            console.log(engine)
             if (typeof engine === 'string' && engine.length > 0) {
                 var script = document.createElement('script');
                 script.innerHTML = engine
                 document.body.appendChild(script);
             }
 
-            const leniaResponse = await fetch(`/metadata/${lenia_id}.json`);
-            let leniaMetadata = await leniaResponse.json()
+            const leniaMetadata = await getLeniaParameters(web3Provider, contract, lenia_id)
             leniaMetadata["config"]["world_params"]["scale"] = scale
-            // const engine = getEngineCode(web3Provider, contract, account)
-            // const lenia_metadata_json = await contract.methods.getMetadata(lenia_id).call({ from: account })
-            // const lenia_cells = await contract.methods.getLeniaCells(lenia_id).call({ from: account })
-            // const lenia_metadata = JSON.parse(lenia_metadata_json)
-            // lenia_metadata["config"]["cells"] = lenia_cells
             
-            
-
             window.leniaEngine.init(WASMByteCode, WASMKey, leniaMetadata, zoom, fps);
         }
     }, [web3Provider, account])
