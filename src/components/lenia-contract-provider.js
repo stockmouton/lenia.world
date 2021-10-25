@@ -2,6 +2,7 @@ import React, { createContext, useState, useContext, useEffect } from 'react'
 import { useQueryParam, StringParam } from "use-query-params";
 import { useWeb3 } from "./web3-provider"
 import artifactsMain from '../artifacts/main.json'
+import artifactsRinkeby from '../artifacts/rinkeby.json'
 import artifactsLocalhost from '../artifacts/localhost.json'
 
 const leniaContractContext = createContext(null)
@@ -13,7 +14,7 @@ export const SALE_STATUSES = {
 }
 
 const getArtifacts = function(network) {
-  if (process?.env.NODE_ENV === 'production' && network === 'rinkeby') return artifactsMain
+  if (process?.env.NODE_ENV === 'production' && network === 'rinkeby') return artifactsRinkeby
   if (process?.env.NODE_ENV === 'production') return artifactsMain
   return artifactsLocalhost
 }

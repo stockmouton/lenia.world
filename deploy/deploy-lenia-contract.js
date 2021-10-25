@@ -2,7 +2,6 @@ const prompt = require('prompt');
 const { assert } = require("chai")
 const fs = require("fs")
 const path = require("path");
-const { solidityKeccak256 } = require('ethers/lib/utils');
 
 const deployLeniaContract = async hre => {
   const {deployments, getNamedAccounts} = hre
@@ -21,7 +20,7 @@ const deployLeniaContract = async hre => {
     }
     assert(Object.keys(addresses).length == 4, 'Expecting 4 addresses to deploy on mainnet')
 
-    console.log('Deploying Lenia Contract')
+    console.log(`Deploying Lenia Contract on ${hre.hardhatArguments.network}`)
     console.log('Splitees', addresses)
     console.log('Shares', shares)
     

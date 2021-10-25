@@ -38,6 +38,7 @@ public
 
 # Hardhat related
 artifacts/
+!src/artifacts
 cache/
 deployments/localhost/
 
