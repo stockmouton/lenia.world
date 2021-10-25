@@ -1,4 +1,5 @@
 import React, { createContext, useState, useContext, useEffect } from 'react'
+import { useQueryParam, StringParam } from "use-query-params";
 import { useWeb3 } from "./web3-provider"
 import artifactsMain from '../artifacts/main.json'
 import artifactsLocalhost from '../artifacts/localhost.json'
@@ -11,7 +12,7 @@ export const SALE_STATUSES = {
   PUBLIC: 'PUBLIC',
 }
 
-const getArtifacts = function() {
+const getArtifacts = function(network) {
   if (process?.env.NODE_ENV === 'production' && network === 'rinkeby') return artifactsMain
   if (process?.env.NODE_ENV === 'production') return artifactsMain
   return artifactsLocalhost
@@ -29,10 +30,12 @@ export const LeniaContractProvider = ({ children }) => {
   const [totalLeniaMinted, setTotalLeniaMinted] = useState(0)
   const [saleStatus, setSaleStatus] = useState(SALE_STATUSES.NOT_STARTED)
   const [isEligibleForPresale, setIsEligibleForPresale] = useState(false)
+
+  const [network] = useQueryParam("network", StringParam)
   
   const initContract = () => {
     try {
-      const artifacts = getArtifacts()
+      const artifacts = getArtifacts(network)
       const contract = web3Provider ? new web3Provider.eth.Contract(artifacts.contracts.Lenia.abi, artifacts.contracts.Lenia.address) : null
       setContract(contract)
     } catch(error) {
