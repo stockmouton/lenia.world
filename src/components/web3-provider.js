@@ -26,7 +26,7 @@ export const Web3Provider = ({ children }) => {
   const initAccount = async (web3Provider, isFirstConnection = false) => {
     try {
       const accounts = await web3Provider.eth.getAccounts()
-      if (isFirstConnection && accounts.length == 0) throw new Error('There is no existing account present.')
+      if (isFirstConnection && accounts.length == 0) throw new Error('There is no existing account present. If you use Metamask, you might have been logged out of the app')
       setAccount(accounts[0])
     } catch (error) {
       setError(error)
@@ -89,7 +89,7 @@ export const Web3Provider = ({ children }) => {
   const resetWeb3Provider = async () => {
     try {
       // TODO: check which providers don't have this method
-      if (provider.close) {
+      if (provider?.close) {
         await provider.close();
         setProvider(null)
       }

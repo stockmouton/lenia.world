@@ -2,7 +2,6 @@ const Web3 = typeof window !== 'undefined' ? require('web3') : null;
 const { ethers } = require("ethers");
 const pako = require('pako');
 
-
 exports.getEngineCode = async function(provider, leniaContract) {
     let contractGzipEngineHex;
     if (Web3 != null && provider instanceof Web3) {
