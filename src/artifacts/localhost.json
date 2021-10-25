@@ -1247,7 +1247,7 @@
       ]
     },
     "LeniaMetadata": {
-      "address": "0xCF65CbCC557aa6DB4856674a663eef39DC2ECf9C",
+      "address": "0xD3A3124d632Ea61BeB25A4B70C44748908d25AFE",
       "abi": [
         {
           "anonymous": false,
@@ -1292,9 +1292,9 @@
           "name": "getLeniaParams",
           "outputs": [
             {
-              "internalType": "address",
+              "internalType": "bytes",
               "name": "",
-              "type": "address"
+              "type": "bytes"
             }
           ],
           "stateMutability": "view",
@@ -1311,9 +1311,9 @@
           "name": "metadata",
           "outputs": [
             {
-              "internalType": "address",
+              "internalType": "bytes",
               "name": "",
-              "type": "address"
+              "type": "bytes"
             }
           ],
           "stateMutability": "view",
@@ -1347,9 +1347,9 @@
               "type": "uint256"
             },
             {
-              "internalType": "address",
+              "internalType": "bytes",
               "name": "metadataAddress",
-              "type": "address"
+              "type": "bytes"
             }
           ],
           "name": "setLeniaParams",

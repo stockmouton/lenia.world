@@ -18,7 +18,7 @@ const GeneratorOnChain = ({ zoom, fps, scale, lenia_id }) => {
     const nodeRef = useRef(null);
 
     const { isUserMarkedConnected, web3Provider, account } = useWeb3()
-    const { contract } = useLeniaContract()
+    const { contract, metadataContract } = useLeniaContract()
     const [ error, setError ] = useState(null)
 
     let contractSet = useRef(false);
@@ -33,7 +33,7 @@ const GeneratorOnChain = ({ zoom, fps, scale, lenia_id }) => {
         }
 
         // Account ready and contract received
-        if (contract && account) {
+        if (contract && metadataContract && account) {
             if (contractSet.current) {
                 return
             } else {
@@ -55,7 +55,7 @@ const GeneratorOnChain = ({ zoom, fps, scale, lenia_id }) => {
                 document.body.appendChild(script);
             }
 
-            const leniaMetadata = await getLeniaParameters(web3Provider, contract, lenia_id)
+            const leniaMetadata = await getLeniaParameters(web3Provider, metadataContract, lenia_id)
             leniaMetadata["config"]["world_params"]["scale"] = scale
             
             window.leniaEngine.init(WASMByteCode, WASMKey, leniaMetadata, zoom, fps);

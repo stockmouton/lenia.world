@@ -137,6 +137,12 @@ task("set-leniaparams", "Set all metadata in the contract")
         }
 
         onlog = !!onlog
+        if (!onlog) {
+            console.log("metadata can be stored using log")
+            console.log('Quitting!')
+            process.exit()
+        }
+
         console.log(`we are about to push data inside the ${onlog ? 'chain logs' : 'chain directly'}`)
         console.log('Is this ok? [y/N]')
         const { ok } = await prompt.get(['ok']);
@@ -153,6 +159,10 @@ task("set-leniaparams", "Set all metadata in the contract")
         })
         const LeniaDeployment = await hre.deployments.get('Lenia')
         const lenia = LeniaContractFactory.attach(LeniaDeployment.address)
+
+        const LeniaMetadataContractFactory = await hre.ethers.getContractFactory("LeniaMetadata")
+        const LeniaMetadataDeployment = await hre.deployments.get('LeniaMetadata')
+        const leniaMetadata = LeniaMetadataContractFactory.attach(LeniaMetadataDeployment.address)
         
         const metadataFullpath = rootFolder + '/' + metadataPath
         const metadata = require(metadataFullpath)
@@ -172,9 +182,11 @@ task("set-leniaparams", "Set all metadata in the contract")
                     m, s, fullmetadataGZIP
                 )
                 await logLeniaParamsTx.wait()
-                setLeniaParamsTx = await lenia.setLeniaParams(index, "", "", logLeniaParamsTx.hash)
+                // Because of a bug we have to use a new contract
+                // setLeniaParamsTx = await lenia.setLeniaParams(index, "", "", logLeniaParamsTx.hash)
+                setLeniaParamsTx = await leniaMetadata.setLeniaParams(index, logLeniaParamsTx.hash)
             } else {
-                setLeniaParamsTx = await lenia.setLeniaParams(index, m, s, fullmetadataGZIP)
+                // setLeniaParamsTx = await lenia.setLeniaParams(index, m, s, fullmetadataGZIP)
             }
             await setLeniaParamsTx.wait()
         }
@@ -192,16 +204,11 @@ task("get-leniaparams", "Get a Lenia metadata")
             throw new Error('Please add the missing --network <localhost|rinkeby|mainnet> argument')
         }
     
-        const LeniaDescriptorLibraryDeployment = await hre.deployments.get('LeniaDescriptor')
-        const LeniaContractFactory = await hre.ethers.getContractFactory("Lenia", {
-            libraries: {
-                LeniaDescriptor: LeniaDescriptorLibraryDeployment.address
-            },
-        })
-        const LeniaDeployment = await hre.deployments.get('Lenia')
-        const lenia = LeniaContractFactory.attach(LeniaDeployment.address)
+        const LeniaMetadataContractFactory = await hre.ethers.getContractFactory("LeniaMetadata")
+        const LeniaMetadataDeployment = await hre.deployments.get('LeniaMetadata')
+        const leniaMetadata = LeniaMetadataContractFactory.attach(LeniaMetadataDeployment.address)
         
-        const leniaParams = await leniaUtils.getLeniaParameters(hre.ethers.provider, lenia, index)
+        const leniaParams = await leniaUtils.getLeniaParameters(hre.ethers.provider, leniaMetadata, index)
         console.log(leniaParams)
     })
 

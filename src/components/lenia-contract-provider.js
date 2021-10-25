@@ -27,6 +27,7 @@ const getSaleStatus = (isPresaleActive, isSaleActive) => {
 export const LeniaContractProvider = ({ children }) => {
   const { web3Provider, account } = useWeb3()
   const [contract, setContract] = useState(null)
+  const [metadataContract, setMetadataContract] = useState(null)
   const [totalLeniaSupply, setTotalLeniaSupply] = useState(0)
   const [totalLeniaMinted, setTotalLeniaMinted] = useState(0)
   const [saleStatus, setSaleStatus] = useState(SALE_STATUSES.NOT_STARTED)
@@ -39,6 +40,10 @@ export const LeniaContractProvider = ({ children }) => {
       const artifacts = getArtifacts(network)
       const contract = web3Provider ? new web3Provider.eth.Contract(artifacts.contracts.Lenia.abi, artifacts.contracts.Lenia.address) : null
       setContract(contract)
+      if (artifacts.contracts.LeniaMetadata) {
+        const metadataContract = web3Provider ? new web3Provider.eth.Contract(artifacts.contracts.LeniaMetadata.abi, artifacts.contracts.LeniaMetadata.address) : null
+        setMetadataContract(metadataContract)
+      }
     } catch(error) {
       console.log(error)
       // Contract is not deployed or the wrong artifact is being imported
@@ -77,6 +82,7 @@ export const LeniaContractProvider = ({ children }) => {
     <>
       <leniaContractContext.Provider value={{
         contract,
+        metadataContract,
         initContract,
         initBlockchainData,
         updateBlockchainData,
