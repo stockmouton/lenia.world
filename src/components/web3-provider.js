@@ -128,7 +128,7 @@ export const Web3Provider = ({ children }) => {
       }
     }
     
-    if (!isWalletConnected) initDefaultProvider()
+    // if (!isWalletConnected) initDefaultProvider()
   };
 
   const handleToastClose = () => setError(null)
@@ -140,12 +140,13 @@ export const Web3Provider = ({ children }) => {
       <web3Context.Provider value={{
         initWeb3Provider,
         resetWeb3Provider,
+        isUserMarkedConnected,
         web3Provider,
         account,
         chainId,
         provider,
       }}>{children}</web3Context.Provider>
-      {error?.message && <Toast type="error" onClose={handleToastClose}>{error.message}</Toast>}
+      {error?.message && <Toast type="error" onClose={handleToastClose}>{error?.message}</Toast>}
     </>
   )
 }

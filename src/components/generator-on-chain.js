@@ -17,24 +17,23 @@ const StyledDiv = styled.div`
 const GeneratorOnChain = ({ zoom, fps, scale, lenia_id }) => {
     const nodeRef = useRef(null);
 
-    const { web3Provider, account } = useWeb3()
+    const { isUserMarkedConnected, web3Provider, account } = useWeb3()
     const { contract } = useLeniaContract()
     const [ error, setError ] = useState(null)
 
-    let updated = useRef(false);
     let contractSet = useRef(false);
 
     useEffect(async () => {
-        if (!updated.current) {
-            updated.current = true
-            return
-        }
-        if (!web3Provider || !account) {
-            setError(new Error("You must connect your account on the homepage before being able to use the generator on chain"))
+        if (!isUserMarkedConnected()) {
+            console.log(window.location);
+            setError(new Error(
+                `You must connect your account on the <a href="${window.location.origin}">homepage</a> before being able to use the generator on chain`
+            ))
             return
         }
 
-        if (contract) {
+        // Account ready and contract received
+        if (contract && account) {
             if (contractSet.current) {
                 return
             } else {
@@ -61,7 +60,7 @@ const GeneratorOnChain = ({ zoom, fps, scale, lenia_id }) => {
             
             window.leniaEngine.init(WASMByteCode, WASMKey, leniaMetadata, zoom, fps);
         }
-    }, [web3Provider, contract])
+    }, [account, contract])
     
     const handleToastClose = () => {
         setError(null)
@@ -72,7 +71,7 @@ const GeneratorOnChain = ({ zoom, fps, scale, lenia_id }) => {
             <StyledDiv ref={nodeRef}>
                 <canvas id="RENDERING_CANVAS"></canvas>
             </StyledDiv>
-            {error && <Toast type="error" onClose={handleToastClose}>{error?.message}</Toast>}
+            {error && <Toast type="error" onClose={handleToastClose}><div dangerouslySetInnerHTML={ { __html: error.message } }></div></Toast>}
         </>
     )
 }
