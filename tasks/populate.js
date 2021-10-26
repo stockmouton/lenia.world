@@ -8,12 +8,55 @@ const { decodeContractMetdata, attrsMap, traitTypeAttrsMap } = require('../test/
 const leniaUtils = require('../src/utils/sm');
 const rootFolder = __dirname + '/..'
 
+
+async function setEngine({ jsenginePath, wasmSourcePath, wasmSimdSourcePath }, hre) {
+    if (hre.hardhatArguments.network == null) {
+        throw new Error('Please add the missing --network <localhost|rinkeby|mainnet> argument')
+    }
+
+    console.log(`We are about to push data inside the chain logs on ${hre.hardhatArguments.network}`)
+    console.log('Paths:');
+    console.log(`   - ${jsenginePath}`);
+    console.log(`   - ${wasmSourcePath}`);
+    console.log(`   - ${wasmSimdSourcePath}`);
+    console.log('Is this ok? [y/N]')
+    const { ok } = await prompt.get(['ok']);
+    if (ok !== 'y') {
+        console.log('Quitting!')
+        process.exit()
+    }
+
+    const LeniaDescriptorLibraryDeployment = await hre.deployments.get('LeniaDescriptor')
+    const LeniaContractFactory = await hre.ethers.getContractFactory("Lenia", {
+        libraries: {
+            LeniaDescriptor: LeniaDescriptorLibraryDeployment.address
+        },
+    })
+    const LeniaDeployment = await hre.deployments.get('Lenia')
+    const lenia = LeniaContractFactory.attach(LeniaDeployment.address)
+    
+    const LeniaMetadataContractFactory = await hre.ethers.getContractFactory("LeniaMetadata")
+    const LeniaMetadataDeployment = await hre.deployments.get('LeniaMetadata')
+    const leniaMetadata = LeniaMetadataContractFactory.attach(LeniaMetadataDeployment.address)
+
+    const gzipFullEngine = compressAllEngineCode(rootFolder, jsenginePath, wasmSourcePath, wasmSimdSourcePath)
+
+    const logEngineTx = await leniaMetadata.logEngine(gzipFullEngine)
+    await logEngineTx.wait()
+    await leniaMetadata.setEngine(logEngineTx.hash)
+
+    const setEngineTx = await lenia.setEngine(LeniaMetadataDeployment.address)
+    setEngineTx.wait()
+
+    const contractEngine = await leniaMetadata.getEngine();
+    if (contractEngine.length) {
+        console.log('Rendering engine successfully set in the smart contract')
+    } else {
+        throw new Error('Something went wrong, rendering engine has not been set')
+    }
+}
 task("set-engine", "Set the engine in the smart contract")
-    .addParam(
-        'onlog',
-        'should the data be stored on the log',
-        types.bool
-    ).addOptionalParam(
+    .addOptionalParam(
         'jsenginePath',
         'The path to the engine JS code',
         'src/engine.js',
@@ -28,49 +71,7 @@ task("set-engine", "Set the engine in the smart contract")
         'The path to the WASM SIMD core code',
         'static/optimized-simd.wasm',
         types.string,
-    ).setAction( async ({ onlog, jsenginePath, wasmSourcePath, wasmSimdSourcePath }, hre) => {
-        if (hre.hardhatArguments.network == null) {
-            throw new Error('Please add the missing --network <localhost|rinkeby|mainnet> argument')
-        }
-
-        onlog = !!onlog
-        console.log(`we are about to push data inside the ${onlog ? 'chain logs' : 'chain directly'}`)
-        console.log('Paths:');
-        console.log(`   - ${jsenginePath}`);
-        console.log(`   - ${wasmSourcePath}`);
-        console.log(`   - ${wasmSimdSourcePath}`);
-        console.log('Is this ok? [y/N]')
-        const { ok } = await prompt.get(['ok']);
-        if (ok !== 'y') {
-            console.log('Quitting!')
-            process.exit()
-        }
-
-        const LeniaDescriptorLibraryDeployment = await hre.deployments.get('LeniaDescriptor')
-        const LeniaContractFactory = await hre.ethers.getContractFactory("Lenia", {
-            libraries: {
-                LeniaDescriptor: LeniaDescriptorLibraryDeployment.address
-            },
-        })
-        const LeniaDeployment = await hre.deployments.get('Lenia')
-        const lenia = LeniaContractFactory.attach(LeniaDeployment.address)
-        
-        const gzipFullEngine = compressAllEngineCode(rootFolder, jsenginePath, wasmSourcePath, wasmSimdSourcePath)
-        if (onlog === true) {
-            const logEngineTx = await lenia.logEngine(gzipFullEngine)
-            await logEngineTx.wait()
-            await lenia.setEngine(logEngineTx.hash)
-        } else {
-            await lenia.setEngine(gzipFullEngine)
-        }
-    
-        const contractEngine = await lenia.getEngine();
-        if (contractEngine.length) {
-            console.log('Rendering engine successfully set in the smart contract')
-        } else {
-            throw new Error('Something went wrong, rendering engine has not been set')
-        }
-    })
+    ).setAction(setEngine)
 
 task("get-engine", "Set the engine in the smart contract",  async (taskArgs, hre) => {
     if (hre.hardhatArguments.network == null) {
@@ -86,7 +87,11 @@ task("get-engine", "Set the engine in the smart contract",  async (taskArgs, hre
     const LeniaDeployment = await hre.deployments.get('Lenia')
     const lenia = LeniaContractFactory.attach(LeniaDeployment.address)
     
-    const files = await leniaUtils.getEngineCode(hre.ethers.provider, lenia)
+    const leniaMetadataContractAdress = await lenia.getEngine()
+    const LeniaMetadataContractFactory = await hre.ethers.getContractFactory("LeniaMetadata")
+    const leniaMetadata = LeniaMetadataContractFactory.attach(leniaMetadataContractAdress)
+    
+    const files = await leniaUtils.getEngineCode(hre.ethers.provider, leniaMetadata)
 
     const WASMSource = files[0]
     const WASMSimdSource = files[1]
@@ -121,152 +126,51 @@ task("get-engine", "Set the engine in the smart contract",  async (taskArgs, hre
     console.log(engineCodeMinified)
 })
 
-task("set-leniaparams", "Set all metadata in the contract")
-    .addParam(
-        'onlog',
-        'should the data be stored on the log',
-        types.bool
-    ).addOptionalParam(
-        'metadataPath',
-        'The path to the metadata containing the cells',
-        'static/metadata/all_metadata.json',
-        types.string,
-    ).setAction( async ({ onlog, metadataPath }, hre ) => {
-        if (hre.hardhatArguments.network == null) {
-            throw new Error('Please add the missing --network <localhost|rinkeby|mainnet> argument')
-        }
+async function setMetadata({ metadataPath }, hre ) {
+    if (hre.hardhatArguments.network == null) {
+        throw new Error('Please add the missing --network <localhost|rinkeby|mainnet> argument')
+    }
 
-        onlog = !!onlog
-        if (!onlog) {
-            console.log("metadata can be stored using log")
-            console.log('Quitting!')
-            process.exit()
-        }
+    console.log(`we are about to push data inside the chain logs on ${hre.hardhatArguments.network}`)
+    console.log('Is this ok? [y/N]')
+    const { ok } = await prompt.get(['ok']);
+    if (ok !== 'y') {
+        console.log('Quitting!')
+        process.exit()
+    }
 
-        console.log(`we are about to push data inside the ${onlog ? 'chain logs' : 'chain directly'}`)
-        console.log('Is this ok? [y/N]')
-        const { ok } = await prompt.get(['ok']);
-        if (ok !== 'y') {
-            console.log('Quitting!')
-            process.exit()
-        }
+    const LeniaMetadataContractFactory = await hre.ethers.getContractFactory("LeniaMetadata")
+    const LeniaMetadataDeployment = await hre.deployments.get('LeniaMetadata')
+    const leniaMetadata = LeniaMetadataContractFactory.attach(LeniaMetadataDeployment.address)
     
-        const LeniaDescriptorLibraryDeployment = await hre.deployments.get('LeniaDescriptor')
-        const LeniaContractFactory = await hre.ethers.getContractFactory("Lenia", {
-            libraries: {
-                LeniaDescriptor: LeniaDescriptorLibraryDeployment.address
-            },
-        })
-        const LeniaDeployment = await hre.deployments.get('Lenia')
-        const lenia = LeniaContractFactory.attach(LeniaDeployment.address)
+    const metadataFullpath = rootFolder + '/' + metadataPath
+    const metadata = require(metadataFullpath)
+    for (let index = 0; index < metadata.length; index++) {
+        console.log(`Setting index ${index}`)
 
-        const LeniaMetadataContractFactory = await hre.ethers.getContractFactory("LeniaMetadata")
-        const LeniaMetadataDeployment = await hre.deployments.get('LeniaMetadata')
-        const leniaMetadata = LeniaMetadataContractFactory.attach(LeniaMetadataDeployment.address)
-        
-        const metadataFullpath = rootFolder + '/' + metadataPath
-        const metadata = require(metadataFullpath)
-        for (let index = 0; index < metadata.length; index++) {
-            console.log(`Setting index ${index}`)
-            let element = metadata[index];
-            const m = element.config.kernels_params[0].m.toFixed(9)
-            const s = element.config.kernels_params[0].s.toFixed(9)
+        let elementMetadata = metadata[index];
+        const fullmetadataGZIP = pako.deflate(JSON.stringify(elementMetadata));
+       
+        const logMetadataTx = await leniaMetadata.logMetadata(fullmetadataGZIP)
+        await logMetadataTx.wait()
 
-            // Because of a bug in the code, we need to hack ourselves to push all the lenia metadata on chain.
-            // Instead of storing the cells, we just store the full JSON here
-            // const gzipCells = pako.deflate(element.config.cells);
-            const fullmetadataGZIP = pako.deflate(JSON.stringify(element));
-            let setLeniaParamsTx;
-            if (onlog === true) {
-                const logLeniaParamsTx = await lenia.logLeniaParams(
-                    m, s, fullmetadataGZIP
-                )
-                await logLeniaParamsTx.wait()
-                // Because of a bug we have to use a new contract
-                // setLeniaParamsTx = await lenia.setLeniaParams(index, "", "", logLeniaParamsTx.hash)
-                setLeniaParamsTx = await leniaMetadata.setLeniaParams(index, logLeniaParamsTx.hash)
-            } else {
-                // setLeniaParamsTx = await lenia.setLeniaParams(index, m, s, fullmetadataGZIP)
-            }
-            await setLeniaParamsTx.wait()
-        }
-        console.log('done!')
-    })
-
-task("get-leniaparams", "Get a Lenia metadata")
-    .addOptionalParam(
-        'index',
-        'The cell\'s index',
-        0,
-        types.int,
-    ).setAction( async ({ index }, hre ) => {
-        if (hre.hardhatArguments.network == null) {
-            throw new Error('Please add the missing --network <localhost|rinkeby|mainnet> argument')
-        }
-    
-        const LeniaMetadataContractFactory = await hre.ethers.getContractFactory("LeniaMetadata")
-        const LeniaMetadataDeployment = await hre.deployments.get('LeniaMetadata')
-        const leniaMetadata = LeniaMetadataContractFactory.attach(LeniaMetadataDeployment.address)
-        
-        const leniaParams = await leniaUtils.getLeniaParameters(hre.ethers.provider, leniaMetadata, index)
-        console.log(leniaParams)
-    })
-
+        const setMetadataTx = await leniaMetadata.setMetadata(index, logMetadataTx.hash)
+        await setMetadataTx.wait()
+    }
+    console.log('done!')
+}
 task("set-metadata", "Set all metadata in the contract")
     .addOptionalParam(
         'metadataPath',
         'The path to the metadata containing the cells',
-        'src/fake/metadata.json',
+        'static/metadata/all_metadata.json',
         types.string,
-    ).setAction( async ({ metadataPath }, hre ) => {
-        if (hre.hardhatArguments.network == null) {
-            throw new Error('Please add the missing --network <localhost|rinkeby|mainnet> argument')
-        }
-    
-        const LeniaDescriptorLibraryDeployment = await hre.deployments.get('LeniaDescriptor')
-        const LeniaContractFactory = await hre.ethers.getContractFactory("Lenia", {
-            libraries: {
-                LeniaDescriptor: LeniaDescriptorLibraryDeployment.address
-            },
-        })
-        const LeniaDeployment = await hre.deployments.get('Lenia')
-        const lenia = LeniaContractFactory.attach(LeniaDeployment.address)
-        
-        const metadataFullpath = rootFolder + '/' + metadataPath
-        const metadata = require(metadataFullpath)
-        for (let index = 0; index < metadata.length; index++) {
-            let element = metadata[index];
-            
-            const paddedID = index.toString().padStart(3, '0');
-            let imageURL = element["image"];
-            let smLeniaAttributes = [];
-            for (let i = 0; i < element.attributes.length; i++) {
-                const attr = element.attributes[i];
-                const traitTypeIndex = traitTypeAttrsMap.indexOf(attr.trait_type.toLowerCase())
-                smLeniaAttributes.push({
-                    'traitType': traitTypeIndex,
-                    'value': attrsMap[traitTypeIndex].indexOf(attr.value.toLowerCase()),
-                    'numericalValue': attr.numerical_value ? attr.numerical_value.toFixed(9) : traitTypeIndex.toFixed(1),
-                })
-            }
-        
-            console.log(`adding metadata id ${index}`)
-            const setMetadataTx = await lenia.setMetadata(
-                index, 
-                paddedID,
-                imageURL,
-                // element["animation_url"],
-                // element["on_chain_url"],
-                smLeniaAttributes
-            )
-            const receipt = await setMetadataTx.wait()
-        }
-    })
+    ).setAction(setMetadata)
 
 task("get-metadata", "Get a Lenia metadata")
     .addOptionalParam(
         'index',
-        'The cell\'s index',
+        'The metadata\'s index',
         0,
         types.int,
     ).setAction( async ({ index }, hre ) => {
@@ -282,25 +186,18 @@ task("get-metadata", "Get a Lenia metadata")
         })
         const LeniaDeployment = await hre.deployments.get('Lenia')
         const lenia = LeniaContractFactory.attach(LeniaDeployment.address)
- 
-        const contractGzipCellsHex = await lenia.getLeniaCells()
-        const contractGzipCell = Buffer.from(ethers.utils.arrayify(contractGzipCellsHex))
-        const contractCells = await ungzip(contractGzipCell);
-        const contractAllCells = contractCells.toString('utf-8').split('%%')
         
-        const encodedContractMetadata = await lenia.getMetadata(index)
-        const contractMetadata = decodeContractMetdata(encodedContractMetadata)
-
-        contractMetadata.config.cells = contractAllCells[index];
-        console.log(contractMetadata)
+        const leniaMetadataContractAdress = await lenia.getEngine()
+        console.log(leniaMetadataContractAdress);
+        const LeniaMetadataContractFactory = await hre.ethers.getContractFactory("LeniaMetadata")
+        const leniaMetadata = LeniaMetadataContractFactory.attach(leniaMetadataContractAdress)
+        
+        const leniaParams = await leniaUtils.getMetadata(hre.ethers.provider, leniaMetadata, index)
+        console.log(leniaParams)
     })
 
 task("populate-all", "Full populate the contract")
-    .addParam(
-        'onlog',
-        'should the data be stored on the log',
-        types.bool
-    ).addOptionalParam(
+    .addOptionalParam(
         'jsenginePath',
         'The path to the engine JS code',
         'src/engine.js',
@@ -329,12 +226,7 @@ task("populate-all", "Full populate the contract")
         if(hre.hardhatArguments.network != 'localhost' && hre.hardhatArguments.network != 'rinkeby') {
             throw new Error('This task only work for localhost or Rinkeby testnet')
         }
-        onlog = !!onlog
-        if (!onlog) {
-            console.log("metadata can be stored using log")
-            console.log('Quitting!')
-            process.exit()
-        }
+
 
         const accounts = await hre.ethers.getSigners()
 
@@ -353,41 +245,12 @@ task("populate-all", "Full populate the contract")
         
         const engineFullpath = path.join(rootFolder, jsenginePath)
         console.log(`Setting the engine at ${engineFullpath}`)
-        const gzipFullEngine = compressAllEngineCode(rootFolder, jsenginePath, wasmSourcePath, wasmSimdSourcePath)
-        let engineTx;
-        if (onlog === true) {
-            const logEngineTx = await lenia.logEngine(gzipFullEngine)
-            await logEngineTx.wait()
-            engineTx = await lenia.setEngine(logEngineTx.hash)
-        } else {
-            engineTx = await lenia.setEngine(gzipFullEngine)
-        }
-        engineTx.wait()
+        await setEngine({jsenginePath, wasmSourcePath, wasmSimdSourcePath}, hre)
         console.log('Setting the engine: Done')
 
         const metadataFullpath = rootFolder + '/' + metadataPath
         console.log(`Setting all lenia Parameters using metadata at ${metadataFullpath}`)
-        const metadata = require(metadataFullpath)
-        for (let index = 0; index < metadata.length; index++) {
-            let element = metadata[index];
-            const m = element.config.kernels_params[0].m.toFixed(9)
-            const s = element.config.kernels_params[0].s.toFixed(9)
-            const fullmetadataGZIP = pako.deflate(JSON.stringify(element));
-            let setLeniaParamsTx;
-            if (onlog === true) {
-                const logLeniaParamsTx = await lenia.logLeniaParams(
-                    m, s, fullmetadataGZIP
-                )
-                await logLeniaParamsTx.wait()
-                // metadataTx = await lenia.setLeniaParams(index, "", "", logLeniaParamsTx.hash)
-                setLeniaParamsTx = await leniaMetadata.setLeniaParams(index, logLeniaParamsTx.hash)
-            } else {
-                setLeniaParamsTx = await lenia.setLeniaParams(
-                    index, m, s, fullmetadataGZIP
-                )
-            }
-            await setLeniaParamsTx.wait()
-        }
+        await setMetadata({ metadataPath }, hre)
         console.log('Setting all lenia Parameters: Done')
 
         let isSaleActive = await lenia.isSaleActive()

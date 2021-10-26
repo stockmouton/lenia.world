@@ -2,31 +2,29 @@ const Web3 = typeof window !== 'undefined' ? require('web3') : null;
 const { ethers } = require("ethers");
 const pako = require('pako');
 
-exports.getEngineCode = async function(provider, leniaContract) {
-    let contractGzipEngineHex;
+exports.getEngineCode = async function(provider, leniaMetadataContract) {
+    let txHash;
     if (Web3 != null && provider instanceof Web3) {
-        contractGzipEngineHex = await leniaContract.methods.getEngine().call()
+        txHash = await leniaMetadataContract.methods.getEngine().call()
     } else {
-        contractGzipEngineHex = await leniaContract.getEngine()
+        txHash = await leniaMetadataContract.getEngine()
     }
+    console.log((txHash));
+    let inputDataHex;
+    if (Web3 != null && provider instanceof Web3) {
+        const tx = await provider.eth.getTransaction(txHash)
+        inputDataHex = tx.input;
+    } else {
+        const tx = await provider.getTransaction(txHash)
+        inputDataHex = tx.data;  
+    }
+    console.log(inputDataHex);
+    const decodedData = ethers.utils.defaultAbiCoder.decode(
+        [ 'bytes' ],
+        ethers.utils.hexDataSlice(inputDataHex, 4)
+    );
+    contractGzipEngineHex = decodedData[0]
 
-    if (contractGzipEngineHex.length == 66) {
-        const txHash = contractGzipEngineHex;
-        let inputDataHex;
-        if (Web3 != null && provider instanceof Web3) {
-            const tx = await provider.eth.getTransaction(txHash)
-            inputDataHex = tx.input;
-        } else {
-            const tx = await provider.getTransaction(txHash)
-            inputDataHex = tx.data;  
-        }
-        const decodedData = ethers.utils.defaultAbiCoder.decode(
-            [ 'bytes' ],
-            ethers.utils.hexDataSlice(inputDataHex, 4)
-        );
-        contractGzipEngineHex = decodedData[0]
-    }
-    
     const contractGzipEngineUint8Array = ethers.utils.arrayify(contractGzipEngineHex)
     const contractEngine = pako.inflate(contractGzipEngineUint8Array)
     const finalBuffer = Buffer.from(contractEngine)
@@ -45,12 +43,12 @@ exports.getEngineCode = async function(provider, leniaContract) {
     return files
 }
 
-exports.getLeniaParameters = async function(provider, leniaMetadataContract, index) {
+exports.getMetadata = async function(provider, leniaMetadataContract, index) {
     let txHash;
     if (Web3 != null && provider instanceof Web3) {
-        txHash = await leniaMetadataContract.methods.leniaParameters(index).call()
+        txHash = await leniaMetadataContract.methods.getMetadata(index).call()
     } else {
-        txHash = await leniaMetadataContract.leniaParameters(index)
+        txHash = await leniaMetadataContract.getMetadata(index)
     }
 
     let inputDataHex;
@@ -63,10 +61,10 @@ exports.getLeniaParameters = async function(provider, leniaMetadataContract, ind
     }
 
     const decodedData = ethers.utils.defaultAbiCoder.decode(
-        [ 'string', 'string', 'bytes' ],
+        [ 'bytes' ],
         ethers.utils.hexDataSlice(inputDataHex, 4)
     );
-    const rawMetadata = decodedData[2]
+    const rawMetadata = decodedData[0]
 
     const contractGzipMetadataUint8Array = ethers.utils.arrayify(rawMetadata)
     const contractMetadata = pako.inflate(contractGzipMetadataUint8Array, {to: 'string'})
