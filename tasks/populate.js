@@ -152,9 +152,11 @@ async function setMetadata({ metadataPath }, hre ) {
         const fullmetadataGZIP = pako.deflate(JSON.stringify(elementMetadata));
        
         const logMetadataTx = await leniaMetadata.logMetadata(fullmetadataGZIP)
+        console.log(`Waiting for log tx: ${logMetadataTx.hash} (${logMetadataTx.nonce})`)
         await logMetadataTx.wait()
 
         const setMetadataTx = await leniaMetadata.setMetadata(index, logMetadataTx.hash)
+        console.log(`Waiting for set tx: ${setMetadataTx.hash} (${setMetadataTx.nonce})`)
         await setMetadataTx.wait()
     }
     console.log('done!')

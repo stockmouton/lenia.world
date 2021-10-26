@@ -9,7 +9,7 @@ exports.getEngineCode = async function(provider, leniaMetadataContract) {
     } else {
         txHash = await leniaMetadataContract.getEngine()
     }
-    console.log((txHash));
+
     let inputDataHex;
     if (Web3 != null && provider instanceof Web3) {
         const tx = await provider.eth.getTransaction(txHash)
@@ -18,7 +18,6 @@ exports.getEngineCode = async function(provider, leniaMetadataContract) {
         const tx = await provider.getTransaction(txHash)
         inputDataHex = tx.data;  
     }
-    console.log(inputDataHex);
     const decodedData = ethers.utils.defaultAbiCoder.decode(
         [ 'bytes' ],
         ethers.utils.hexDataSlice(inputDataHex, 4)

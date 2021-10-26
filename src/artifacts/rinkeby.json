@@ -1247,7 +1247,7 @@
       ]
     },
     "LeniaMetadata": {
-      "address": "0x31AA397E8dD75b76173De20F36241153F9EF22c7",
+      "address": "0x81f41E43C7707A4f78AF0A119360C2074510a0e9",
       "abi": [
         {
           "anonymous": false,
@@ -1282,14 +1282,8 @@
           "type": "function"
         },
         {
-          "inputs": [
-            {
-              "internalType": "uint256",
-              "name": "",
-              "type": "uint256"
-            }
-          ],
-          "name": "leniaParameters",
+          "inputs": [],
+          "name": "getEngine",
           "outputs": [
             {
               "internalType": "bytes",
@@ -1298,6 +1292,51 @@
             }
           ],
           "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "uint256",
+              "name": "id",
+              "type": "uint256"
+            }
+          ],
+          "name": "getMetadata",
+          "outputs": [
+            {
+              "internalType": "bytes",
+              "name": "",
+              "type": "bytes"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "bytes",
+              "name": "callEngine",
+              "type": "bytes"
+            }
+          ],
+          "name": "logEngine",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "bytes",
+              "name": "callMetadata",
+              "type": "bytes"
+            }
+          ],
+          "name": "logMetadata",
+          "outputs": [],
+          "stateMutability": "nonpayable",
           "type": "function"
         },
         {
@@ -1323,6 +1362,19 @@
         {
           "inputs": [
             {
+              "internalType": "bytes",
+              "name": "callEngine",
+              "type": "bytes"
+            }
+          ],
+          "name": "setEngine",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
               "internalType": "uint256",
               "name": "id",
               "type": "uint256"
@@ -1333,7 +1385,7 @@
               "type": "bytes"
             }
           ],
-          "name": "setLeniaParams",
+          "name": "setMetadata",
           "outputs": [],
           "stateMutability": "nonpayable",
           "type": "function"

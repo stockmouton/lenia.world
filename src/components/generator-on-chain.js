@@ -25,7 +25,6 @@ const GeneratorOnChain = ({ zoom, fps, scale, lenia_id }) => {
 
     useEffect(async () => {
         if (!isUserMarkedConnected()) {
-            console.log(window.location);
             setError(new Error(
                 `You must connect your account on the <a href="${window.location.origin}">homepage</a> before being able to use the generator on chain`
             ))
