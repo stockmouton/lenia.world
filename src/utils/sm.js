@@ -48,9 +48,9 @@ exports.getEngineCode = async function(provider, leniaContract) {
 exports.getLeniaParameters = async function(provider, leniaMetadataContract, index) {
     let txHash;
     if (Web3 != null && provider instanceof Web3) {
-        txHash = await leniaMetadataContract.methods.getLeniaParams(index).call()
+        txHash = await leniaMetadataContract.methods.leniaParameters(index).call()
     } else {
-        txHash = await leniaMetadataContract.getLeniaParams(index)
+        txHash = await leniaMetadataContract.leniaParameters(index)
     }
 
     let inputDataHex;

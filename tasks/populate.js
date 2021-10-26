@@ -330,6 +330,12 @@ task("populate-all", "Full populate the contract")
             throw new Error('This task only work for localhost or Rinkeby testnet')
         }
         onlog = !!onlog
+        if (!onlog) {
+            console.log("metadata can be stored using log")
+            console.log('Quitting!')
+            process.exit()
+        }
+
         const accounts = await hre.ethers.getSigners()
 
         const LeniaDescriptorLibraryDeployment = await hre.deployments.get('LeniaDescriptor')
@@ -338,9 +344,12 @@ task("populate-all", "Full populate the contract")
                 LeniaDescriptor: LeniaDescriptorLibraryDeployment.address
             },
         })
-
         const LeniaDeployment = await hre.deployments.get('Lenia')
         const lenia = LeniaContractFactory.attach(LeniaDeployment.address)
+
+        const LeniaMetadataContractFactory = await hre.ethers.getContractFactory("LeniaMetadata")
+        const LeniaMetadataDeployment = await hre.deployments.get('LeniaMetadata')
+        const leniaMetadata = LeniaMetadataContractFactory.attach(LeniaMetadataDeployment.address)
         
         const engineFullpath = path.join(rootFolder, jsenginePath)
         console.log(`Setting the engine at ${engineFullpath}`)
@@ -364,19 +373,20 @@ task("populate-all", "Full populate the contract")
             const m = element.config.kernels_params[0].m.toFixed(9)
             const s = element.config.kernels_params[0].s.toFixed(9)
             const fullmetadataGZIP = pako.deflate(JSON.stringify(element));
-            let metadataTx;
+            let setLeniaParamsTx;
             if (onlog === true) {
                 const logLeniaParamsTx = await lenia.logLeniaParams(
                     m, s, fullmetadataGZIP
                 )
                 await logLeniaParamsTx.wait()
-                metadataTx = await lenia.setLeniaParams(index, "", "", logLeniaParamsTx.hash)
+                // metadataTx = await lenia.setLeniaParams(index, "", "", logLeniaParamsTx.hash)
+                setLeniaParamsTx = await leniaMetadata.setLeniaParams(index, logLeniaParamsTx.hash)
             } else {
-                metadataTx = await lenia.setLeniaParams(
+                setLeniaParamsTx = await lenia.setLeniaParams(
                     index, m, s, fullmetadataGZIP
                 )
             }
-            await metadataTx.wait()
+            await setLeniaParamsTx.wait()
         }
         console.log('Setting all lenia Parameters: Done')
 
