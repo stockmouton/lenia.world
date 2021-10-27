@@ -63,7 +63,7 @@ describe("Lenia", function () {
 
       for (let index = 0; index < max_length; index++) {
         const element = metadata[index];
-        const leniaParams = await leniaUtils.getLeniaParameters(ethers.provider, hardhatLenia, index)
+        const leniaParams = await leniaUtils.getMetadata(ethers.provider, hardhatLenia, index)
         expect(leniaParams.m).to.equal(element.config.kernels_params[0].m.toFixed(9))
         expect(leniaParams.s).to.equal(element.config.kernels_params[0].s.toFixed(9))
         expect(leniaParams.cells).to.equal(element.config.cells)
@@ -90,7 +90,7 @@ describe("Lenia", function () {
 
       for (let index = 0; index < max_length; index++) {
         const element = metadata[index];
-        const leniaParams = await leniaUtils.getLeniaParameters(ethers.provider, hardhatLenia, index)
+        const leniaParams = await leniaUtils.getMetadata(ethers.provider, hardhatLenia, index)
 
         expect(leniaParams.m).to.equal(element.config.kernels_params[0].m.toFixed(9))
         expect(leniaParams.s).to.equal(element.config.kernels_params[0].s.toFixed(9))

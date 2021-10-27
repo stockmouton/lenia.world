@@ -48,7 +48,7 @@ const deployLeniaRoyaltiesContract = async hre => {
   })
 }
 
-deployLeniaRoyaltiesContract.tags = ['LeniaRoyalties']
+deployLeniaRoyaltiesContract.tags = ['lenia-royalties']
 
 
 module.exports = deployLeniaRoyaltiesContract

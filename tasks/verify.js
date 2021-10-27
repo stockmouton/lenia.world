@@ -45,3 +45,12 @@ task("verify-royalties", "Verify LeniaRoyalties smart contract",  async (taskArg
     contract: "contracts/LeniaRoyalties.sol:LeniaRoyalties"
   })
 })
+
+task("verify-metadata", "Verify LeniaMetadata smart contract",  async (taskArgs, hre) => {
+  const LeniaMetadataDeployment = await hre.deployments.get('LeniaMetadata')
+
+  await hre.run("verify:verify", {
+    address: LeniaMetadataDeployment.address,
+    contract: "contracts/LeniaMetadata.sol:LeniaMetadata"
+  })
+})
