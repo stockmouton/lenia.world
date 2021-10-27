@@ -1,8 +1,12 @@
+const fs = require('fs');
+const UglifyJS = require("uglify-js")
 const path = require('path');
 const pako = require('pako');
 const prompt = require('prompt');
 
 const leniaUtils = require('../src/utils/sm');
+const { init } = require('es-module-lexer');
+const { assert } = require('console');
 const rootFolder = __dirname + '/..'
 
 
@@ -36,13 +40,25 @@ async function setEngine({ jsenginePath, wasmSourcePath, wasmSimdSourcePath }, h
     const LeniaMetadataDeployment = await hre.deployments.get('LeniaMetadata')
     const leniaMetadata = LeniaMetadataContractFactory.attach(LeniaMetadataDeployment.address)
 
-    const gzipFullEngine = leniaUtils.compressAllEngineCode(rootFolder, jsenginePath, wasmSourcePath, wasmSimdSourcePath)
+    const engineCode = fs.readFileSync(path.join(rootFolder, jsenginePath), 'utf-8')
+    const engineCodeMinified = UglifyJS.minify([engineCode]).code;
+    const engineCodeMinifiedBuffer = Buffer.from(engineCodeMinified)
+    const wasmSource = fs.readFileSync(path.join(rootFolder, wasmSourcePath))
+    const wasmSimdSource = fs.readFileSync(path.join(rootFolder, wasmSimdSourcePath))
+
+    const gzipFullEngine = leniaUtils.compressAllEngineCode(
+        wasmSource, wasmSimdSource, engineCodeMinifiedBuffer
+    )
 
     const logEngineTx = await leniaMetadata.logEngine(gzipFullEngine)
+    console.log(`Waiting for log tx: ${logEngineTx.hash} (${logEngineTx.nonce})  (payload size in bytes: ${gzipFullEngine.length})`)
     await logEngineTx.wait()
-    await leniaMetadata.setEngine(logEngineTx.hash)
+    const setEngineCodeTx = await leniaMetadata.setEngine(logEngineTx.hash)
+    console.log(`Waiting for setEngineCode tx: ${setEngineCodeTx.hash} (${setEngineCodeTx.nonce})`)
+    await setEngineCodeTx.wait()
 
     const setEngineTx = await lenia.setEngine(LeniaMetadataDeployment.address)
+    console.log(`Waiting for set tx: ${setEngineTx.hash} (${setEngineTx.nonce})`)
     await setEngineTx.wait()
 
     const contractEngine = await leniaMetadata.getEngine();
@@ -123,12 +139,24 @@ task("get-engine", "Set the engine in the smart contract",  async (taskArgs, hre
     console.log(engineCodeMinified)
 })
 
-async function setMetadata({ metadataPath }, hre ) {
+async function setMetadata({ metadataPath, initIndex, stopIndex }, hre ) {
     if (hre.hardhatArguments.network == null) {
         throw new Error('Please add the missing --network <localhost|rinkeby|mainnet> argument')
     }
 
+    const metadataFullpath = rootFolder + '/' + metadataPath
+    const metadata = require(metadataFullpath)
+
+    initIndex = Math.max(initIndex, 0)
+    stopIndex = Math.min(stopIndex, metadata.length)
+    console.log(initIndex < stopIndex);
+    if (!(initIndex < stopIndex)) {
+        throw new Error(`stopIndex ${stopIndex} must be bigger than initIndex ${initIndex}`)
+    }
+
     console.log(`we are about to push data inside the chain logs on ${hre.hardhatArguments.network}`)
+    console.log(`initIndex: ${initIndex}`)
+    console.log(`stopIndex: ${stopIndex}`)
     console.log('Is this ok? [y/N]')
     const { ok } = await prompt.get(['ok']);
     if (ok !== 'y') {
@@ -140,15 +168,17 @@ async function setMetadata({ metadataPath }, hre ) {
     const LeniaMetadataDeployment = await hre.deployments.get('LeniaMetadata')
     const leniaMetadata = LeniaMetadataContractFactory.attach(LeniaMetadataDeployment.address)
     
-    const metadataFullpath = rootFolder + '/' + metadataPath
-    const metadata = require(metadataFullpath)
-    for (let index = 0; index < metadata.length; index++) {
+    overrides = {
+        maxFeePerGas: 50_000_000_000,  // 50 Gwei
+        maxPriorityFeePerGas: 1_000_000_000
+    }
+    for (let index = initIndex; index < stopIndex; index++) {
         console.log(`Setting index ${index}`)
 
         let elementMetadata = metadata[index];
         const fullmetadataGZIP = pako.deflate(JSON.stringify(elementMetadata));
        
-        const logMetadataTx = await leniaMetadata.logMetadata(fullmetadataGZIP)
+        const logMetadataTx = await leniaMetadata.logMetadata(fullmetadataGZIP, overrides)
         console.log(`Waiting for log tx: ${logMetadataTx.hash} (${logMetadataTx.nonce})`)
         await logMetadataTx.wait()
 
@@ -159,7 +189,13 @@ async function setMetadata({ metadataPath }, hre ) {
     console.log('done!')
 }
 task("set-metadata", "Set all metadata in the contract")
-    .addOptionalParam(
+    .addParam(
+        'initIndex',
+        'index at which we start adding metadata'
+    ).addParam(
+        'stopIndex',
+        'index at which we stop adding metadata'
+    ).addOptionalParam(
         'metadataPath',
         'The path to the metadata containing the cells',
         'static/metadata/all_metadata.json',

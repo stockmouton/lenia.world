@@ -35,9 +35,12 @@ describe("Lenia", function () {
 
       const engineCode = fs.readFileSync(path.join(rootFolder, jsenginePath), 'utf-8')
       const engineCodeMinified = UglifyJS.minify([engineCode]).code;
+      const engineCodeMinifiedBuffer = Buffer.from(engineCodeMinified)
+      const wasmSource = fs.readFileSync(path.join(rootFolder, wasmSourcePath))
+      const wasmSimdSource = fs.readFileSync(path.join(rootFolder, wasmSimdSourcePath))
 
       const gzipFullEngine = leniaUtils.compressAllEngineCode(
-        rootFolder, jsenginePath, wasmSourcePath, wasmSimdSourcePath
+        wasmSource, wasmSimdSource, engineCodeMinifiedBuffer
       )
       const logEngineTx = await leniaMetadata.logEngine(gzipFullEngine)
       await logEngineTx.wait()

@@ -1,7 +1,7 @@
 import React, { createContext, useState, useContext, useEffect } from 'react'
 import { useQueryParam, StringParam } from "use-query-params";
 import { useWeb3 } from "./web3-provider"
-import artifactsMain from '../artifacts/main.json'
+import artifactsMain from '../artifacts/mainnet.json'
 import artifactsRinkeby from '../artifacts/rinkeby.json'
 import artifactsLocalhost from '../artifacts/localhost.json'
 
