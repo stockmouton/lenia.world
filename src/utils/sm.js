@@ -1,3 +1,6 @@
+const UglifyJS = require("uglify-js");
+const fs = require('fs');
+const path = require('path');
 const Web3 = typeof window !== 'undefined' ? require('web3') : null;
 const { ethers } = require("ethers");
 const pako = require('pako');
@@ -70,4 +73,29 @@ exports.getMetadata = async function(provider, leniaMetadataContract, index) {
     const leniaMetadata = JSON.parse(contractMetadata)
 
     return leniaMetadata
+}
+
+
+exports.compressAllEngineCode = function(rootFolder, jsenginePath, wasmSourcePath, wasmSimdSourcePath) {
+    const engineCode = fs.readFileSync(path.join(rootFolder, jsenginePath), 'utf-8')
+    const engineCodeMinified = UglifyJS.minify([engineCode]).code;
+    const engineCodeMinifiedBuffer = Buffer.from(engineCodeMinified)
+    const wasmSource = fs.readFileSync(path.join(rootFolder, wasmSourcePath))
+    const wasmSimdSource = fs.readFileSync(path.join(rootFolder, wasmSimdSourcePath))
+    
+    const metadataBuffer = Buffer.allocUnsafe(4 * 4);
+    metadataBuffer.writeUInt32LE(3, 0)
+    metadataBuffer.writeUInt32LE(wasmSource.length, 4)
+    metadataBuffer.writeUInt32LE(wasmSimdSource.length, 8)
+    metadataBuffer.writeUInt32LE(engineCodeMinifiedBuffer.length, 12)
+
+    const finalBuffer = Buffer.concat([
+        metadataBuffer,
+        wasmSource, 
+        wasmSimdSource, 
+        engineCodeMinifiedBuffer
+    ])
+    const gzipFullEngine = pako.deflate(finalBuffer);
+
+    return gzipFullEngine
 }

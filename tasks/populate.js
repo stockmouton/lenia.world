@@ -1,10 +1,7 @@
-const UglifyJS = require("uglify-js");
-const fs = require('fs');
 const path = require('path');
 const pako = require('pako');
 const prompt = require('prompt');
 
-const { decodeContractMetdata, attrsMap, traitTypeAttrsMap } = require('../test/utils')
 const leniaUtils = require('../src/utils/sm');
 const rootFolder = __dirname + '/..'
 
@@ -39,14 +36,14 @@ async function setEngine({ jsenginePath, wasmSourcePath, wasmSimdSourcePath }, h
     const LeniaMetadataDeployment = await hre.deployments.get('LeniaMetadata')
     const leniaMetadata = LeniaMetadataContractFactory.attach(LeniaMetadataDeployment.address)
 
-    const gzipFullEngine = compressAllEngineCode(rootFolder, jsenginePath, wasmSourcePath, wasmSimdSourcePath)
+    const gzipFullEngine = leniaUtils.compressAllEngineCode(rootFolder, jsenginePath, wasmSourcePath, wasmSimdSourcePath)
 
     const logEngineTx = await leniaMetadata.logEngine(gzipFullEngine)
     await logEngineTx.wait()
     await leniaMetadata.setEngine(logEngineTx.hash)
 
     const setEngineTx = await lenia.setEngine(LeniaMetadataDeployment.address)
-    setEngineTx.wait()
+    await setEngineTx.wait()
 
     const contractEngine = await leniaMetadata.getEngine();
     if (contractEngine.length) {
@@ -287,29 +284,3 @@ task("populate-all", "Full populate the contract")
 
         console.log('if you want assets to be update, you need to launch the reveal script now.');
     })
-
-
-
-function compressAllEngineCode(rootFolder, jsenginePath, wasmSourcePath, wasmSimdSourcePath) {
-    const engineCode = fs.readFileSync(path.join(rootFolder, jsenginePath), 'utf-8')
-    const engineCodeMinified = UglifyJS.minify([engineCode]).code;
-    const engineCodeMinifiedBuffer = Buffer.from(engineCodeMinified)
-    const wasmSource = fs.readFileSync(path.join(rootFolder, wasmSourcePath))
-    const wasmSimdSource = fs.readFileSync(path.join(rootFolder, wasmSimdSourcePath))
-    
-    const metadataBuffer = Buffer.allocUnsafe(4 * 4);
-    metadataBuffer.writeUInt32LE(3, 0)
-    metadataBuffer.writeUInt32LE(wasmSource.length, 4)
-    metadataBuffer.writeUInt32LE(wasmSimdSource.length, 8)
-    metadataBuffer.writeUInt32LE(engineCodeMinifiedBuffer.length, 12)
-
-    const finalBuffer = Buffer.concat([
-        metadataBuffer,
-        wasmSource, 
-        wasmSimdSource, 
-        engineCodeMinifiedBuffer
-    ])
-    const gzipFullEngine = pako.deflate(finalBuffer);
-
-    return gzipFullEngine
-}

@@ -26,6 +26,15 @@ exports.deployLeniaContract = async (ethers) => {
     return contractPromise
 }
 
+exports.deployLeniaMetadataContract = async (ethers) => {
+    [owner, ...otherAccounts] = await ethers.getSigners()
+
+    LeniaMetadata = await ethers.getContractFactory("LeniaMetadata")
+    const contractPromise = LeniaMetadata.deploy()
+
+    return contractPromise
+}
+
 exports.generatePrivateKey = () => {
     return `0x${crypto.randomBytes(32).toString('hex')}`
 }
@@ -35,7 +44,7 @@ exports.traitTypeAttrsMap = [
 ]
 exports.attrsMap = [
     // ["Black White", "Carmine Blue", "Carmine Green", "Cinnamon", "Golden", "Msdos", "Rainbow", "Rainbow_transparent", "Salvia", "White Black"],
-    ["Alizarin", "Black White", "Carmine Blue", "Cinnamon", "City", "Golden", "Laurel", "Msdos", "Pink Beach", "Rainbow", "River Leaf", "Salvia", "Summer", "White Black"]
+    ["Alizarin", "Black White", "Carmine Blue", "Cinnamon", "City", "Golden", "Laurel", "Msdos", "Pink Beach", "Rainbow", "River Leaf", "Salvia", "Summer", "White Black"],
     ["Genesis", "Aquarium", "Terrarium", "Aerium", "Ignis", "Maelstrom", "Amphibium", "Pulsium", "Etherium", "Nexus", "Oscillium", "Kaleidium"],
     ["Kiai", "Kiroku", "Kihaku", "Hibiki"],
     ["Etheric", "Mental", "Astral", "Celestial", "Spiritual"],

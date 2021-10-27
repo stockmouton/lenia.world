@@ -6,7 +6,7 @@ function timeout(ms) {
 }
 
 describe("Royalties", function () {
-  let hardhatLenia
+  let leniaRoyalties
 
   beforeEach(async function () {
     [owner, ...otherAccounts] = await ethers.getSigners()
@@ -22,13 +22,13 @@ describe("Royalties", function () {
         otherAddresses[2], // Team Member 3
     ]
     const payeeShares = [2, 1, 1, 2]
-    hardhatLenia = await Royalties.deploy(payeeAdresses, payeeShares)
+    leniaRoyalties = await Royalties.deploy(payeeAdresses, payeeShares)
   })
 
   describe("Deployment", function () {
     it("Should set the payees", async function () {
       const [owner] = await ethers.getSigners()
-      const firstPayee = await hardhatLenia.payee(0)
+      const firstPayee = await leniaRoyalties.payee(0)
       expect(firstPayee).to.equal(owner.address)
       await timeout(3000)
     })
