@@ -29,7 +29,7 @@ const IndexPage = () => {
             <StyledH4>✍️ Articles</StyledH4>
             <StyledUL>
                 <li>
-                    <a href="on-chain.html">Lenia on chain</a>
+                    <a href="on-chain">Lenia on chain</a>
                 </li>
             </StyledUL>
         </StyledDiv>

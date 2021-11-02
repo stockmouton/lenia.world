@@ -1,13 +1,13 @@
 import React from 'react'
-import ReactDom from 'react-dom'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 
-const markdown = require('!!raw-loader!./on-chain.md')
+require("./template.css")
+const markdown = require('!!raw-loader!./on-chain.md').default
 
 const OnChainPage = () => {
     return (
-        <ReactMarkdown children={markdown} remarkPlugins={[remarkGfm]} />
+        <ReactMarkdown className="markdown" children={markdown} remarkPlugins={[remarkGfm]} />
     )
 }
 
