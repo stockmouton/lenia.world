@@ -96,6 +96,12 @@ const Layout = ({ children }) => {
                 <BrandName>Github</BrandName>
               </NavBar.Link>
             </NavBar.Item.AboveSm>
+            <NavBar.Item.AboveSm>
+              <NavBar.Link href="/blog">
+                <BrandLogo><GithubLogo height={18} /></BrandLogo>
+                <BrandName>Blog</BrandName>
+              </NavBar.Link>
+            </NavBar.Item.AboveSm>
             <NavBar.Item>
               <WalletConnectorButton />
             </NavBar.Item>
