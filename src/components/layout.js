@@ -9,7 +9,7 @@ import NavBar from "./navbar";
 import NavMenu from "./nav-menu"
 import WalletConnectorButton from "./wallet-connector-button";
 import Footer from "./footer";
-import { EtherscanLogo, DiscordLogo, GithubLogo, OpenseaLogo, TwitterLogo } from "./brand-logo"
+import { EtherscanLogo, DiscordLogo, GithubLogo, OpenseaLogo, TwitterLogo, MediumLogo } from "./brand-logo"
 
 /**
  * If re-adding the sidebar is necessary, add:
@@ -94,6 +94,12 @@ const Layout = ({ children }) => {
               <NavBar.Link href="https://github.com/stockmouton/lenia.stockmouton.com">
                 <BrandLogo><GithubLogo height={18} /></BrandLogo>
                 <BrandName>Github</BrandName>
+              </NavBar.Link>
+            </NavBar.Item.AboveSm>
+            <NavBar.Item.AboveSm>
+              <NavBar.Link href="https://medium.com/lenia-nft">
+                <BrandLogo><MediumLogo height={18} /></BrandLogo>
+                <BrandName>Blog</BrandName>
               </NavBar.Link>
             </NavBar.Item.AboveSm>
             <NavBar.Item>

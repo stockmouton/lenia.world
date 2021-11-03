@@ -139,6 +139,25 @@ task("get-engine", "Set the engine in the smart contract",  async (taskArgs, hre
     console.log(engineCodeMinified)
 })
 
+
+task("get-engine-address", "Get the engine address",  async (taskArgs, hre) => {
+    if (hre.hardhatArguments.network == null) {
+        throw new Error('Please add the missing --network <localhost|rinkeby|mainnet> argument')
+    }
+
+    const LeniaDescriptorLibraryDeployment = await hre.deployments.get('LeniaDescriptor')
+    const LeniaContractFactory = await hre.ethers.getContractFactory("Lenia", {
+        libraries: {
+            LeniaDescriptor: LeniaDescriptorLibraryDeployment.address
+        },
+    })
+    const LeniaDeployment = await hre.deployments.get('Lenia')
+    const lenia = LeniaContractFactory.attach(LeniaDeployment.address)
+    
+    const engineAddress = await lenia.getEngine()
+    console.log(engineAddress)
+})
+
 async function setMetadata({ metadataPath, initIndex, stopIndex }, hre ) {
     if (hre.hardhatArguments.network == null) {
         throw new Error('Please add the missing --network <localhost|rinkeby|mainnet> argument')
@@ -168,10 +187,11 @@ async function setMetadata({ metadataPath, initIndex, stopIndex }, hre ) {
     const LeniaMetadataDeployment = await hre.deployments.get('LeniaMetadata')
     const leniaMetadata = LeniaMetadataContractFactory.attach(LeniaMetadataDeployment.address)
     
-    overrides = {
-        maxFeePerGas: 50_000_000_000,  // 50 Gwei
-        maxPriorityFeePerGas: 1_000_000_000
-    }
+    overrides = {}
+    // overrides = {
+    //     maxFeePerGas: 100_000_000_000,  // Gwei
+    //     maxPriorityFeePerGas: 1_000_000_000
+    // }
     for (let index = initIndex; index < stopIndex; index++) {
         console.log(`Setting index ${index}`)
 
@@ -180,11 +200,12 @@ async function setMetadata({ metadataPath, initIndex, stopIndex }, hre ) {
        
         const logMetadataTx = await leniaMetadata.logMetadata(fullmetadataGZIP, overrides)
         console.log(`Waiting for log tx: ${logMetadataTx.hash} (${logMetadataTx.nonce})`)
-        await logMetadataTx.wait()
+        // await logMetadataTx.wait() Thanks to nonce, we don't need to wait for the log call to be executed
 
-        const setMetadataTx = await leniaMetadata.setMetadata(index, logMetadataTx.hash)
+        const setMetadataTx = await leniaMetadata.setMetadata(index, logMetadataTx.hash, overrides)
         console.log(`Waiting for set tx: ${setMetadataTx.hash} (${setMetadataTx.nonce})`)
         await setMetadataTx.wait()
+        // In this case, we wait jsut to make sure we don't rush
     }
     console.log('done!')
 }
