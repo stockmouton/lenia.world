@@ -1,30 +1,23 @@
 module.exports = {
   env: {
-    browser: false,
+    browser: true,
     es2021: true,
-    mocha: true,
-    node: true,
   },
   extends: [
-    "standard",
-    "plugin:prettier/recommended",
-    "plugin:node/recommended",
+    'plugin:react/recommended',
+    'airbnb',
+    'prettier',
   ],
   parserOptions: {
-    ecmaVersion: 12,
+    ecmaFeatures: {
+      jsx: true,
+    },
+    ecmaVersion: 13,
+    sourceType: 'module',
   },
-  overrides: [
-    {
-      files: ["hardhat.config.js"],
-      globals: { task: true },
-    },
-    {
-      files: ["scripts/**"],
-      rules: { "no-process-exit": "off" },
-    },
-    {
-      files: ["hardhat.config.js", "scripts/**", "test/**"],
-      rules: { "node/no-unpublished-require": "off" },
-    },
+  plugins: [
+    'react',
   ],
+  rules: {
+  },
 };
