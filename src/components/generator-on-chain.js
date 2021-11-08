@@ -21,7 +21,7 @@ const GeneratorOnChain = ({ zoom, fps, scale, lenia_id }) => {
     const { metadataContract } = useLeniaContract()
     const [ error, setError ] = useState(null)
 
-    let contractSet = useRef(false);
+    const contractSet = useRef(false);
 
     useEffect(async () => {
         if (!isUserMarkedConnected()) {
@@ -35,9 +35,9 @@ const GeneratorOnChain = ({ zoom, fps, scale, lenia_id }) => {
         if (metadataContract && account) {
             if (contractSet.current) {
                 return
-            } else {
+            } 
                 contractSet.current = true
-            }
+            
 
             lenia_id = Math.max(Math.min(lenia_id, 201), 0)                
 
@@ -49,13 +49,13 @@ const GeneratorOnChain = ({ zoom, fps, scale, lenia_id }) => {
             const WASMByteCode = hasSIMD ? WASMSIMDSource : WASMSource
             const engine = engineBytes.toString('utf-8')
             if (typeof engine === 'string' && engine.length > 0) {
-                var script = document.createElement('script');
+                const script = document.createElement('script');
                 script.innerHTML = engine
                 document.body.appendChild(script);
             }
 
             const leniaMetadata = await getMetadata(web3Provider, metadataContract, lenia_id)
-            leniaMetadata["config"]["world_params"]["scale"] = scale
+            leniaMetadata.config.world_params.scale = scale
             
             window.leniaEngine.init(WASMByteCode, WASMKey, leniaMetadata, zoom, fps);
         }
@@ -68,9 +68,9 @@ const GeneratorOnChain = ({ zoom, fps, scale, lenia_id }) => {
     return (
         <>
             <StyledDiv ref={nodeRef}>
-                <canvas id="RENDERING_CANVAS"></canvas>
+                <canvas id="RENDERING_CANVAS" />
             </StyledDiv>
-            {error && <Toast type="error" onClose={handleToastClose}><div dangerouslySetInnerHTML={ { __html: error.message } }></div></Toast>}
+            {error && <Toast type="error" onClose={handleToastClose}><div dangerouslySetInnerHTML={ { __html: error.message } } /></Toast>}
         </>
     )
 }

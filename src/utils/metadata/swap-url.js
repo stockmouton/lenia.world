@@ -3,7 +3,7 @@ const fs = require( 'fs' );
 const path = require( 'path' );
 
 const oriFolder = path.join(__dirname, "ori");
-const targetFolder = __dirname + "/../../../static/metadata/all_metadata.json";
+const targetFolder = `${__dirname  }/../../../static/metadata/all_metadata.json`;
 
 const imageIPFSPrefix = 'ipfs://Qmcrjm6EU9dJSdYwCBLmMc4JjV7zHKJ6D7SqpoY7ST4Q2t/';
 const animationURLIPFSPrefix = 'ipfs://QmPqnfEuQxHg1EtAMGENdDBjWwLNF22pxiWBcKsQ9mMAMS/';
@@ -35,7 +35,7 @@ const animationURLIPFSPrefix = 'ipfs://QmPqnfEuQxHg1EtAMGENdDBjWwLNF22pxiWBcKsQ9
             console.log(idx, fromPath, toPath)
             console.log(imageURL, animationURL)
 
-            let metadata = JSON.parse(fs.readFileSync(fromPath));
+            const metadata = JSON.parse(fs.readFileSync(fromPath));
             metadata.image = imageURL
             metadata.animation_url = animationURL
 

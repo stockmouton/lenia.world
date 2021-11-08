@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react"
-import Section from "./section"
 import styled from "styled-components"
 import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, Cell, ResponsiveContainer, Label } from 'recharts';
 import axios from "axios"
+import { useMediaQuery } from 'beautiful-react-hooks'; 
+import Section from "./section"
 import Grid from "./grid"
 import CHANNEL_CHANGE from "../audio/channel-change.wav"
 import NavBar from "./navbar";
@@ -13,7 +14,6 @@ import LeniaList from "./leniadex/lenia-list"
 import Link from "./link";
 import STATIC_NOISE_IMAGE from "../images/static-noise.gif"
 import { createMediaQuery, BREAKPOINTS, gridBreakpoints } from "../global-styles"
-import { useMediaQuery } from 'beautiful-react-hooks'; 
 import TextInput from "./text-input";
 
 const LENIADEX_STATUSES = {
@@ -197,8 +197,7 @@ const AppliedFilters = styled(Legend)`
   margin: 25px 0 0 60px;
 `
 
-const CustomScatterDot = ({ cx, cy, radius, fill }) => {
-  return (
+const CustomScatterDot = ({ cx, cy, radius, fill }) => (
     <Dot
       cx={cx}
       cy={cy}
@@ -208,7 +207,6 @@ const CustomScatterDot = ({ cx, cy, radius, fill }) => {
       fill={fill}
     />
   );
-};
 
 const audio = typeof window !== 'undefined' ? new window.Audio(CHANNEL_CHANGE) : null;
 if (audio) {
@@ -289,7 +287,7 @@ const LeniaDex = () => {
   }
 
   const handleInputChange = e => {
-    const value = e.target.value
+    const {value} = e.target
     setInputValue(value)
   }
 
@@ -439,7 +437,7 @@ const LeniaDex = () => {
               </Grid.Cell>
             </Grid>
             <VideoScreen>
-              <Video key={displayedLenia?.id} preload='auto' loop autoPlay muted playsInline={true}>
+              <Video key={displayedLenia?.id} preload='auto' loop autoPlay muted playsInline>
                 <source src={`https://lenia.world/metadata/${displayedLenia?.id}.mp4`} type="video/mp4" />
                 <p>Couldn't load this Lenia, please use a better browser ;)</p>
               </Video>

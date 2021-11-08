@@ -8,27 +8,27 @@ const pako = require('pako');
 const { attrsMap, traitTypeAttrsMap, deployLeniaContract, deployLeniaMetadataContract } = require('./utils')
 const leniaUtils = require('../src/utils/sm')
 
-const rootFolder = __dirname + '/..'
+const rootFolder = `${__dirname  }/..`
 
-describe("Lenia", function () {
+describe("Lenia", () => {
   let lenia
   let leniaMetadata
 
-  beforeEach(async function () {
+  beforeEach(async () => {
     lenia = await deployLeniaContract(ethers)
     leniaMetadata = await deployLeniaMetadataContract(ethers)
   })
 
-  describe("Deployment", function () {
-    it("Should set the right owner", async function () {
+  describe("Deployment", () => {
+    it("Should set the right owner", async () => {
       const [owner] = await ethers.getSigners()
       const contractOwner = await lenia.owner()
       expect(contractOwner).to.equal(owner.address)
     })
   })
 
-  describe("Populate", function () {
-    it("should log (and get) the engine using calldata", async function () {
+  describe("Populate", () => {
+    it("should log (and get) the engine using calldata", async () => {
       const jsenginePath = 'src/engine.js';
       const wasmSourcePath = 'static/optimized.wasm';
       const wasmSimdSourcePath = 'static/optimized-simd.wasm';
@@ -85,12 +85,12 @@ describe("Lenia", function () {
       expect(engineCodeMinified2).to.equal(engineCodeMinified)
     })
 
-    it("should log (and get) metadata using callData", async function () {
+    it("should log (and get) metadata using callData", async () => {
       const metadata = require('../static/metadata/all_metadata.json')
       
       const max_length = 5
       for (let index = 0; index < max_length; index++) {
-        let elementMetadata = metadata[index];
+        const elementMetadata = metadata[index];
         const fullmetadataGZIP = pako.deflate(JSON.stringify(elementMetadata));
        
         const logMetadataTx = await leniaMetadata.logMetadata(fullmetadataGZIP)
@@ -111,8 +111,8 @@ describe("Lenia", function () {
     })
   })
 
-  describe("Presale", function () {
-    it("should toggle the presale status", async function () {
+  describe("Presale", () => {
+    it("should toggle the presale status", async () => {
       let isPreSaleActive = await lenia.isPresaleActive()
       expect(isPreSaleActive).to.equal(false)
 
@@ -128,7 +128,7 @@ describe("Lenia", function () {
       expect(isPreSaleActive).to.equal(false)
     })
 
-    it("should add addresses to the presale list", async function() {
+    it("should add addresses to the presale list", async () => {
       const [_, ...otherAccounts] = await ethers.getSigners()
       const eligibleAccounts = otherAccounts.filter((_, i) => i < (otherAccounts.length / 2))
       const eligibleAddresses = eligibleAccounts.map(account => account.address)
@@ -147,7 +147,7 @@ describe("Lenia", function () {
       }
     })
 
-    it("should mint for the presale only once for an eligible address", async function () {
+    it("should mint for the presale only once for an eligible address", async () => {
       const [_, ...otherAccounts] = await ethers.getSigners()
       const eligibleAccounts = otherAccounts.filter((_, i) => i < (otherAccounts.length / 2))
       const eligibleAddresses = eligibleAccounts.map(account => account.address)
@@ -193,7 +193,7 @@ describe("Lenia", function () {
       }
     })
 
-    it("should not mint when presale is not active", async function () {    
+    it("should not mint when presale is not active", async () => {    
       const contractPrice = await lenia.getPrice()
       const mintTx = lenia.presaleMint({
         value: contractPrice
@@ -202,7 +202,7 @@ describe("Lenia", function () {
       expect(mintTx).to.be.revertedWith("Presale is not active")
     })
 
-    it("should not mint when max public supply is reached", async function () {
+    it("should not mint when max public supply is reached", async () => {
       const [_, ...otherAccounts] = await ethers.getSigners()
       const maxSupply = await lenia.MAX_SUPPLY()
       const reserved = await lenia.getReservedLeft()
@@ -231,7 +231,7 @@ describe("Lenia", function () {
       }
     })
 
-    it("should not mint when transaction value doesn\'t meet price", async function () {
+    it("should not mint when transaction value doesn\'t meet price", async () => {
       await lenia.togglePresaleStatus()
       
       // Add eligible addresses to the presale list
@@ -248,7 +248,7 @@ describe("Lenia", function () {
   })
 
   describe("Sale", () => {
-    it("should toggle the sale status", async function () {
+    it("should toggle the sale status", async () => {
       let isSaleActive;
 
       isSaleActive = await lenia.isSaleActive()
@@ -270,7 +270,7 @@ describe("Lenia", function () {
       expect(toggleSaleTx).to.be.revertedWith("Ownable: caller is not the owner")
     })
 
-    it("should not mint when sale is not active", async function () {          
+    it("should not mint when sale is not active", async () => {          
       const contractPrice = await lenia.getPrice()
       const mintTx = lenia.mint({
         value: contractPrice
@@ -279,7 +279,7 @@ describe("Lenia", function () {
       expect(mintTx).to.be.revertedWith("Public sale is not active")
     })
   
-    it("should mint for the sale", async function () {
+    it("should mint for the sale", async () => {
       await lenia.toggleSaleStatus()
     
       const contractPrice = await lenia.getPrice()
@@ -293,7 +293,7 @@ describe("Lenia", function () {
       expect(totalSupply).to.equal(1)
     })
 
-    it("should not mint when max public supply is reached", async function () {
+    it("should not mint when max public supply is reached", async () => {
       await lenia.toggleSaleStatus()
 
       const maxSupply = await lenia.MAX_SUPPLY()
@@ -311,7 +311,7 @@ describe("Lenia", function () {
       }
     })
 
-    it("should not mint when transaction value doesn\'t meet price", async function () {
+    it("should not mint when transaction value doesn\'t meet price", async () => {
       await lenia.toggleSaleStatus()
     
       const contractPrice = await lenia.getPrice()
@@ -324,7 +324,7 @@ describe("Lenia", function () {
   })
 
   describe("Payment Splitter", () => {
-    it("should send the money to the different shareholders", async function () {
+    it("should send the money to the different shareholders", async () => {
       const [owner, payee, ...otherAccounts] = await ethers.getSigners()
       const minter = otherAccounts[10]
       await lenia.toggleSaleStatus()

@@ -1,8 +1,8 @@
 import React from "react"
 import styled from "styled-components"
+import { useQueryParam, BooleanParam } from "use-query-params";
 import Menu from "./menu"
 import { useMenu } from "./menu-trigger";
-import { useQueryParam, BooleanParam } from "use-query-params";
 
 const StyledMenu = styled(Menu)`
   width: 264px;

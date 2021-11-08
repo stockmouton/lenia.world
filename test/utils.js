@@ -35,9 +35,7 @@ exports.deployLeniaMetadataContract = async (ethers) => {
     return contractPromise
 }
 
-exports.generatePrivateKey = () => {
-    return `0x${crypto.randomBytes(32).toString('hex')}`
-}
+exports.generatePrivateKey = () => `0x${crypto.randomBytes(32).toString('hex')}`
 
 exports.traitTypeAttrsMap = [
     'Colormap', 'Family', 'Ki', 'Aura', 'Weight', 'Robustness', 'Avoidance', 'Velocity', 'Spread'

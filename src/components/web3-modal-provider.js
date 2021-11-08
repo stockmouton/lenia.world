@@ -1,9 +1,8 @@
-import React, { createContext, useState, useContext } from 'react'
-import { useWeb3 } from "./web3-provider"
+import React, { createContext, useState, useContext , useEffect } from 'react'
 import Web3Modal from "web3modal"
 import WalletConnectProvider from '@walletconnect/web3-provider'
-import { useEffect } from 'react'
 import { useQueryParam, StringParam } from "use-query-params";
+import { useWeb3 } from "./web3-provider"
 
 
 const web3ModalContext = createContext({})

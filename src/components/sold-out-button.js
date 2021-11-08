@@ -1,6 +1,6 @@
 import React from 'react'
-import Button from './button'
 import styled from "styled-components"
+import Button from './button'
 import { createMediaQuery, BREAKPOINTS } from "../global-styles"
 
 const LeniaSupplyContent = styled.p`

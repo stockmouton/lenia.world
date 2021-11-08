@@ -13,6 +13,7 @@ require("solidity-coverage")
 const ethers = require("ethers")
 require('./tasks');
 const {generatePrivateKey} = require('./test/utils')
+
 const defaultPrivateKey = {
   'privateKey': process.env.DAO_PK,
   'balance': ethers.utils.parseEther("10000").toString()
@@ -51,7 +52,7 @@ module.exports = {
   },
   plugins: ["solidity-coverage"],
   gasReporter: {
-    enabled: (process.env.REPORT_GAS) ? true : false,
+    enabled: !!(process.env.REPORT_GAS),
     currency: "USD",
     gasPrice: 100,
     coinmarketcap: process.env.COINMARKETCAP

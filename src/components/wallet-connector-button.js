@@ -1,4 +1,5 @@
 import React, {useState} from 'react'
+import { useQueryParam, StringParam } from "use-query-params";
 import { useWeb3 } from "./web3-provider"
 import {useWeb3Modal} from "./web3-modal-provider"
 import NavBar from "./navbar"
@@ -6,7 +7,6 @@ import Dropdown from "./dropdown";
 import Menu from "./menu"
 import Toast from './toast'
 import { getAllowedChainIds, getChainDisplayName } from '../utils/wallet'
-import { useQueryParam, StringParam } from "use-query-params";
 
 const WalletConnectorButton = () => {
   const { resetWeb3Provider, account, chainId, provider } = useWeb3()

@@ -8,7 +8,7 @@ const deployLeniaContract = async hre => {
   const {deploy} = deployments
   
   const accounts = await getNamedAccounts()
-  const deployer = accounts.deployer
+  const {deployer} = accounts
   let addresses = []
   let shares = []
 

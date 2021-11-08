@@ -2,7 +2,7 @@ const axios = require('axios');
 const fs = require("fs")
 
 const jsonIPFSPrefix = 'https://gateway.pinata.cloud/ipfs/Qmf6kAYSHmBXvJbtkxDcqYiDWF5akvz8QxuqzMWC3JDtNd/';
-const allMetadataLocalFullpath = __dirname + "/../../../static/metadata/all_metadata.json";
+const allMetadataLocalFullpath = `${__dirname  }/../../../static/metadata/all_metadata.json`;
 
 
 function sleep(ms) {
@@ -10,7 +10,7 @@ function sleep(ms) {
 }
 
 (async () =>{
-    let allMetadataLocal = [];
+    const allMetadataLocal = [];
     const promises = []
     for (let index = 0; index < 202; index++) {        
         promises.push((async (index) => {
@@ -20,11 +20,11 @@ function sleep(ms) {
         })(index))
     }
 
-    let results = await Promise.all(promises)
+    const results = await Promise.all(promises)
 
     for (let i = 0; i < results.length; i++) {
         const response = results[i];
-        let rawDataIPFS = response.data
+        const rawDataIPFS = response.data
         allMetadataLocal.push(rawDataIPFS)
     }
 

@@ -1,4 +1,5 @@
 import React from "react"
+import { useQueryParam, BooleanParam } from "use-query-params";
 import Layout from "../components/layout"
 import Container from "../components/container";
 import Seo from "../components/seo"
@@ -15,7 +16,6 @@ import Link from "../components/link";
 import Panel from "../components/panel";
 import LeniaDex from "../components/leniadex"
 import { LeniaContractProvider } from "../components/lenia-contract-provider";
-import { useQueryParam, BooleanParam } from "use-query-params";
 
 import BBA_PICTURE from "../images/bba.png"
 import ALEX_PICTURE from "../images/alexorange.jpeg"

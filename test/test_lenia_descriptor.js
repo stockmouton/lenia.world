@@ -3,28 +3,28 @@ const { ethers } = require("hardhat");
 
 const { decodeContractMetdata, attrsMap, traitTypeAttrsMap, deployLeniaContract } = require('./utils')
 
-describe("LeniaDescriptor", function () {
+describe("LeniaDescriptor", () => {
     let lenia;
 
-    beforeEach(async function () {
+    beforeEach(async () => {
         lenia = await deployLeniaContract(ethers)
     })
 
-    describe("constructTokenURI", function () {
+    describe("constructTokenURI", () => {
         if (!process.env.REPORT_GAS) {
-            it("empty attributes array - should return a valid JSON engine", async function () {
+            it("empty attributes array - should return a valid JSON engine", async () => {
                 const index = 0;
                 
                 // Fake lenia params
-                let m = 0.123456789
-                let s = 1.123456789
-                let cells = Buffer.from("x");
+                const m = 0.123456789
+                const s = 1.123456789
+                const cells = Buffer.from("x");
 
                 const stringID = index.toString()
-                let name = "Lenia #" + stringID;
-                let imageURL = "image.png";
-                let animationURL = "video.mp4";
-                let smLeniaAttributes = []
+                const name = `Lenia #${  stringID}`;
+                const imageURL = "image.png";
+                const animationURL = "video.mp4";
+                const smLeniaAttributes = []
 
                 await lenia.setLeniaParams(
                     index,
@@ -49,22 +49,22 @@ describe("LeniaDescriptor", function () {
                 expect(contractMetadata.attributes.length).to.equal(1)
             })
 
-            it("one attributes array - should return a valid JSON the engine", async function () {
+            it("one attributes array - should return a valid JSON the engine", async () => {
                 const index = 5;
 
                 // Fake lenia params
-                let m = 0.123456789
-                let s = 1.123456789
-                let cells = Buffer.from("x");
+                const m = 0.123456789
+                const s = 1.123456789
+                const cells = Buffer.from("x");
 
                 const stringID = index.toString()
 
-                let imageURL = "image.png";
-                let animationURL = "video.mp4";
+                const imageURL = "image.png";
+                const animationURL = "video.mp4";
                 const attrTraitType0 = 'Colormap'
                 const attrValue0 = 'Black White'
 
-                let smLeniaAttributes = [{
+                const smLeniaAttributes = [{
                     'value': attrsMap[traitTypeAttrsMap.indexOf(attrTraitType0)].indexOf(attrValue0),
                     'numericalValue': '0.000',
                     'traitType': traitTypeAttrsMap.indexOf(attrTraitType0),
@@ -93,19 +93,19 @@ describe("LeniaDescriptor", function () {
                 expect(contractMetadata.attributes[0].numerical_value).to.equal(0.)
             })
         }
-        it("test all attributes - should return a valid JSON the engine", async function () {
+        it("test all attributes - should return a valid JSON the engine", async () => {
             const index = 5;
 
             // Fake lenia params
-            let m = 0.123456789
-            let s = 1.123456789
-            let cells = Buffer.from("x");
+            const m = 0.123456789
+            const s = 1.123456789
+            const cells = Buffer.from("x");
 
             const stringID = index.toString()
-            let imageURL = "image.png";
-            let animationURL = "video.mp4";
+            const imageURL = "image.png";
+            const animationURL = "video.mp4";
             for (let i = 0; i < traitTypeAttrsMap.length; i++) {
-                let smLeniaAttributes = []
+                const smLeniaAttributes = []
                 for (let j = 0; j < attrsMap[i].length; j++) {
                     smLeniaAttributes.push({
                         'traitType': i,

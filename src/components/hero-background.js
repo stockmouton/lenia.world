@@ -1,13 +1,12 @@
-import React, {useState} from "react"
+import React, {useState, useEffect } from "react"
 import styled from "styled-components"
+import {useWindowResize, useThrottledFn} from "beautiful-react-hooks"
 import BEAST_800_1600 from "../images/beast-800-1600.mp4"
 import BEAST_1000_1000 from "../images/beast-1000-1000.mp4"
 import BEAST_1920_1080 from "../images/beast-1920-1080.mp4"
-import {useWindowResize, useThrottledFn} from "beautiful-react-hooks"
-import { useEffect } from "react"
 
 const Video = ({src}) => (
-  <video width="100%" preload='auto' loop autoPlay muted playsInline={true}>
+  <video width="100%" preload='auto' loop autoPlay muted playsInline>
     <source src={src} type="video/mp4" />
   </video>
 )

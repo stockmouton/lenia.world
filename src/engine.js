@@ -3,9 +3,9 @@ window.leniaEngine.init = (WASMSource, WASMKey, metadata, zoom=1, fps=30) => {
     // Most problematic functions: FFT1D, transpose2D, complexMatrixDot
     // Those are problematic because they are called all the time
 
-    ///////////////////////////////
+    /// ////////////////////////////
     // Globals
-    ///////////////////////////////
+    /// ////////////////////////////
     let ADD_LENIA = false;
     let INIT_CELLS; 
     let INIT_CELLS_X = 0; 
@@ -32,28 +32,28 @@ window.leniaEngine.init = (WASMSource, WASMKey, metadata, zoom=1, fps=30) => {
     let PIXEL_SIZE = 1;
     let CANVAS_SIZE = 1;
 
-    ///////////////////////////////
+    /// ////////////////////////////
     // Loader
-    ///////////////////////////////
+    /// ////////////////////////////
     let exportsUpdateFn;
     function init(metadata, zoom, fps) {
         zoom = parseInt(Math.min(Math.max(zoom - 1, 0), 5), 10);
         PIXEL_SIZE = 1 << zoom;
         
-        metadata["config"]["world_params"]["scale"] = parseInt(Math.min(Math.max(metadata["config"]["world_params"]["scale"], 1), 4), 10);
+        metadata.config.world_params.scale = parseInt(Math.min(Math.max(metadata.config.world_params.scale, 1), 4), 10);
 
-        const memory = createWASMMemory(metadata["config"]["world_params"]["scale"])
-        let wasmConfig = {
+        const memory = createWASMMemory(metadata.config.world_params.scale)
+        const wasmConfig = {
             env: {
                 memory
             },
             Math
         };
         wasmConfig[WASMKey] = {  // Name of the file
-            GF_ID       : metadata["config"]["kernels_params"][0]["gf_id"],
-            GF_M        : metadata["config"]["kernels_params"][0]["m"],
-            GF_S        : metadata["config"]["kernels_params"][0]["s"],
-            T           : metadata["config"]["world_params"]["T"],
+            GF_ID       : metadata.config.kernels_params[0].gf_id,
+            GF_M        : metadata.config.kernels_params[0].m,
+            GF_S        : metadata.config.kernels_params[0].s,
+            T           : metadata.config.world_params.T,
         };
         // const module = WebAssembly.compile(WASMSource)
         WebAssembly.instantiate(WASMSource, wasmConfig)
@@ -61,12 +61,12 @@ window.leniaEngine.init = (WASMSource, WASMKey, metadata, zoom=1, fps=30) => {
                 exports = instance.exports
 
                 exportsUpdateFn = exports.updateFn
-                let buffer = new Float32Array(memory.buffer);
+                const buffer = new Float32Array(memory.buffer);
 
                 initWithProgressiveScaling(buffer, metadata, exports)
 
                 update(buffer, fps);
-                render(buffer, metadata["attributes"])
+                render(buffer, metadata.attributes)
 
                 setListener(buffer)
             })
@@ -77,27 +77,27 @@ window.leniaEngine.init = (WASMSource, WASMKey, metadata, zoom=1, fps=30) => {
     init(metadata, zoom, fps)
 
     function initWithProgressiveScaling(buffer, metadata, exports) {
-        const config = metadata["config"]
+        const {config} = metadata
 
-        let R = config["world_params"]["R"];
+        let {R} = config.world_params;
 
         SCALE = 1.
-        let cellsSt = config["cells"];
+        const cellsSt = config.cells;
         let initCells = decompressArray(cellsSt);
         let initDone = false
-        let scale = config["world_params"]["scale"]
+        let {scale} = config.world_params
         while (scale > 1 || !initDone) {
             initDone = true
-            let currentScale = Math.min(scale, 2.)
+            const currentScale = Math.min(scale, 2.)
 
             setGlobals(SCALE * currentScale)
             exports.setWorldSize(WORLD_SIZE)
 
             R = Math.round(R * currentScale);
-            setKernel(buffer, exports.FFT2D, R, config["kernels_params"]);
+            setKernel(buffer, exports.FFT2D, R, config.kernels_params);
 
-            let x1 = Math.floor(WORLD_SIZE / 2 - (initCells.shape[2] / 2) * currentScale);
-            let y1 = Math.floor(WORLD_SIZE / 2 - (initCells.shape[1] / 2) * currentScale);
+            const x1 = Math.floor(WORLD_SIZE / 2 - (initCells.shape[2] / 2) * currentScale);
+            const y1 = Math.floor(WORLD_SIZE / 2 - (initCells.shape[1] / 2) * currentScale);
             const angle = 0;
             clearCells(buffer, 0)
             copyInitCells(buffer, initCells, x1, y1, currentScale, angle);
@@ -130,28 +130,28 @@ window.leniaEngine.init = (WASMSource, WASMKey, metadata, zoom=1, fps=30) => {
     function decompressArray(string_cells) {
         const nbChars = ord("Z") - ord("A") + (ord("z") - ord("a")) + (ord("þ") - ord("À"));
 
-        let string_array = string_cells.split("::");
+        const string_array = string_cells.split("::");
 
         console.assert(
             string_array.length == 2 && string_array[0].length % 2 == 0
         );
 
-        let max_val = nbChars ** 2 - 1;
-        let raw_shape = string_array[1].split(";");
-        let cells_shape = [];
+        const max_val = nbChars ** 2 - 1;
+        const raw_shape = string_array[1].split(";");
+        const cells_shape = [];
         for (let index = 0; index < raw_shape.length; index++) {
             cells_shape.push(parseInt(raw_shape[index], 10));
         }
-        let cells_val_l = [];
+        const cells_val_l = [];
         for (let index = 0; index < string_array[0].length; index += 2) {
-            let val_i = ch2val(
+            const val_i = ch2val(
                 string_array[0][index] + string_array[0][index + 1],
                 nbChars
             );
-            let val_f = val_i / max_val;
+            const val_f = val_i / max_val;
             cells_val_l.push(val_f);
         }
-        let cellsMat = createMat(cells_val_l, cells_shape);
+        const cellsMat = createMat(cells_val_l, cells_shape);
 
         return cellsMat;
     }
@@ -159,8 +159,8 @@ window.leniaEngine.init = (WASMSource, WASMKey, metadata, zoom=1, fps=30) => {
     function ch2val(c, nbChars) {
         console.assert(c.length == 2);
 
-        let first_char = c[0];
-        let second_char = c[1];
+        const first_char = c[0];
+        const second_char = c[1];
 
         let first_char_idx;
         let second_char_idx;
@@ -195,15 +195,15 @@ window.leniaEngine.init = (WASMSource, WASMKey, metadata, zoom=1, fps=30) => {
     function createMat(flat_data, shape) {
         console.assert(shape.length == 3);
 
-        let nb_channels = shape[0];
-        let nb_rows = shape[1];
-        let nb_cols = shape[2];
+        const nb_channels = shape[0];
+        const nb_rows = shape[1];
+        const nb_cols = shape[2];
 
-        let arr = new Array(nb_channels);
+        const arr = new Array(nb_channels);
         for (let i = 0; i < nb_channels; i++) {
-            let channel = new Array(nb_rows);
+            const channel = new Array(nb_rows);
             for (let j = 0; j < nb_rows; j++) {
-                let row = new Float32Array(nb_cols);
+                const row = new Float32Array(nb_cols);
                 for (let k = 0; k < nb_cols; k++) {
                     row[k] =
                         flat_data[i * (nb_rows + nb_cols) + j * nb_cols + k];
@@ -213,15 +213,15 @@ window.leniaEngine.init = (WASMSource, WASMKey, metadata, zoom=1, fps=30) => {
             arr[i] = channel;
         }
 
-        let arr_data = {
-            arr: arr,
-            shape: shape,
+        const arr_data = {
+            arr,
+            shape,
         };
         return arr_data;
     }
 
     function createDataArray(world_size) {
-        let arr = Array(world_size);
+        const arr = Array(world_size);
         for (let i = 0; i < world_size; i++)
             arr[i] = new Float32Array(world_size).fill(0);
         return arr;
@@ -235,41 +235,41 @@ window.leniaEngine.init = (WASMSource, WASMKey, metadata, zoom=1, fps=30) => {
             canvas = document.getElementById(id);
         }
         canvas.width = canvas.height = canvas_size;
-        let ctx = canvas.getContext("2d");
-        let img = ctx.createImageData(canvas.width, canvas.height);
-        let rect = canvas.getBoundingClientRect();
+        const ctx = canvas.getContext("2d");
+        const img = ctx.createImageData(canvas.width, canvas.height);
+        const rect = canvas.getBoundingClientRect();
 
         return {
             can: canvas,
-            ctx: ctx,
-            img: img,
+            ctx,
+            img,
             left: rect.left,
             top: rect.top,
         };
     }
 
     function copyInitCells(buffer, newCells, x1, y1, scale, angle) {
-        let arr = newCells.arr[0];
-        let h = newCells.shape[1];
-        let w = newCells.shape[2];
+        const arr = newCells.arr[0];
+        const h = newCells.shape[1];
+        const w = newCells.shape[2];
 
-        let sin = Math.sin((angle / 180) * Math.PI);
-        let cos = Math.cos((angle / 180) * Math.PI);
-        let fh = (Math.abs(h * cos) + Math.abs(w * sin) + 1) * scale - 1;
-        let fw = (Math.abs(w * cos) + Math.abs(h * sin) + 1) * scale - 1;
+        const sin = Math.sin((angle / 180) * Math.PI);
+        const cos = Math.cos((angle / 180) * Math.PI);
+        const fh = (Math.abs(h * cos) + Math.abs(w * sin) + 1) * scale - 1;
+        const fw = (Math.abs(w * cos) + Math.abs(h * sin) + 1) * scale - 1;
         for (let fi = 0; fi < fh; fi++) {
             for (let fj = 0; fj < fw; fj++) {
-                let i = Math.round(
+                const i = Math.round(
                     (-(fj - fw / 2) * sin + (fi - fh / 2) * cos) / scale + h / 2
                 );
-                let j = Math.round(
+                const j = Math.round(
                     (+(fj - fw / 2) * cos + (fi - fh / 2) * sin) / scale + w / 2
                 );
-                let x = Mod(fj + x1, WORLD_SIZE);
-                let y = Mod(fi + y1, WORLD_SIZE);
+                const x = Mod(fj + x1, WORLD_SIZE);
+                const y = Mod(fi + y1, WORLD_SIZE);
 
-                let inBounds = (i >= 0 && j >= 0 && i < h && j < arr[i].length)
-                let c = inBounds ? arr[i][j] : 0.;
+                const inBounds = (i >= 0 && j >= 0 && i < h && j < arr[i].length)
+                const c = inBounds ? arr[i][j] : 0.;
                 if (c > 0) {
                     buffer[BUFFER_CELLS_OUT_IDX * BUFFER_SIZE + y * WORLD_SIZE + x] = c
                 };
@@ -277,9 +277,9 @@ window.leniaEngine.init = (WASMSource, WASMKey, metadata, zoom=1, fps=30) => {
         }
     }
 
-    ///////////////////////////////
+    /// ////////////////////////////
     // Renderer
-    ///////////////////////////////
+    /// ////////////////////////////
     function update(buffer, fps) {
         (function loop() {
             setTimeout(loop, 1000 / fps);
@@ -309,8 +309,8 @@ window.leniaEngine.init = (WASMSource, WASMKey, metadata, zoom=1, fps=30) => {
         let colorName;
         for (let index = 0; index < attributes.length; index++) {
             const attribute = attributes[index];
-            if (attribute["trait_type"] === "Colormap") {
-                colorName = attribute["value"]
+            if (attribute.trait_type === "Colormap") {
+                colorName = attribute.value
                     .trim()
                     .toLocaleLowerCase()
                     .replace(" ", "-");
@@ -324,17 +324,17 @@ window.leniaEngine.init = (WASMSource, WASMKey, metadata, zoom=1, fps=30) => {
 
     function DrawArray(canvas, buffer, max_val, colorName) {
         const nb_colors = COLORS[colorName].length;
-        let imgData = canvas.img.data;
+        const imgData = canvas.img.data;
 
         let p = 0;
         let rgba;
         for (let i = 0; i < CANVAS_SIZE; i++) {
-            let ii = Math.floor(i / PIXEL_SIZE);
+            const ii = Math.floor(i / PIXEL_SIZE);
             for (let j = 0; j < CANVAS_SIZE; j++) {
-                let jj = Math.floor(j / PIXEL_SIZE);
-                let outBufPos = BUFFER_CELLS_OUT_IDX * BUFFER_SIZE + ii * WORLD_SIZE + jj;
+                const jj = Math.floor(j / PIXEL_SIZE);
+                const outBufPos = BUFFER_CELLS_OUT_IDX * BUFFER_SIZE + ii * WORLD_SIZE + jj;
 
-                let v = buffer[outBufPos] * max_val;
+                const v = buffer[outBufPos] * max_val;
                 let c = Math.floor(v * nb_colors);
                 c = Math.max(c, 0);
                 c = Math.min(c, nb_colors - 1);
@@ -351,20 +351,20 @@ window.leniaEngine.init = (WASMSource, WASMKey, metadata, zoom=1, fps=30) => {
         RENDERING_CANVAS.ctx.drawImage(canvas.can, 0, 0);
     }
 
-    ///////////////////////////////
+    /// ////////////////////////////
     // Kernels
-    ///////////////////////////////
+    /// ////////////////////////////
     function setKernel(buffer, fft2dFn, R, kernels_params) {
-        let k_id = kernels_params[0]["k_id"];
-        let k_q = kernels_params[0]["q"];
-        let k_r = kernels_params[0]["r"];
-        let tmp_bs = kernels_params[0]["b"];
+        const {k_id} = kernels_params[0];
+        const k_q = kernels_params[0].q;
+        const k_r = kernels_params[0].r;
+        const tmp_bs = kernels_params[0].b;
         let bs;
 
-        let kernelRe = createDataArray(WORLD_SIZE);
-        if (typeof tmp_bs == "string") {
+        const kernelRe = createDataArray(WORLD_SIZE);
+        if (typeof tmp_bs === "string") {
             bs = [];
-            let tmp_bs_arr = tmp_bs.split(",");
+            const tmp_bs_arr = tmp_bs.split(",");
             for (let index = 0; index < tmp_bs_arr.length; index++) {
                 const split = tmp_bs_arr[index].split("/");
                 if (split.length == 2) {
@@ -374,7 +374,7 @@ window.leniaEngine.init = (WASMSource, WASMKey, metadata, zoom=1, fps=30) => {
                 }
             }
         } else {
-            bs = kernels_params[0]["b"];
+            bs = kernels_params[0].b;
         }
 
         let weight = 0.0;
@@ -385,8 +385,8 @@ window.leniaEngine.init = (WASMSource, WASMKey, metadata, zoom=1, fps=30) => {
                     ((i + world_size_center) % WORLD_SIZE) - world_size_center;
                 let jj =
                     ((j + world_size_center) % WORLD_SIZE) - world_size_center;
-                let r = Math.sqrt(ii * ii + jj * jj) / R;
-                let v = kernelShell(k_id, k_q, bs, k_r, r);
+                const r = Math.sqrt(ii * ii + jj * jj) / R;
+                const v = kernelShell(k_id, k_q, bs, k_r, r);
                 weight += v;
                 kernelRe[i][j] = v;
                 ii = WORLD_SIZE - ((i + WORLD_SIZE / 2) % WORLD_SIZE) - 1;
@@ -410,12 +410,12 @@ window.leniaEngine.init = (WASMSource, WASMKey, metadata, zoom=1, fps=30) => {
     }
 
     function kernelShell(k_id, k_q, bs, k_r, dist) {
-        let nb_b = bs.length;
-        let b_dist = nb_b * dist;
-        let b_threshold =
+        const nb_b = bs.length;
+        const b_dist = nb_b * dist;
+        const b_threshold =
             bs[Math.min(parseInt(Math.floor(b_dist), 10), nb_b - 1)];
 
-        let k_val = (dist < 1) * kernelFn(k_id, k_q, b_dist % 1) * b_threshold;
+        const k_val = (dist < 1) * kernelFn(k_id, k_q, b_dist % 1) * b_threshold;
 
         return k_val;
     }
@@ -438,9 +438,9 @@ window.leniaEngine.init = (WASMSource, WASMKey, metadata, zoom=1, fps=30) => {
         }
     }
 
-    ///////////////////////////
+    /// ////////////////////////
     // Math
-    ///////////////////////////
+    /// ////////////////////////
     function Mod(x, n) {
         return ((x % n) + n) % n;
     }
@@ -451,9 +451,9 @@ window.leniaEngine.init = (WASMSource, WASMKey, metadata, zoom=1, fps=30) => {
         return Math.floor(Random() * (max + 1 - min) + min);
     }
 
-    ///////////////////////////
+    /// ////////////////////////
     // Utils
-    ///////////////////////////
+    /// ////////////////////////
     function setGlobals(scale) {
         SCALE = parseInt(Math.min(Math.max(scale, 1), 4), 10);
         WORLD_SIZE = computeWorldSize(SCALE);
@@ -513,10 +513,10 @@ window.leniaEngine.init = (WASMSource, WASMKey, metadata, zoom=1, fps=30) => {
     }
 
     function crop(buffer){
-        let bounds = {'x': WORLD_SIZE, 'y': WORLD_SIZE, 'xm': 0, 'ym': 0}
+        const bounds = {'x': WORLD_SIZE, 'y': WORLD_SIZE, 'xm': 0, 'ym': 0}
         for (let y = 0; y < WORLD_SIZE; y++) {
             for (let x = 0; x < WORLD_SIZE; x++) {
-                let v = buffer[BUFFER_CELLS_OUT_IDX * BUFFER_SIZE + y * WORLD_SIZE + x]
+                const v = buffer[BUFFER_CELLS_OUT_IDX * BUFFER_SIZE + y * WORLD_SIZE + x]
                 if(v > 0) {
                     bounds.x = Math.min(x, bounds.x)
                     bounds.y = Math.min(y, bounds.y)
@@ -525,14 +525,14 @@ window.leniaEngine.init = (WASMSource, WASMKey, metadata, zoom=1, fps=30) => {
                 }
             }
         }
-        let cells = {
+        const cells = {
             "arr": [[]],
             "shape": [1, bounds.ym - bounds.y, bounds.xm - bounds.x]
         } 
 
-        for (let y = bounds.y; y < bounds.ym; y++) {
-            let subarray = new Float32Array(cells.shape[2])
-            for (let x = bounds.x, i = 0; x < bounds.xm; x++, i++) {
+        for (let {y} = bounds; y < bounds.ym; y++) {
+            const subarray = new Float32Array(cells.shape[2])
+            for (let {x} = bounds, i = 0; x < bounds.xm; x++, i++) {
                 subarray[i] = buffer[BUFFER_CELLS_OUT_IDX * BUFFER_SIZE + y * WORLD_SIZE + x]
             }
             cells.arr[0].push(subarray)
@@ -542,15 +542,15 @@ window.leniaEngine.init = (WASMSource, WASMKey, metadata, zoom=1, fps=30) => {
     }
 
     function onClick(e) {
-        let rect = e.target.getBoundingClientRect();
-        INIT_CELLS_X = (e.clientX - rect.left) / CANVAS_SCALING; //x position within the element.
-        INIT_CELLS_Y = (e.clientY - rect.top) / CANVAS_SCALING;  //y position within the element.
+        const rect = e.target.getBoundingClientRect();
+        INIT_CELLS_X = (e.clientX - rect.left) / CANVAS_SCALING; // x position within the element.
+        INIT_CELLS_Y = (e.clientY - rect.top) / CANVAS_SCALING;  // y position within the element.
         ADD_LENIA = true;
     }
 
-    ///////////////////////////
+    /// ////////////////////////
     // Colors
-    ///////////////////////////
+    /// ////////////////////////
     const COLORS = {
         alizarin: hex_to_palette_rgba("d6c3c9", [
             "f9c784",
@@ -738,9 +738,9 @@ window.leniaEngine.init = (WASMSource, WASMKey, metadata, zoom=1, fps=30) => {
                 colors.push(color1 * (1 - frac) + color2 * frac);
             }
             return colors;
-        } else {
+        } 
             return colors1 * (1 - frac) + colors2 * frac;
-        }
+        
     }
 
     function fromSRGB(rgbUINT8) {
@@ -788,8 +788,8 @@ window.leniaEngine.init = (WASMSource, WASMKey, metadata, zoom=1, fps=30) => {
         return sum ** gamma;
     }
 
-    ///////////////////////////
+    /// ////////////////////////
     // Setting public functions
-    ///////////////////////////
+    /// ////////////////////////
     
 };

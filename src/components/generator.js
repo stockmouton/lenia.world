@@ -27,16 +27,16 @@ const Generator = ({ zoom, fps, scale, lenia_id }) => {
             : 'engine'
   
         const leniaResponse = await fetch(`/metadata/${lenia_id}.json`);
-        let leniaMetadata = await leniaResponse.json()
+        const leniaMetadata = await leniaResponse.json()
 
-        leniaMetadata["config"]["world_params"]["scale"] = scale
+        leniaMetadata.config.world_params.scale = scale
 
         window.leniaEngine.init(WASMSource, WASMKey, leniaMetadata, zoom, fps);
     })
     
     return (
         <StyledDiv ref={nodeRef}>
-            <canvas id="RENDERING_CANVAS"></canvas>
+            <canvas id="RENDERING_CANVAS" />
         </StyledDiv>
     )
 }

@@ -4,10 +4,11 @@ const path = require('path');
 const pako = require('pako');
 const prompt = require('prompt');
 
-const leniaUtils = require('../src/utils/sm');
 const { init } = require('es-module-lexer');
 const { assert } = require('console');
-const rootFolder = __dirname + '/..'
+const leniaUtils = require('../src/utils/sm');
+
+const rootFolder = `${__dirname  }/..`
 
 
 async function setEngine({ jsenginePath, wasmSourcePath, wasmSimdSourcePath }, hre) {
@@ -163,7 +164,7 @@ async function setMetadata({ metadataPath, initIndex, stopIndex }, hre ) {
         throw new Error('Please add the missing --network <localhost|rinkeby|mainnet> argument')
     }
 
-    const metadataFullpath = rootFolder + '/' + metadataPath
+    const metadataFullpath = `${rootFolder  }/${  metadataPath}`
     const metadata = require(metadataFullpath)
 
     initIndex = Math.max(initIndex, 0)
@@ -195,7 +196,7 @@ async function setMetadata({ metadataPath, initIndex, stopIndex }, hre ) {
     for (let index = initIndex; index < stopIndex; index++) {
         console.log(`Setting index ${index}`)
 
-        let elementMetadata = metadata[index];
+        const elementMetadata = metadata[index];
         const fullmetadataGZIP = pako.deflate(JSON.stringify(elementMetadata));
        
         const logMetadataTx = await leniaMetadata.logMetadata(fullmetadataGZIP, overrides)
@@ -304,7 +305,7 @@ task("populate-all", "Full populate the contract")
         await setEngine({jsenginePath, wasmSourcePath, wasmSimdSourcePath}, hre)
         console.log('Setting the engine: Done')
 
-        const metadataFullpath = rootFolder + '/' + metadataPath
+        const metadataFullpath = `${rootFolder  }/${  metadataPath}`
         console.log(`Setting all lenia Parameters using metadata at ${metadataFullpath}`)
         await setMetadata({ metadataPath }, hre)
         console.log('Setting all lenia Parameters: Done')

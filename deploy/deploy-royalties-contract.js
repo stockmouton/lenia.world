@@ -8,7 +8,7 @@ const deployLeniaRoyaltiesContract = async hre => {
   const {deploy} = deployments
   
   const accounts = await getNamedAccounts()
-  const deployer = accounts.deployer
+  const {deployer} = accounts
   let addresses = []
   let shares = []
 
@@ -23,7 +23,7 @@ const deployLeniaRoyaltiesContract = async hre => {
     console.log('Deploying LeniaRoyalties Contract')
     console.log('Splitees', addresses)
     console.log('Shares', shares)
-    const deployer = accounts.deployer
+    const {deployer} = accounts
     console.log('Deployer', deployer)
     console.log('Is this ok? [y/N]')
     const { ok } = await prompt.get(['ok']);

@@ -30,10 +30,10 @@ exports.getEngineCode = async function(provider, leniaMetadataContract) {
 
     const nbFiles = parseInt(finalBuffer.readUInt32LE(0).toString(), 10)
     let nbBytesPrefix = (nbFiles + 1) * 4
-    let files = []
+    const files = []
     for (let i = 0; i < nbFiles; i++) {
         const fileLength = parseInt(finalBuffer.readUInt32LE((i + 1) * 4).toString(), 10)
-        let fileBuffer = Buffer.allocUnsafe(fileLength)
+        const fileBuffer = Buffer.allocUnsafe(fileLength)
         finalBuffer.copy(fileBuffer, 0, nbBytesPrefix, nbBytesPrefix + fileLength)
         files.push(fileBuffer)
         nbBytesPrefix += fileLength

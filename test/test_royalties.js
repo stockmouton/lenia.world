@@ -5,10 +5,10 @@ function timeout(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-describe("Royalties", function () {
+describe("Royalties", () => {
   let leniaRoyalties
 
-  beforeEach(async function () {
+  beforeEach(async () => {
     [owner, ...otherAccounts] = await ethers.getSigners()
 
     Royalties = await ethers.getContractFactory("LeniaRoyalties")
@@ -25,8 +25,8 @@ describe("Royalties", function () {
     leniaRoyalties = await Royalties.deploy(payeeAdresses, payeeShares)
   })
 
-  describe("Deployment", function () {
-    it("Should set the payees", async function () {
+  describe("Deployment", () => {
+    it("Should set the payees", async () => {
       const [owner] = await ethers.getSigners()
       const firstPayee = await leniaRoyalties.payee(0)
       expect(firstPayee).to.equal(owner.address)

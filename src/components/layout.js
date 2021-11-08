@@ -44,8 +44,7 @@ const NavBarWrapper = styled.nav`
   height: 27px;
 `
 
-const Layout = ({ children }) => {
-  return (
+const Layout = ({ children }) => (
     <>
       <GlobalStyles />
       <NavBarWrapper>
@@ -113,7 +112,6 @@ const Layout = ({ children }) => {
       <Footer />
     </>
   )
-}
 
 Layout.propTypes = {
   children: PropTypes.node.isRequired,

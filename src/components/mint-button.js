@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react'
+import styled from "styled-components"
 import Button from './button'
 import { useWeb3 } from "./web3-provider"
 import Toast from './toast'
-import styled from "styled-components"
 import { createMediaQuery, BREAKPOINTS } from "../global-styles"
 import { useWeb3Modal } from './web3-modal-provider'
 import { useLeniaContract, SALE_STATUSES } from './lenia-contract-provider'

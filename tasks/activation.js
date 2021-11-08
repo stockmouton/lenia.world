@@ -49,7 +49,7 @@ task("set-baseuri", "Set the base uri")
     const LeniaDeployment = await hre.deployments.get('Lenia')
     const lenia = LeniaContractFactory.attach(LeniaDeployment.address)
 
-    let setBaseURITx = await lenia.setBaseURI(baseuri)
+    const setBaseURITx = await lenia.setBaseURI(baseuri)
     console.log('baseURI was successfully set')
   })
 
