@@ -12,12 +12,6 @@ const StyledDropdown = styled.div`
 
 const Dropdown = ({onClickOutside, ...props}) => {
   const node = useRef(null);
-  useEffect(() => {
-    document.addEventListener("click", handleClickOutside), false;
-    return () => {
-      document.removeEventListener("click", handleClickOutside, false);
-    };
-  }, []);
 
   const handleClickOutside = e => {
     const event = e
@@ -25,6 +19,13 @@ const Dropdown = ({onClickOutside, ...props}) => {
       onClickOutside(event)
     }
   };
+
+  useEffect(() => {
+    document.addEventListener("click", handleClickOutside, false);
+    return () => {
+      document.removeEventListener("click", handleClickOutside, false);
+    };
+  }, []);
 
   return <StyledDropdown {...props} ref={node} />
 }

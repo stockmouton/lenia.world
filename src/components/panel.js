@@ -29,7 +29,7 @@ const CollapseIcon = styled.span`
 const StyledPanel = ({ heading, body }) => {
   const [isOpen, setIsOpen] = useState(false);
 
-  const handleClick = () => setIsOpen(isOpen => !isOpen);
+  const handleClick = () => setIsOpen(wasOpen => !wasOpen);
 
   return (
     <Panel>

@@ -1,9 +1,8 @@
-const { Console } = require('console');
 const fs = require( 'fs' );
 const path = require( 'path' );
 
 const oriFolder = path.join(__dirname, "ori");
-const targetFolder = `${__dirname  }/../../../static/metadata/all_metadata.json`;
+const targetFolder = `${__dirname  }/../../static/metadata/all_metadata.json`;
 
 const imageIPFSPrefix = 'ipfs://Qmcrjm6EU9dJSdYwCBLmMc4JjV7zHKJ6D7SqpoY7ST4Q2t/';
 const animationURLIPFSPrefix = 'ipfs://QmPqnfEuQxHg1EtAMGENdDBjWwLNF22pxiWBcKsQ9mMAMS/';
@@ -16,13 +15,13 @@ const animationURLIPFSPrefix = 'ipfs://QmPqnfEuQxHg1EtAMGENdDBjWwLNF22pxiWBcKsQ9
         const files = await fs.promises.readdir( oriFolder );
 
         // Loop them all with the new for...of
-        for( const file of files ) {
+        files.forEach(file => {
             // Get the full paths
             if (!file.includes('json')) {
-                continue
+                return
             }
             if (file.includes('all_metadata')) {
-                continue
+                return
             }
 
             const idx = file.split('.')[0]
@@ -41,7 +40,7 @@ const animationURLIPFSPrefix = 'ipfs://QmPqnfEuQxHg1EtAMGENdDBjWwLNF22pxiWBcKsQ9
 
             fs.writeFileSync(toPath, JSON.stringify(metadata));
             console.log( "Moved '%s'->'%s'", fromPath, toPath );
-        } // End for...of
+        })
     }
     catch( e ) {
         // Catch anything bad that happens

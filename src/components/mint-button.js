@@ -41,7 +41,7 @@ const StyledButton = styled(Button)`
 `
 
 const MintButton = () => {
-  const { web3Provider, account, chainId } = useWeb3()
+  const { web3Provider, account: currentAccount, chainId } = useWeb3()
   const { openWeb3Modal } = useWeb3Modal()
   const { isEligibleForPresale, saleStatus, totalLeniaMinted, totalLeniaSupply, initBlockchainData, updateBlockchainData, contract } = useLeniaContract()
   const [mintingTransactionStatus, setMintingTransactionStatus] = useState(MINTING_TRANSACTION_STATUSES.READY)
@@ -56,26 +56,29 @@ const MintButton = () => {
 
   useEffect(() => {
     initBlockchainData()
-  }, [web3Provider, account])
+  }, [web3Provider, currentAccount])
 
   useEffect(() => {
     const canAccountMint = (saleStatus === SALE_STATUSES.PRESALE && isEligibleForPresale) || saleStatus === SALE_STATUSES.PUBLIC
-    setButtonStatus(getButtonStatus(account, canAccountMint, totalLeniaSupply == totalLeniaMinted && totalLeniaSupply > 0))
-  }, [saleStatus, isEligibleForPresale, totalLeniaMinted, totalLeniaSupply, account])
+    setButtonStatus(getButtonStatus(currentAccount, canAccountMint, totalLeniaSupply === totalLeniaMinted && totalLeniaSupply > 0))
+  }, [saleStatus, isEligibleForPresale, totalLeniaMinted, totalLeniaSupply, currentAccount])
 
   const handleClick = async () => {
-    if (account === '') return openWeb3Modal()
+    if (currentAccount === '') {
+      openWeb3Modal()
+      return
+    }
 
     setButtonStatus(BUTTON_STATUSES.LOADING)
     setMintingTransactionStatus(MINTING_TRANSACTION_STATUSES.PROCESSING)
     try {
       const contractMethod = saleStatus === SALE_STATUSES.PUBLIC ? 'mint' : 'presaleMint'
-      const leniaUnitPrice = await contract.methods.getPrice().call({ from: account })
-      await contract.methods[contractMethod]().send({ from: account, value: leniaUnitPrice })
+      const leniaUnitPrice = await contract.methods.getPrice().call({ from: currentAccount })
+      await contract.methods[contractMethod]().send({ from: currentAccount, value: leniaUnitPrice })
       setMintingTransactionStatus(MINTING_TRANSACTION_STATUSES.SUCCESS)
       updateBlockchainData()
-    } catch (error) {
-      setError(error)
+    } catch (e) {
+      setError(e)
       setButtonStatus(BUTTON_STATUSES.READY)
       setMintingTransactionStatus(MINTING_TRANSACTION_STATUSES.ERROR)
     }
@@ -104,8 +107,8 @@ const MintButton = () => {
       </p>
       <StyledButton onClick={handleClick} disabled={[BUTTON_STATUSES.NOT_ALLOWED, BUTTON_STATUSES.LOADING, BUTTON_STATUSES.SOLD_OUT].includes(buttonStatus)}>{getButtonContent()}</StyledButton>
       {saleStatus !== SALE_STATUSES.NOT_STARTED && Boolean(totalLeniaSupply) && <LeniaSupplyContent>{totalLeniaMinted}/{totalLeniaSupply} Lenia minted</LeniaSupplyContent>}
-      {mintingTransactionStatus == MINTING_TRANSACTION_STATUSES.ERROR && error && <Toast type="error" onClose={handleToastClose}>{error?.message}</Toast>}
-      {mintingTransactionStatus == MINTING_TRANSACTION_STATUSES.SUCCESS && <Toast onClose={handleToastClose}>You successfully minted a lenia! <Link href={`https://${chainId === ETHEREUM_CHAIN_IDS.MAINNET ? '' : 'testnets.'}opensea.io/account/${chainId === ETHEREUM_CHAIN_IDS.MAINNET ? 'lenia-nft' : 'lenia'}`}>Go check your Lenia on Opensea.</Link></Toast>}
+      {mintingTransactionStatus === MINTING_TRANSACTION_STATUSES.ERROR && error && <Toast type="error" onClose={handleToastClose}>{error?.message}</Toast>}
+      {mintingTransactionStatus === MINTING_TRANSACTION_STATUSES.SUCCESS && <Toast onClose={handleToastClose}>You successfully minted a lenia! <Link href={`https://${chainId === ETHEREUM_CHAIN_IDS.MAINNET ? '' : 'testnets.'}opensea.io/account/${chainId === ETHEREUM_CHAIN_IDS.MAINNET ? 'lenia-nft' : 'lenia'}`}>Go check your Lenia on Opensea.</Link></Toast>}
     </>
   )
 }

@@ -15,7 +15,7 @@ const EmbedPage = () => {
     return (
         <Video key={id} preload='auto' loop autoPlay muted playsInline>
             <source src={`/metadata/${id}.mp4`} type="video/mp4" />
-            <p>Couldn't load this Lenia, please use a better browser ;)</p>
+            <p>Couldn&lsquo;t load this Lenia, please use a better browser ;)</p>
         </Video>
     )
 }

@@ -1,3 +1,5 @@
+const { types } = require("hardhat/config")
+
 task("start-presale", "Start Lenia presale", async (taskArgs, hre) => {
   if (hre.hardhatArguments.network == null) {
     throw new Error('Please add the missing --network <localhost|rinkeby|mainnet> argument')
@@ -49,7 +51,7 @@ task("set-baseuri", "Set the base uri")
     const LeniaDeployment = await hre.deployments.get('Lenia')
     const lenia = LeniaContractFactory.attach(LeniaDeployment.address)
 
-    const setBaseURITx = await lenia.setBaseURI(baseuri)
+    await lenia.setBaseURI(baseuri)
     console.log('baseURI was successfully set')
   })
 

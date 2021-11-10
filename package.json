@@ -74,7 +74,7 @@
     "stockmouton"
   ],
   "scripts": {
-    "eslint": "eslint . --ext .js,.jsx,.ts,.tsx",
+    "eslint": "eslint . --ext .js",
     "build": "gatsby build",
     "format": "prettier --write \"deploy/**/*.{js,jsx,ts,tsx,json,md}\" \"src/**/*.{js,jsx,ts,tsx,json,md}\" \"test/**/*.{js,jsx,ts,tsx,json,md}\"",
     "develop": "gatsby develop",

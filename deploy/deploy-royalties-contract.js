@@ -12,18 +12,17 @@ const deployLeniaRoyaltiesContract = async hre => {
   let addresses = []
   let shares = []
 
-  if (hre.hardhatArguments.network == 'mainnet' || hre.hardhatArguments.network == 'rinkeby') {
-    splitter = JSON.parse(fs.readFileSync(path.join(__dirname, `../tasks/data/royalties-payment-splitter-${hre.hardhatArguments.network}.json`), 'utf8'))
-    for (i = 0; i < splitter.length; i++) {
+  if (hre.hardhatArguments.network === 'mainnet' || hre.hardhatArguments.network === 'rinkeby') {
+    const splitter = JSON.parse(fs.readFileSync(path.join(__dirname, `../tasks/data/royalties-payment-splitter-${hre.hardhatArguments.network}.json`), 'utf8'))
+    for (let i = 0; i < splitter.length; i+=1) {
       addresses.push(splitter[i].address)
       shares.push(splitter[i].shares)
     }
-    assert(Object.keys(addresses).length == 4, 'Expecting 4 addresses to deploy on mainnet')
+    assert(Object.keys(addresses).length === 4, 'Expecting 4 addresses to deploy on mainnet')
 
     console.log('Deploying LeniaRoyalties Contract')
     console.log('Splitees', addresses)
     console.log('Shares', shares)
-    const {deployer} = accounts
     console.log('Deployer', deployer)
     console.log('Is this ok? [y/N]')
     const { ok } = await prompt.get(['ok']);

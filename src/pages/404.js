@@ -17,7 +17,7 @@ const NotFoundPage = () => {
         <Container>
           <Jumbotron>
             <h1>404: Page Not Found</h1>
-            <img src={Shauns} />
+            <img src={Shauns} alt="Shauns dancing" />
             <Lead>
               <p>But fret not traveller, you will be redirected to our homepage in a few seconds...</p>
             </Lead>

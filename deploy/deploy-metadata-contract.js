@@ -6,12 +6,9 @@ const deployLeniaMetadataContract = async hre => {
   
   const accounts = await getNamedAccounts()
   const {deployer} = accounts
-  const addresses = []
-  const shares = []
 
-  if (hre.hardhatArguments.network == 'mainnet' || hre.hardhatArguments.network == 'rinkeby') {
+  if (hre.hardhatArguments.network === 'mainnet' || hre.hardhatArguments.network === 'rinkeby') {
     console.log(`Deploying LeniaMetadata Contract on ${hre.hardhatArguments.network}`)
-    const {deployer} = accounts
     console.log('Deployer', deployer)
     console.log('Is this ok? [y/N]')
     const { ok } = await prompt.get(['ok']);

@@ -14,7 +14,7 @@ const StyledDiv = styled.div`
   transform: translate(-50%, -50%);
 `
 
-const GeneratorOnChain = ({ zoom, fps, scale, lenia_id }) => {
+const GeneratorOnChain = ({ zoom, fps, scale, leniaId }) => {
     const nodeRef = useRef(null);
 
     const { isUserMarkedConnected, web3Provider, account } = useWeb3()
@@ -39,7 +39,7 @@ const GeneratorOnChain = ({ zoom, fps, scale, lenia_id }) => {
                 contractSet.current = true
             
 
-            lenia_id = Math.max(Math.min(lenia_id, 201), 0)                
+            const modifiedLeniaId = Math.max(Math.min(leniaId, 201), 0)                
 
             const hasSIMD = await simd();
             const WASMKey = hasSIMD
@@ -54,7 +54,7 @@ const GeneratorOnChain = ({ zoom, fps, scale, lenia_id }) => {
                 document.body.appendChild(script);
             }
 
-            const leniaMetadata = await getMetadata(web3Provider, metadataContract, lenia_id)
+            const leniaMetadata = await getMetadata(web3Provider, metadataContract, modifiedLeniaId)
             leniaMetadata.config.world_params.scale = scale
             
             window.leniaEngine.init(WASMByteCode, WASMKey, leniaMetadata, zoom, fps);
@@ -70,6 +70,7 @@ const GeneratorOnChain = ({ zoom, fps, scale, lenia_id }) => {
             <StyledDiv ref={nodeRef}>
                 <canvas id="RENDERING_CANVAS" />
             </StyledDiv>
+            {/* eslint-disable-next-line react/no-danger */}
             {error && <Toast type="error" onClose={handleToastClose}><div dangerouslySetInnerHTML={ { __html: error.message } } /></Toast>}
         </>
     )

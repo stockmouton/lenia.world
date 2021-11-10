@@ -27,7 +27,7 @@ const HeroBackground = () => {
   const [width, setWidth] = useState(isBrowser ? window.innerWidth : 0);
   const [height, setHeight] = useState(isBrowser ? window.innerHeight : 0);
   
-  useWindowResize(useThrottledFn(event => {
+  useWindowResize(useThrottledFn(() => {
     setWidth(window.innerWidth);
     setHeight(window.innerHeight);
   }))

@@ -1,5 +1,6 @@
 const path = require('path');
 const fs = require('fs')
+const ethers = require('ethers')
 
 const ROOT_FOLDER = path.join(__dirname, '..')
 const METADATA_FOLDER = path.join(ROOT_FOLDER, 'static', 'metadata')
@@ -17,23 +18,23 @@ function sleep(ms) {
 function checkIndex(oriMetadataFolder, index) {
     console.log(`Checking index ${index}`)
 
-    const dst_json = path.join(METADATA_FOLDER, `${index}.json`)
-    if (!fs.existsSync(dst_json)) {
-        const src_json = path.join(oriMetadataFolder, `${index}.json`)
-        console.log(` - Copying ${src_json} -> ${dst_json}`)
-        fs.copyFileSync(src_json, dst_json)
+    const dstJson = path.join(METADATA_FOLDER, `${index}.json`)
+    if (!fs.existsSync(dstJson)) {
+        const srcJson = path.join(oriMetadataFolder, `${index}.json`)
+        console.log(` - Copying ${srcJson} -> ${dstJson}`)
+        fs.copyFileSync(srcJson, dstJson)
     }
-    const dst_mp4 = path.join(METADATA_FOLDER, `${index}.mp4`)
-    if (!fs.existsSync(dst_mp4)) {
-        const src_mp4 = path.join(oriMetadataFolder, `${index}.mp4`)
-        console.log(` - Copying ${src_mp4} -> ${dst_mp4}`)
-        fs.copyFileSync(src_mp4, dst_mp4)
+    const dstMp4 = path.join(METADATA_FOLDER, `${index}.mp4`)
+    if (!fs.existsSync(dstMp4)) {
+        const srcMp4 = path.join(oriMetadataFolder, `${index}.mp4`)
+        console.log(` - Copying ${srcMp4} -> ${dstMp4}`)
+        fs.copyFileSync(srcMp4, dstMp4)
     }
-    const dst_gif = path.join(METADATA_FOLDER, `${index}.gif`)
-    if (!fs.existsSync(dst_gif)) {
-        const src_gif = path.join(oriMetadataFolder, `${index}.gif`)
-        console.log(` - Copying ${src_gif} -> ${dst_gif}`)
-        fs.copyFileSync(src_gif, dst_gif)
+    const dstGif = path.join(METADATA_FOLDER, `${index}.gif`)
+    if (!fs.existsSync(dstGif)) {
+        const srcGif = path.join(oriMetadataFolder, `${index}.gif`)
+        console.log(` - Copying ${srcGif} -> ${dstGif}`)
+        fs.copyFileSync(srcGif, dstGif)
     }
 }
 
@@ -43,7 +44,7 @@ task("reveal", "listen and reveal",  async (taskArgs, hre) => {
     }
 
     let oriMetadataFolder;
-    if (hre.hardhatArguments.network == 'localhost') {
+    if (hre.hardhatArguments.network === 'localhost') {
         oriMetadataFolder = path.join(ROOT_FOLDER, 'metadata', 'fake')
     } else {
         oriMetadataFolder = path.join(ROOT_FOLDER, 'metadata', 'ori')
@@ -65,33 +66,33 @@ task("reveal", "listen and reveal",  async (taskArgs, hre) => {
     console.log(`current total supply is ${totalSupply}`)
 
     // Check that up to totalSupply we have already put all files
-    for (let index = 0; index < totalSupply; index++) {
+    for (let index = 0; index < totalSupply; index+=1) {
         checkIndex(oriMetadataFolder, index)
     }
 
     console.log(`listening to contract at ${lenia.address}`)
-    filter = {
+    const filter = {
         topics: [
             ethers.utils.id("Transfer(address,address,uint256)")
         ]
     }
     lenia.on(filter, async (from, to, tokenID) => {
         // console.log(from, to, tokenID)
-        if(from == '0x0000000000000000000000000000000000000000') {
+        if(from === '0x0000000000000000000000000000000000000000') {
             console.log(`Our new friend ${to} has mint a Lenia!`)
             checkIndex(oriMetadataFolder, tokenID)
 
             totalSupply = await lenia.totalSupply()
             console.log(`Current total supply is ${totalSupply}`)
-            if (totalSupply == maxSupply){
+            if (totalSupply === maxSupply){
                 console.log(`Current total supply (${totalSupply}) has reached max supply (${maxSupply})`)
                 console.log(`Clearing timeout`)
-                clearTimeout(timer);
+                clearTimeout(currentTimer);
             }
         }
     })
 
-    while (totalSupply != maxSupply) {
+    while (totalSupply !== maxSupply) {
         await sleep(60000)    
     }
 })

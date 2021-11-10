@@ -73,7 +73,7 @@ const LinkElement = styled.a`
     outline: 0;
   }
 ` 
-NavBar.Link = props => (props.href?.startsWith('#') ? <LinkElement {...props} /> : <LinkElement target="_blank" rel="noopener noreferrer" {...props} />)
+NavBar.Link = ({href, ...props}) => (href?.startsWith('#') ? <LinkElement href={href} {...props} /> : <LinkElement href={href} target="_blank" rel="noopener noreferrer" {...props} />)
 
 NavBar.Button = styled(Button)`
   background: #000000;

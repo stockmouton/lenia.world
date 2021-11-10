@@ -2,7 +2,7 @@ const Web3 = typeof window !== 'undefined' ? require('web3') : null;
 const { ethers } = require("ethers");
 const pako = require('pako');
 
-exports.getEngineCode = async function(provider, leniaMetadataContract) {
+exports.getEngineCode = async (provider, leniaMetadataContract) => {
     let txHash;
     if (Web3 != null && provider instanceof Web3) {
         txHash = await leniaMetadataContract.methods.getEngine().call()
@@ -22,7 +22,7 @@ exports.getEngineCode = async function(provider, leniaMetadataContract) {
         [ 'bytes' ],
         ethers.utils.hexDataSlice(inputDataHex, 4)
     );
-    contractGzipEngineHex = decodedData[0]
+    const contractGzipEngineHex = decodedData[0]
 
     const contractGzipEngineUint8Array = ethers.utils.arrayify(contractGzipEngineHex)
     const contractEngine = pako.inflate(contractGzipEngineUint8Array)
@@ -31,7 +31,7 @@ exports.getEngineCode = async function(provider, leniaMetadataContract) {
     const nbFiles = parseInt(finalBuffer.readUInt32LE(0).toString(), 10)
     let nbBytesPrefix = (nbFiles + 1) * 4
     const files = []
-    for (let i = 0; i < nbFiles; i++) {
+    for (let i = 0; i < nbFiles; i+=1) {
         const fileLength = parseInt(finalBuffer.readUInt32LE((i + 1) * 4).toString(), 10)
         const fileBuffer = Buffer.allocUnsafe(fileLength)
         finalBuffer.copy(fileBuffer, 0, nbBytesPrefix, nbBytesPrefix + fileLength)
@@ -42,7 +42,7 @@ exports.getEngineCode = async function(provider, leniaMetadataContract) {
     return files
 }
 
-exports.getMetadata = async function(provider, leniaMetadataContract, index) {
+exports.getMetadata = async (provider, leniaMetadataContract, index) => {
     let txHash;
     if (Web3 != null && provider instanceof Web3) {
         txHash = await leniaMetadataContract.methods.getMetadata(index).call()
@@ -73,7 +73,7 @@ exports.getMetadata = async function(provider, leniaMetadataContract, index) {
 }
 
 
-exports.compressAllEngineCode = function(wasmSource, wasmSimdSource, engineCodeMinifiedBuffer) {
+exports.compressAllEngineCode = (wasmSource, wasmSimdSource, engineCodeMinifiedBuffer) => {
     const metadataBuffer = Buffer.allocUnsafe(4 * 4);
     metadataBuffer.writeUInt32LE(3, 0)
     metadataBuffer.writeUInt32LE(wasmSource.length, 4)

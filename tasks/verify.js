@@ -7,8 +7,8 @@ task("verify-lenia", "Verify Lenia smart contract",  async (taskArgs, hre) => {
 
   const addresses = []
   const shares = []
-  splitter = JSON.parse(fs.readFileSync(path.join(__dirname, `../tasks/data/payment-splitter-${hre.hardhatArguments.network}.json`), 'utf8'))
-  for (i = 0; i < splitter.length; i++) {
+  const splitter = JSON.parse(fs.readFileSync(path.join(__dirname, `../tasks/data/payment-splitter-${hre.hardhatArguments.network}.json`), 'utf8'))
+  for (let i = 0; i < splitter.length; i+=1) {
     addresses.push(splitter[i].address)
     shares.push(splitter[i].shares)
   }
@@ -30,8 +30,8 @@ task("verify-royalties", "Verify LeniaRoyalties smart contract",  async (taskArg
 
   const addresses = []
   const shares = []
-  splitter = JSON.parse(fs.readFileSync(path.join(__dirname, `../tasks/data/royalties-payment-splitter-${hre.hardhatArguments.network}.json`), 'utf8'))
-  for (i = 0; i < splitter.length; i++) {
+  const splitter = JSON.parse(fs.readFileSync(path.join(__dirname, `../tasks/data/royalties-payment-splitter-${hre.hardhatArguments.network}.json`), 'utf8'))
+  for (let i = 0; i < splitter.length; i+=1) {
     addresses.push(splitter[i].address)
     shares.push(splitter[i].shares)
   }

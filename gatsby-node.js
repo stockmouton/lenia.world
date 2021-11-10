@@ -6,7 +6,7 @@
 const path = require('path')
 const webpack = require('webpack')
 
-exports.onCreateWebpackConfig = ({ stage, loaders, actions }) => {
+exports.onCreateWebpackConfig = ({ actions }) => {
   actions.setWebpackConfig({
     resolve: {
       fallback: {

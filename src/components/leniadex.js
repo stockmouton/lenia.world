@@ -320,7 +320,7 @@ const LeniaDex = () => {
         return acc
       }, {})
 
-      const radarData = allMetadata.map(lenia => {
+      const startingRadarData = allMetadata.map(lenia => {
         const numericalAttributes = lenia.attributes.reduce((acc, attribute) => {
           const allocatedIndex = RADAR_CHART_ORDERED_ATTRIBUTES.findIndex(value => attribute.trait_type === value)
           if (typeof attribute.numerical_value === 'undefined') {
@@ -343,7 +343,7 @@ const LeniaDex = () => {
 
       setAllScatterData(scatterData)
       setFilteredScatterData(scatterData)
-      setRadarData(radarData)
+      setRadarData(startingRadarData)
       setLeniaDexStatus(LENIADEX_STATUSES.READY)
     }
   }, [])
@@ -351,7 +351,7 @@ const LeniaDex = () => {
   useEffect(() => {
     if (allScatterData.length === 0) return
 
-    const filteredScatterData = allScatterData.filter(lenia => {
+    const changedScatterData = allScatterData.filter(lenia => {
       const isFamilyFiltered = familyFilters.length === 0 || familyFilters.includes(capitalize(lenia.Family))
       const isColormapFiltered = colormapFilters.length === 0 || colormapFilters.includes(capitalize(lenia.Colormap))
       const idMatches = inputValue.match(/\d+/g)
@@ -359,7 +359,7 @@ const LeniaDex = () => {
       return isFamilyFiltered && isColormapFiltered && isMatchingId
     })
 
-    setFilteredScatterData(filteredScatterData)
+    setFilteredScatterData(changedScatterData)
     setScatterRenderKey(counter => counter + 1)
   }, [familyFilters, colormapFilters, inputValue])
 
@@ -422,6 +422,7 @@ const LeniaDex = () => {
               </MenuTrigger>
             </NavBar.Item>
             <NavBar.Item>
+              {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
               <NavBar.Text><label>Search by ID:<SearchInput onChange={handleInputChange} value={inputValue} /></label></NavBar.Text>
             </NavBar.Item>
           </NavBar.List>
@@ -439,7 +440,7 @@ const LeniaDex = () => {
             <VideoScreen>
               <Video key={displayedLenia?.id} preload='auto' loop autoPlay muted playsInline>
                 <source src={`https://lenia.world/metadata/${displayedLenia?.id}.mp4`} type="video/mp4" />
-                <p>Couldn't load this Lenia, please use a better browser ;)</p>
+                <p>Couldn&lsquo;t load this Lenia, please use a better browser ;)</p>
               </Video>
             </VideoScreen>
             {displayedLenia ? (
@@ -503,7 +504,7 @@ const LeniaDex = () => {
               )}
               {leniaDexStatus === LENIADEX_STATUSES.LOADING_FAILURE && (
                 <OverlayWrapper>
-                  My bad fellow Lenia lover, couldn't load the LeniaDEX for you
+                  My bad fellow Lenia lover, couldn&lsquo;t load the LeniaDEX for you
                 </OverlayWrapper>
               )}
             </LeniaMap>

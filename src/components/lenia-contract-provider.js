@@ -13,7 +13,7 @@ export const SALE_STATUSES = {
   PUBLIC: 'PUBLIC',
 }
 
-const getArtifacts = function(network) {
+const getArtifacts = network => {
   if (process?.env.NODE_ENV === 'production' && network === 'rinkeby') return artifactsRinkeby
   if (process?.env.NODE_ENV === 'production') return artifactsMain
   return artifactsLocalhost
@@ -26,12 +26,12 @@ const getSaleStatus = (isPresaleActive, isSaleActive) => {
 
 export const LeniaContractProvider = ({ children }) => {
   const { web3Provider, account } = useWeb3()
-  const [contract, setContract] = useState(null)
+  const [currentContract, setContract] = useState(null)
   const [metadataContract, setMetadataContract] = useState(null)
-  const [totalLeniaSupply, setTotalLeniaSupply] = useState(0)
-  const [totalLeniaMinted, setTotalLeniaMinted] = useState(0)
+  const [currentTotalLeniaSupply, setTotalLeniaSupply] = useState(0)
+  const [currentTotalLeniaMinted, setTotalLeniaMinted] = useState(0)
   const [saleStatus, setSaleStatus] = useState(SALE_STATUSES.NOT_STARTED)
-  const [isEligibleForPresale, setIsEligibleForPresale] = useState(false)
+  const [isCurrentlyEligibleForPresale, setIsEligibleForPresale] = useState(false)
 
   const [network] = useQueryParam("network", StringParam)
   
@@ -41,11 +41,10 @@ export const LeniaContractProvider = ({ children }) => {
       const contract = web3Provider ? new web3Provider.eth.Contract(artifacts.contracts.Lenia.abi, artifacts.contracts.Lenia.address) : null
       setContract(contract)
       if (artifacts.contracts.LeniaMetadata) {
-        const metadataContract = web3Provider ? new web3Provider.eth.Contract(artifacts.contracts.LeniaMetadata.abi, artifacts.contracts.LeniaMetadata.address) : null
-        setMetadataContract(metadataContract)
+        const startingMetadataContract = web3Provider ? new web3Provider.eth.Contract(artifacts.contracts.LeniaMetadata.abi, artifacts.contracts.LeniaMetadata.address) : null
+        setMetadataContract(startingMetadataContract)
       }
     } catch(error) {
-      console.log(error)
       // Contract is not deployed or the wrong artifact is being imported
     }
   }
@@ -53,12 +52,12 @@ export const LeniaContractProvider = ({ children }) => {
   useEffect(initContract, [web3Provider])
 
   const initBlockchainData = async () => {
-    if (contract) {
-      const isPresaleActive = await contract.methods.isPresaleActive().call({from: account})
-      const isEligibleForPresale = await contract.methods.isEligibleForPresale(account).call({from: account})
-      const isSaleActive = await contract.methods.isSaleActive().call({ from: account })      
-      const totalLeniaSupply = await contract.methods.MAX_SUPPLY().call({ from: account }) || 0
-      const totalLeniaMinted = await contract.methods.totalSupply().call({ from: account }) || 0
+    if (currentContract) {
+      const isPresaleActive = await currentContract.methods.isPresaleActive().call({from: account})
+      const isEligibleForPresale = await currentContract.methods.isEligibleForPresale(account).call({from: account})
+      const isSaleActive = await currentContract.methods.isSaleActive().call({ from: account })      
+      const totalLeniaSupply = await currentContract.methods.MAX_SUPPLY().call({ from: account }) || 0
+      const totalLeniaMinted = await currentContract.methods.totalSupply().call({ from: account }) || 0
       setSaleStatus(getSaleStatus(isPresaleActive, isSaleActive))
       setIsEligibleForPresale(isEligibleForPresale)
       setTotalLeniaSupply(parseInt(totalLeniaSupply, 10))
@@ -68,8 +67,8 @@ export const LeniaContractProvider = ({ children }) => {
 
   const updateBlockchainData = async () => {
     try {
-      const totalLeniaMinted = await contract.methods.totalSupply().call({ from: account })
-      const isEligibleForPresale = await contract.methods.isEligibleForPresale(account).call({from: account})
+      const totalLeniaMinted = await currentContract.methods.totalSupply().call({ from: account })
+      const isEligibleForPresale = await currentContract.methods.isEligibleForPresale(account).call({from: account})
       
       setIsEligibleForPresale(isEligibleForPresale)
       setTotalLeniaMinted(parseInt(totalLeniaMinted, 10))
@@ -81,15 +80,15 @@ export const LeniaContractProvider = ({ children }) => {
   return (
     <>
       <leniaContractContext.Provider value={{
-        contract,
+        contract: currentContract,
         metadataContract,
         initContract,
         initBlockchainData,
         updateBlockchainData,
         saleStatus,
-        isEligibleForPresale,
-        totalLeniaSupply,
-        totalLeniaMinted,
+        isEligibleForPresale: isCurrentlyEligibleForPresale,
+        totalLeniaSupply: currentTotalLeniaSupply,
+        totalLeniaMinted: currentTotalLeniaMinted,
       }}>{children}</leniaContractContext.Provider>
     </>
   )

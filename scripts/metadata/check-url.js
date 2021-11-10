@@ -3,15 +3,15 @@ const fs = require("fs")
 
 const jsonIPFSPrefix = 'https://gateway.pinata.cloud/ipfs/Qmf6kAYSHmBXvJbtkxDcqYiDWF5akvz8QxuqzMWC3JDtNd/';
 const jsonPrefix = 'https://lenia.world/metadata/';
-const allMetadataLocalFullpath = `${__dirname  }/../../../static/metadata/all_metadata.json`;
-allMetadataLocal = JSON.parse(fs.readFileSync(allMetadataLocalFullpath), 'utf8');
+const allMetadataLocalFullpath = `${__dirname  }/../../static/metadata/all_metadata.json`;
+const allMetadataLocal = JSON.parse(fs.readFileSync(allMetadataLocalFullpath), 'utf8');
 
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 (async ()=>{
-    for (let index = 0; index < 202; index++) {
+    for (let index = 0; index < 202; index+=1) {
         const response = await axios.get(`${jsonIPFSPrefix}${index}.json`);
         const rawDataIPFS = response.data
         const fullDataIPFS = JSON.stringify(rawDataIPFS)
@@ -28,7 +28,7 @@ function sleep(ms) {
         const rawDataLocal = allMetadataLocal[index]
         const fullDataLocal = JSON.stringify(rawDataLocal)
 
-        console.log(index, dataWeb == dataIPFS && fullDataLocal == fullDataIPFS)   
+        console.log(index, dataWeb === dataIPFS && fullDataLocal === fullDataIPFS)   
 
         await sleep(100)
     }

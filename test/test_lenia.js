@@ -5,8 +5,9 @@ const fs = require('fs')
 const path = require('path')
 const pako = require('pako');
 
-const { attrsMap, traitTypeAttrsMap, deployLeniaContract, deployLeniaMetadataContract } = require('./utils')
+const { deployLeniaContract, deployLeniaMetadataContract } = require('./utils')
 const leniaUtils = require('../src/utils/sm')
+const metadata = require('../static/metadata/all_metadata.json')
 
 const rootFolder = `${__dirname  }/..`
 
@@ -85,11 +86,10 @@ describe("Lenia", () => {
       expect(engineCodeMinified2).to.equal(engineCodeMinified)
     })
 
-    it("should log (and get) metadata using callData", async () => {
-      const metadata = require('../static/metadata/all_metadata.json')
+    it("should log (and get) metadata using callData", async () => {      
+      const maxLength = 5
       
-      const max_length = 5
-      for (let index = 0; index < max_length; index++) {
+      for (let index = 0; index < maxLength; index+=1) {
         const elementMetadata = metadata[index];
         const fullmetadataGZIP = pako.deflate(JSON.stringify(elementMetadata));
        
@@ -100,7 +100,7 @@ describe("Lenia", () => {
         await setMetadataTx.wait()
       }
 
-      for (let index = 0; index < max_length; index++) {
+      for (let index = 0; index < maxLength; index+=1) {
         const element = metadata[index];
         const leniaMetadataContract = await leniaUtils.getMetadata(ethers.provider, leniaMetadata, index)
         
@@ -129,7 +129,7 @@ describe("Lenia", () => {
     })
 
     it("should add addresses to the presale list", async () => {
-      const [_, ...otherAccounts] = await ethers.getSigners()
+      const [, ...otherAccounts] = await ethers.getSigners()
       const eligibleAccounts = otherAccounts.filter((_, i) => i < (otherAccounts.length / 2))
       const eligibleAddresses = eligibleAccounts.map(account => account.address)
       const uneligibleAccounts = otherAccounts.filter((_, i) => i >= (otherAccounts.length / 2))
@@ -138,17 +138,17 @@ describe("Lenia", () => {
       // Add eligible addresses to the presale list
       await lenia.addPresaleList(eligibleAddresses)
 
-      for (i = 0; i < eligibleAddresses.length; i++) {
+      for (let i = 0; i < eligibleAddresses.length; i+=1) {
         expect(await lenia.isEligibleForPresale(eligibleAddresses[i])).to.equal(true)
       }
 
-      for (i = 0; i < uneligibleAddresses.length; i++) {
+      for (let i = 0; i < uneligibleAddresses.length; i+=1) {
         expect(await lenia.isEligibleForPresale(uneligibleAddresses[i])).to.equal(false)
       }
     })
 
     it("should mint for the presale only once for an eligible address", async () => {
-      const [_, ...otherAccounts] = await ethers.getSigners()
+      const [, ...otherAccounts] = await ethers.getSigners()
       const eligibleAccounts = otherAccounts.filter((_, i) => i < (otherAccounts.length / 2))
       const eligibleAddresses = eligibleAccounts.map(account => account.address)
       const uneligibleAccounts = otherAccounts.filter((_, i) => i >= (otherAccounts.length / 2))
@@ -163,7 +163,7 @@ describe("Lenia", () => {
       const contractPrice = await lenia.getPrice()
 
       // Mint for each address
-      for (let i = 0; i < eligibleAccounts.length; i++) {
+      for (let i = 0; i < eligibleAccounts.length; i+=1) {
         const account = eligibleAccounts[i]
         await lenia.connect(account).presaleMint({
           value: contractPrice
@@ -183,7 +183,7 @@ describe("Lenia", () => {
       }
 
       // Try to mint for each uneligible address and fail
-      for (let i = 0; i < uneligibleAccounts.length; i++) {
+      for (let i = 0; i < uneligibleAccounts.length; i+=1) {
         const account = uneligibleAccounts[i]
         const failingMintTx = lenia.connect(account).presaleMint({
           value: contractPrice
@@ -203,14 +203,14 @@ describe("Lenia", () => {
     })
 
     it("should not mint when max public supply is reached", async () => {
-      const [_, ...otherAccounts] = await ethers.getSigners()
+      const [, ...otherAccounts] = await ethers.getSigners()
       const maxSupply = await lenia.MAX_SUPPLY()
       const reserved = await lenia.getReservedLeft()
       const publicSupply = maxSupply - reserved
       
       const eligibleWallets = []
 
-      for (let i = 0; i <= publicSupply; i++) {
+      for (let i = 0; i <= publicSupply; i+=1) {
         eligibleWallets.push(ethers.Wallet.createRandom())
       }
       const eligibleAddresses = otherAccounts.map(wallet => wallet.address)
@@ -218,7 +218,7 @@ describe("Lenia", () => {
       await lenia.togglePresaleStatus()
       
       const contractPrice = await lenia.getPrice()
-      for (let i = 0; i < eligibleAddresses.length; i++) {
+      for (let i = 0; i < eligibleAddresses.length; i+=1) {
         const mintTx = lenia.connect(otherAccounts[i]).presaleMint({
           value: contractPrice
         })
@@ -231,7 +231,7 @@ describe("Lenia", () => {
       }
     })
 
-    it("should not mint when transaction value doesn\'t meet price", async () => {
+    it("should not mint when transaction value doesn't meet price", async () => {
       await lenia.togglePresaleStatus()
       
       // Add eligible addresses to the presale list
@@ -265,7 +265,7 @@ describe("Lenia", () => {
     })
 
     it("should toggle the sale status only by the owner", async () => {
-      const [_, account] = await ethers.getSigners()
+      const [, account] = await ethers.getSigners()
       const toggleSaleTx = lenia.connect(account).toggleSaleStatus()
       expect(toggleSaleTx).to.be.revertedWith("Ownable: caller is not the owner")
     })
@@ -299,7 +299,7 @@ describe("Lenia", () => {
       const maxSupply = await lenia.MAX_SUPPLY()
       const reserved = await lenia.getReservedLeft()
       const publicSupply = maxSupply - reserved
-      for (i = 1; i <= publicSupply + 1; i++) {
+      for (let i = 1; i <= publicSupply + 1; i+=1) {
         const contractPrice = await lenia.getPrice()
         const mintTx = lenia.mint({
           value: contractPrice
@@ -311,7 +311,7 @@ describe("Lenia", () => {
       }
     })
 
-    it("should not mint when transaction value doesn\'t meet price", async () => {
+    it("should not mint when transaction value doesn't meet price", async () => {
       await lenia.toggleSaleStatus()
     
       const contractPrice = await lenia.getPrice()
@@ -325,12 +325,12 @@ describe("Lenia", () => {
 
   describe("Payment Splitter", () => {
     it("should send the money to the different shareholders", async () => {
-      const [owner, payee, ...otherAccounts] = await ethers.getSigners()
+      const [, payee, ...otherAccounts] = await ethers.getSigners()
       const minter = otherAccounts[10]
       await lenia.toggleSaleStatus()
       
       
-      for (i = 0; i < 10; i++) {
+      for (let i = 0; i < 10; i+=1) {
         const contractPrice = await lenia.getPrice()
         await lenia.connect(minter).mint({
           value: contractPrice
@@ -351,7 +351,7 @@ describe("Lenia", () => {
 
   describe("Claim an amount of reserved tokens", () => {
     it("should mint the number of reserved tokens to an account", async () => {
-      const [_, account] = await ethers.getSigners()
+      const [, account] = await ethers.getSigners()
       const reserved = await lenia.getReservedLeft()
       await lenia.claimReserved(2, account.address)
       
@@ -361,7 +361,7 @@ describe("Lenia", () => {
     })
 
     it("should not exceed the maximum amount of reserved tokens", async () => {
-      const [_, account] = await ethers.getSigners()
+      const [, account] = await ethers.getSigners()
       const reserved = await lenia.getReservedLeft()
       const reserveTx = lenia.claimReserved(reserved + 1, account.address)
       
@@ -369,7 +369,7 @@ describe("Lenia", () => {
     })
 
     it("should only be called by the owner", async () => {
-      const [_, account] = await ethers.getSigners()
+      const [, account] = await ethers.getSigners()
       const reserveTx = lenia.connect(account).claimReserved(2, account.address)
       expect(reserveTx).to.be.revertedWith("Ownable: caller is not the owner")
     })
@@ -377,7 +377,7 @@ describe("Lenia", () => {
 
   describe("Set Base URI", async () => {
     it("should only be called by the owner", async () => {
-      const [_, account] = await ethers.getSigners()
+      const [, account] = await ethers.getSigners()
       const reserveTx = lenia.connect(account).setBaseURI('stockmouton.com')
       expect(reserveTx).to.be.revertedWith("Ownable: caller is not the owner")
     })

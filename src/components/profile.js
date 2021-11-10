@@ -28,14 +28,14 @@ const Image = styled.img`
   width: 80px;
 `
 
-const Profile = ({pictureSrc, name, twitterHandle, role, description}) => (
+const Profile = ({pictureSrc, name, twitterHandle, title, description}) => (
   <StyledHeroUnit>
     <Picture>
       <Image src={pictureSrc} />
       <Caption>{name}<br /><Link inverse href={`https://twitter.com/${twitterHandle}`}>@{twitterHandle}</Link></Caption>
     </Picture>
     <Article>
-      <h2>{role}</h2>
+      <h2>{title}</h2>
       {description}
     </Article>
   </StyledHeroUnit>

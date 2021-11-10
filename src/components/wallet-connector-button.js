@@ -9,7 +9,7 @@ import Toast from './toast'
 import { getAllowedChainIds, getChainDisplayName } from '../utils/wallet'
 
 const WalletConnectorButton = () => {
-  const { resetWeb3Provider, account, chainId, provider } = useWeb3()
+  const { resetWeb3Provider, account: currentAccount, chainId } = useWeb3()
   const { web3Modal, openWeb3Modal } = useWeb3Modal()
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const [error, setError] = useState(null)
@@ -25,13 +25,13 @@ const WalletConnectorButton = () => {
       // WalletConnect will default to the existing session
       // and does not allow to re-scan the QR code with a new wallet.
       await web3Modal.clearCachedProvider()
-    } catch(error) {
-      setError(error)
+    } catch(e) {
+      setError(e)
     }
   }
 
-  const handleClick = async () => {
-    if (account) return setIsDropdownOpen(true)
+  const handleClick = () => {
+    if (currentAccount) setIsDropdownOpen(true)
     openWeb3Modal()
   }
 
@@ -40,8 +40,8 @@ const WalletConnectorButton = () => {
     try {
       await handleDisconnect()
       openWeb3Modal()
-    } catch(error) {
-      setError(error)
+    } catch(e) {
+      setError(e)
     }
   }
 
@@ -53,8 +53,8 @@ const WalletConnectorButton = () => {
   }
 
   const getConnectorButtonContent = () => {
-    if (account && !allowedChainIds.includes(chainId)) return `Wrong Network! Please connect to ${chainDisplayName}`
-    if (account) return getTruncatedAccount(account)
+    if (currentAccount && !allowedChainIds.includes(chainId)) return `Wrong Network! Please connect to ${chainDisplayName}`
+    if (currentAccount) return getTruncatedAccount(currentAccount)
     return 'Connect Wallet'
   }
 
@@ -62,7 +62,7 @@ const WalletConnectorButton = () => {
     <>
       <NavBar.Button 
         onClick={handleClick}
-        disabled={account && !allowedChainIds.includes(chainId)}
+        disabled={currentAccount && !allowedChainIds.includes(chainId)}
       >
         {getConnectorButtonContent()}
       </NavBar.Button>

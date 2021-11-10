@@ -9,9 +9,9 @@ describe("Royalties", () => {
   let leniaRoyalties
 
   beforeEach(async () => {
-    [owner, ...otherAccounts] = await ethers.getSigners()
+    const [owner, ...otherAccounts] = await ethers.getSigners()
 
-    Royalties = await ethers.getContractFactory("LeniaRoyalties")
+    const Royalties = await ethers.getContractFactory("LeniaRoyalties")
 
     const otherAddresses = otherAccounts.map(account => account.address)
     // Simulate splitting Ether balance among a group of accounts

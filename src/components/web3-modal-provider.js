@@ -3,7 +3,7 @@ import Web3Modal from "web3modal"
 import WalletConnectProvider from '@walletconnect/web3-provider'
 import { useQueryParam, StringParam } from "use-query-params";
 import { useWeb3 } from "./web3-provider"
-
+import Toast from './toast';
 
 const web3ModalContext = createContext({})
 
@@ -24,12 +24,14 @@ export const Web3ModalProvider = ({ children }) => {
     try {
       const provider = await web3Modal.connect()
       initWeb3Provider(provider)
-    } catch(error) {
-      if (error instanceof Error) {
-        setError(error)
+    } catch(e) {
+      if (e instanceof Error) {
+        setError(e)
       }
     }
   }
+
+  const handleToastClose = () => setError(null)
 
   useEffect(() => {
     setWeb3Modal(new Web3Modal({

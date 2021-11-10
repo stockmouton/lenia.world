@@ -1,3 +1,4 @@
+/* eslint-disable */
 window.leniaEngine = {}
 window.leniaEngine.init = (WASMSource, WASMKey, metadata, zoom=1, fps=30) => {
     // Most problematic functions: FFT1D, transpose2D, complexMatrixDot

@@ -1,5 +1,4 @@
 import React from "react"
-import { useQueryParam, BooleanParam } from "use-query-params";
 import Layout from "../components/layout"
 import Container from "../components/container";
 import Seo from "../components/seo"
@@ -22,9 +21,7 @@ import ALEX_PICTURE from "../images/alexorange.jpeg"
 import MORGAN_PICTURE from "../images/morgangiraud.png"
 import TOOMAIE_PICTURE from "../images/toomaie.jpeg"
 
-const IndexPage = () => {
-  const [isStaging] = useQueryParam("staging", BooleanParam)
-  return (
+const IndexPage = () => (
     <Web3Provider>
       <Web3ModalProvider>
         <LeniaContractProvider>
@@ -112,7 +109,7 @@ const IndexPage = () => {
                       name="Morgan Giraud"
                       pictureSrc={MORGAN_PICTURE}
                       twitterHandle="morgangiraud"
-                      role="Big Brain Energy"
+                      title="Big Brain Energy"
                       description={<p>ML amateur and crypto enthusiast. Tends to be lost in math.</p>}
                     />
                   </Grid.Cell>
@@ -121,7 +118,7 @@ const IndexPage = () => {
                       name="Alex Orange"
                       pictureSrc={ALEX_PICTURE}
                       twitterHandle="orangealexandre"
-                      role="Just the muscles"
+                      title="Just the muscles"
                       description={<p>Full-stack developer, humble yield farmer, sprinkles some Solidity in his daily life</p>}
                     />
                   </Grid.Cell>
@@ -130,7 +127,7 @@ const IndexPage = () => {
                       name="BBA"
                       pictureSrc={BBA_PICTURE}
                       twitterHandle="ape6743"
-                      role="Apefluencer"
+                      title="Apefluencer"
                       description={<p>Metaverse famous apefluencer, jack of all trades, master of none.</p>}
                     />
                   </Grid.Cell>
@@ -139,7 +136,7 @@ const IndexPage = () => {
                       name="Toomaie"
                       pictureSrc={TOOMAIE_PICTURE}
                       twitterHandle="toomaie"
-                      role="Passing By"
+                      title="Passing By"
                       description={<p>Generative Art &amp; Cellular Automata mad scientist. Speaking Solidity.</p>}
                     />
                   </Grid.Cell>
@@ -166,6 +163,5 @@ const IndexPage = () => {
       </Web3ModalProvider>
     </Web3Provider>
   )
-}
 
 export default IndexPage

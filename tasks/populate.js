@@ -3,9 +3,7 @@ const UglifyJS = require("uglify-js")
 const path = require('path');
 const pako = require('pako');
 const prompt = require('prompt');
-
-const { init } = require('es-module-lexer');
-const { assert } = require('console');
+const { types } = require("hardhat/config")
 const leniaUtils = require('../src/utils/sm');
 
 const rootFolder = `${__dirname  }/..`
@@ -159,16 +157,17 @@ task("get-engine-address", "Get the engine address",  async (taskArgs, hre) => {
     console.log(engineAddress)
 })
 
-async function setMetadata({ metadataPath, initIndex, stopIndex }, hre ) {
+async function setMetadata({ metadataPath, initIndex: signedInitIndex, stopIndex: unboundedStopIndex }, hre ) {
     if (hre.hardhatArguments.network == null) {
         throw new Error('Please add the missing --network <localhost|rinkeby|mainnet> argument')
     }
 
     const metadataFullpath = `${rootFolder  }/${  metadataPath}`
+    /* eslint-disable-next-line global-require, import/no-dynamic-require */
     const metadata = require(metadataFullpath)
 
-    initIndex = Math.max(initIndex, 0)
-    stopIndex = Math.min(stopIndex, metadata.length)
+    const initIndex = Math.max(signedInitIndex, 0)
+    const stopIndex = Math.min(unboundedStopIndex, metadata.length)
     console.log(initIndex < stopIndex);
     if (!(initIndex < stopIndex)) {
         throw new Error(`stopIndex ${stopIndex} must be bigger than initIndex ${initIndex}`)
@@ -188,12 +187,13 @@ async function setMetadata({ metadataPath, initIndex, stopIndex }, hre ) {
     const LeniaMetadataDeployment = await hre.deployments.get('LeniaMetadata')
     const leniaMetadata = LeniaMetadataContractFactory.attach(LeniaMetadataDeployment.address)
     
-    overrides = {}
+    const overrides = {}
     // overrides = {
     //     maxFeePerGas: 100_000_000_000,  // Gwei
     //     maxPriorityFeePerGas: 1_000_000_000
     // }
-    for (let index = initIndex; index < stopIndex; index++) {
+
+    for (let index = initIndex; index < stopIndex; index+=1) {
         console.log(`Setting index ${index}`)
 
         const elementMetadata = metadata[index];
@@ -206,7 +206,7 @@ async function setMetadata({ metadataPath, initIndex, stopIndex }, hre ) {
         const setMetadataTx = await leniaMetadata.setMetadata(index, logMetadataTx.hash, overrides)
         console.log(`Waiting for set tx: ${setMetadataTx.hash} (${setMetadataTx.nonce})`)
         await setMetadataTx.wait()
-        // In this case, we wait jsut to make sure we don't rush
+        // In this case, we wait just to make sure we don't rush
     }
     console.log('done!')
 }
@@ -276,11 +276,11 @@ task("populate-all", "Full populate the contract")
         'static/metadata/all_metadata.json',
         types.string,
     )
-    .setAction( async ( {onlog, jsenginePath, wasmSourcePath, wasmSimdSourcePath, metadataPath}, hre ) => {
+    .setAction( async ( {jsenginePath, wasmSourcePath, wasmSimdSourcePath, metadataPath}, hre ) => {
         if (hre.hardhatArguments.network == null) {
             throw new Error('Please add the missing --network <localhost> argument')
         }
-        if(hre.hardhatArguments.network != 'localhost' && hre.hardhatArguments.network != 'rinkeby') {
+        if(hre.hardhatArguments.network !== 'localhost' && hre.hardhatArguments.network !== 'rinkeby') {
             throw new Error('This task only work for localhost or Rinkeby testnet')
         }
 
@@ -298,7 +298,7 @@ task("populate-all", "Full populate the contract")
 
         const LeniaMetadataContractFactory = await hre.ethers.getContractFactory("LeniaMetadata")
         const LeniaMetadataDeployment = await hre.deployments.get('LeniaMetadata')
-        const leniaMetadata = LeniaMetadataContractFactory.attach(LeniaMetadataDeployment.address)
+        LeniaMetadataContractFactory.attach(LeniaMetadataDeployment.address)
         
         const engineFullpath = path.join(rootFolder, jsenginePath)
         console.log(`Setting the engine at ${engineFullpath}`)
@@ -332,7 +332,7 @@ task("populate-all", "Full populate the contract")
         const totalSupply = Number(await lenia.totalSupply())
         const contractPrice = await lenia.getPrice()
         console.log(maxSupply, totalSupply);
-        for (let index = 0; index < maxSupply - totalSupply; index++) {
+        for (let index = 0; index < maxSupply - totalSupply; index+=1) {
             const mintTx = await lenia.mint({
                 value: contractPrice
             })

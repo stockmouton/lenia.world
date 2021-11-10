@@ -1,4 +1,6 @@
 const prompt = require("prompt")
+const fs = require("fs")
+const path = require("path")
 
 task("release", "Withdraw money from contract for one address", async (taskArgs, hre) => {
   if (hre.hardhatArguments.network == null) {

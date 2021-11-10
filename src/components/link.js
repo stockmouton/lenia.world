@@ -21,6 +21,6 @@ const LinkElement = styled.a`
   }
 `
 
-const Link = props => (props.href?.startsWith('#') ? <LinkElement {...props} /> : <LinkElement target="_blank" rel="noopener noreferrer" {...props} />)
+const Link = ({href, ...props}) => (props.href?.startsWith('#') ? <LinkElement href={href} {...props} /> : <LinkElement href={href} target="_blank" rel="noopener noreferrer" {...props} />)
 
 export default Link;

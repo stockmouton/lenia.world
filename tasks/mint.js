@@ -37,7 +37,7 @@ task("add-presale-list", "Add a range of addresses to the presale list", async (
   // wait until the transaction is mined
   await addPresaleListTx.wait();
 
-  for (let i = 0; i < presaleList.length; i++) {
+  for (let i = 0; i < presaleList.length; i+=1) {
     const account = presaleList[i]
     const isEligibleForPresale = await lenia.isEligibleForPresale(account)
     if (isEligibleForPresale) {
@@ -103,7 +103,7 @@ task("claim-reserved", "Claim reserved tokens for the team", async (taskArgs, hr
     console.log('Quitting!')
     process.exit()
   }
-  for (i = 0; i < reserved.length; i++) {
+  for (let i = 0; i < reserved.length; i+=1) {
     const futureOwner = reserved[i]
     console.log(futureOwner)
     const claimReservedTx = await lenia.claimReserved(futureOwner.reserved, futureOwner.address);

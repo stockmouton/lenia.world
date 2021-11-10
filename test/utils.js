@@ -1,12 +1,12 @@
 const crypto = require('crypto');
 
 exports.deployLeniaContract = async (ethers) => {
-    [owner, ...otherAccounts] = await ethers.getSigners()
+    const [owner, ...otherAccounts] = await ethers.getSigners()
 
-    LeniaDescriptor = await ethers.getContractFactory("LeniaDescriptor")
+    const LeniaDescriptor = await ethers.getContractFactory("LeniaDescriptor")
     const leniaDescriptorLibrary = await LeniaDescriptor.deploy()
 
-    Lenia = await ethers.getContractFactory("Lenia", {
+    const Lenia = await ethers.getContractFactory("Lenia", {
         libraries: {
             LeniaDescriptor: leniaDescriptorLibrary.address
         }
@@ -27,9 +27,7 @@ exports.deployLeniaContract = async (ethers) => {
 }
 
 exports.deployLeniaMetadataContract = async (ethers) => {
-    [owner, ...otherAccounts] = await ethers.getSigners()
-
-    LeniaMetadata = await ethers.getContractFactory("LeniaMetadata")
+    const LeniaMetadata = await ethers.getContractFactory("LeniaMetadata")
     const contractPromise = LeniaMetadata.deploy()
 
     return contractPromise

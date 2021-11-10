@@ -104,9 +104,9 @@ describe("LeniaDescriptor", () => {
             const stringID = index.toString()
             const imageURL = "image.png";
             const animationURL = "video.mp4";
-            for (let i = 0; i < traitTypeAttrsMap.length; i++) {
+            for (let i = 0; i < traitTypeAttrsMap.length; i+=1) {
                 const smLeniaAttributes = []
-                for (let j = 0; j < attrsMap[i].length; j++) {
+                for (let j = 0; j < attrsMap[i].length; j+=1) {
                     smLeniaAttributes.push({
                         'traitType': i,
                         'value': j,
@@ -132,13 +132,10 @@ describe("LeniaDescriptor", () => {
                 const encodedContractMetadata = await lenia.tokenURI(index)
                 const contractMetadata = decodeContractMetdata(encodedContractMetadata)
                     
-                currentAttrIndex = 0
-                for (let j = 0; j < attrsMap[i].length; j++) {
-                    expect(contractMetadata.attributes[currentAttrIndex].trait_type).to.equal(traitTypeAttrsMap[i])
-                    expect(contractMetadata.attributes[currentAttrIndex].value).to.equal(attrsMap[i][j])
-                    expect(contractMetadata.attributes[currentAttrIndex].numerical_value).to.equal(0.)
-
-                    currentAttrIndex++
+                for (let j = 0; j < attrsMap[i].length; j+=1) {
+                    expect(contractMetadata.attributes[j].trait_type).to.equal(traitTypeAttrsMap[i])
+                    expect(contractMetadata.attributes[j].value).to.equal(attrsMap[i][j])
+                    expect(contractMetadata.attributes[j].numerical_value).to.equal(0.)
                 }
             }
         })
