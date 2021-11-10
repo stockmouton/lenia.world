@@ -52,7 +52,7 @@ const IndexPage = () => {
                   <ul>
                     <li>Lenia are pure mathematical creatures and a subject of active research in the field of Artificial Life.</li>
                     <li>They are also gorgeous and give some kind of meditative vibes.</li>
-                    <li>Open Source: everything we do is open! Check our <Link href="https://github.com/stockmouton/lenia.stockmouton.com">Github</Link>!</li>
+                    <li>Open Source: everything we do is open! Check our <Link href="https://github.com/stockmouton/lenia.world">Github</Link>!</li>
                   </ul>
                 </article>
 

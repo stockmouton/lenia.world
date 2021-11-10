@@ -91,7 +91,7 @@ const Layout = ({ children }) => {
               </NavBar.Link>
             </NavBar.Item.AboveSm>
             <NavBar.Item.AboveSm>
-              <NavBar.Link href="https://github.com/stockmouton/lenia.stockmouton.com">
+              <NavBar.Link href="https://github.com/stockmouton/lenia.world">
                 <BrandLogo><GithubLogo height={18} /></BrandLogo>
                 <BrandName>Github</BrandName>
               </NavBar.Link>
