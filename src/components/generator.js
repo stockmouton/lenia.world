@@ -3,7 +3,6 @@ import styled from "styled-components"
 import { simd } from 'wasm-feature-detect';
 
 if (typeof window !== 'undefined') {
-    /* eslint-disable-next-line global-require */
     require('../engine')
 }
 
@@ -14,7 +13,7 @@ const StyledDiv = styled.div`
   transform: translate(-50%, -50%);
 `
 
-const Generator = ({ zoom, fps, scale, leniaId }) => {
+const Generator = ({ zoom, fps, scale, lenia_id }) => {
     const nodeRef = useRef(null);
 
     useEffect(async () => {  
@@ -27,17 +26,17 @@ const Generator = ({ zoom, fps, scale, leniaId }) => {
             ? 'engine-simd'
             : 'engine'
   
-        const leniaResponse = await fetch(`/metadata/${leniaId}.json`);
-        const leniaMetadata = await leniaResponse.json()
+        const leniaResponse = await fetch(`/metadata/${lenia_id}.json`);
+        let leniaMetadata = await leniaResponse.json()
 
-        leniaMetadata.config.world_params.scale = scale
+        leniaMetadata["config"]["world_params"]["scale"] = scale
 
         window.leniaEngine.init(WASMSource, WASMKey, leniaMetadata, zoom, fps);
     })
     
     return (
         <StyledDiv ref={nodeRef}>
-            <canvas id="RENDERING_CANVAS" />
+            <canvas id="RENDERING_CANVAS"></canvas>
         </StyledDiv>
     )
 }
