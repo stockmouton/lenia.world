@@ -53,7 +53,7 @@ const Footer = () => (
         </Link>
       </SocialMedia.Item>
       <SocialMedia.Item>
-        <Link href="https://github.com/stockmouton/lenia.stockmouton.com">
+        <Link href="https://github.com/stockmouton/lenia.world">
           <GithubLogo height={18} />
         </Link>
       </SocialMedia.Item>

@@ -1,10 +1,9 @@
-import React, { useRef, useEffect, useState } from "react"
+import React, { useRef, useEffect } from "react"
 import styled from "styled-components"
 import { simd } from 'wasm-feature-detect';
+import { ethers } from "ethers";
 
-import Toast from './toast'
-import { useLeniaContract } from './lenia-contract-provider'
-import { useWeb3 } from "./web3-provider"
+import artifacts from '../artifacts/mainnet.json'
 import { getEngineCode, getMetadata } from "../utils/sm"
 
 const StyledDiv = styled.div`
@@ -14,65 +13,39 @@ const StyledDiv = styled.div`
   transform: translate(-50%, -50%);
 `
 
-const GeneratorOnChain = ({ zoom, fps, scale, leniaId }) => {
+const GeneratorOnChain = ({zoom, fps, scale, leniaId }) => {
     const nodeRef = useRef(null);
-
-    const { isUserMarkedConnected, web3Provider, account } = useWeb3()
-    const { metadataContract } = useLeniaContract()
-    const [ error, setError ] = useState(null)
-
-    const contractSet = useRef(false);
-
+    
+    const modifiedLeniaId = Math.max(Math.min(leniaId, 201), 0)
     useEffect(async () => {
-        if (!isUserMarkedConnected()) {
-            setError(new Error(
-                `You must connect your account on the <a href="${window.location.origin}">homepage</a> before being able to use the generator on chain`
-            ))
-            return
-        }
+        const provider = new ethers.providers.JsonRpcProvider('https://cloudflare-eth.com');
+        const metadataContract = new ethers.Contract(
+            artifacts.contracts.LeniaMetadata.address, 
+            artifacts.contracts.LeniaMetadata.abi, 
+            provider
+        );
+        const [WASMSource, WASMSIMDSource, engineBytes] = await getEngineCode(provider, metadataContract)
+        const leniaMetadata = await getMetadata(provider, metadataContract, modifiedLeniaId)
+        
+        leniaMetadata.config.world_params.scale = scale
 
-        // Account ready and contract received
-        if (metadataContract && account) {
-            if (contractSet.current) {
-                return
-            } 
-                contractSet.current = true
-            
+        const hasSIMD = await simd();
+        const WASMKey = hasSIMD ? 'engine-simd' : 'engine'
+        const WASMByteCode = hasSIMD ? WASMSIMDSource : WASMSource
 
-            const modifiedLeniaId = Math.max(Math.min(leniaId, 201), 0)                
-
-            const hasSIMD = await simd();
-            const WASMKey = hasSIMD
-                ? 'engine-simd'
-                : 'engine'
-            const [WASMSource, WASMSIMDSource, engineBytes] = await getEngineCode(web3Provider, metadataContract)
-            const WASMByteCode = hasSIMD ? WASMSIMDSource : WASMSource
-            const engine = engineBytes.toString('utf-8')
-            if (typeof engine === 'string' && engine.length > 0) {
-                const script = document.createElement('script');
-                script.innerHTML = engine
-                document.body.appendChild(script);
-            }
-
-            const leniaMetadata = await getMetadata(web3Provider, metadataContract, modifiedLeniaId)
-            leniaMetadata.config.world_params.scale = scale
-            
+        const engine = engineBytes.toString('utf-8')
+        if (engine.length > 0) {
+            const script = document.createElement('script');
+            script.innerHTML = engine
+            document.body.appendChild(script);
             window.leniaEngine.init(WASMByteCode, WASMKey, leniaMetadata, zoom, fps);
         }
-    }, [account, metadataContract])
-    
-    const handleToastClose = () => {
-        setError(null)
-    }
+    }, [])
 
     return (
-        <>
-            <StyledDiv ref={nodeRef}>
-                <canvas id="RENDERING_CANVAS" />
-            </StyledDiv>
-            {/* eslint-disable-next-line react/no-danger */}
-            {error && <Toast type="error" onClose={handleToastClose}><div dangerouslySetInnerHTML={ { __html: error.message } } /></Toast>}
-        </>
+        <StyledDiv ref={nodeRef}>
+            <canvas id="RENDERING_CANVAS" />
+        </StyledDiv>
     )
 }
 
