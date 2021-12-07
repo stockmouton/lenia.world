@@ -47,6 +47,10 @@ const Button = styled.button`
     background: #bbbbbb;
     color: #000000;
   }
+
+  a {
+    color: #000000;
+  }
 `
 
 export default Button

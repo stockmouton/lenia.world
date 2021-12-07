@@ -50,17 +50,17 @@ const Layout = ({ children }) => {
       <GlobalStyles />
       <NavBarWrapper>
         <NavBar>
-          <NavBar.Brand href="#home">
-            <StaticImage
-              src="../images/logo.png"
-              width={27}
-              quality={95}
-              formats={["AUTO", "WEBP", "AVIF"]}
-              alt="Lenia"
-            />
-            {' '} Lenia
-          </NavBar.Brand>
           <NavBar.List>
+            <NavBar.Brand target="" href="/">
+              <StaticImage
+                src="../images/logo.png"
+                width={27}
+                quality={95}
+                formats={["AUTO", "WEBP", "AVIF"]}
+                alt="Lenia"
+              />
+              {' '} Lenia
+            </NavBar.Brand>
             <NavBar.Item.UnderSm>
               <MenuTrigger menu={<NavMenu />}>
                 ☰ <MenuButtonText>Menu</MenuButtonText>
@@ -79,15 +79,15 @@ const Layout = ({ children }) => {
               </NavBar.Link>
             </NavBar.Item.AboveSm>
             <NavBar.Item.AboveSm>
-              <NavBar.Link href="https://opensea.io/collection/lenia-nft">
-                <BrandLogo><OpenseaLogo height={18} /></BrandLogo>
-                <BrandName>Opensea</BrandName>
+              <NavBar.Link href="https://medium.com/lenia-nft">
+                <BrandLogo><MediumLogo height={18} /></BrandLogo>
+                <BrandName>Blog</BrandName>
               </NavBar.Link>
             </NavBar.Item.AboveSm>
             <NavBar.Item.AboveSm>
-              <NavBar.Link href="https://etherscan.io/address/0xe95004c7f061577df60e9e46c1e724cc75b01850">
-                <BrandLogo><EtherscanLogo height={18} /></BrandLogo>
-                <BrandName>Etherscan</BrandName>
+              <NavBar.Link href="https://opensea.io/collection/lenia-nft">
+                <BrandLogo><OpenseaLogo height={18} /></BrandLogo>
+                <BrandName>Opensea</BrandName>
               </NavBar.Link>
             </NavBar.Item.AboveSm>
             <NavBar.Item.AboveSm>
@@ -97,14 +97,14 @@ const Layout = ({ children }) => {
               </NavBar.Link>
             </NavBar.Item.AboveSm>
             <NavBar.Item.AboveSm>
-              <NavBar.Link href="https://medium.com/lenia-nft">
-                <BrandLogo><MediumLogo height={18} /></BrandLogo>
-                <BrandName>Blog</BrandName>
+              <NavBar.Link href="https://etherscan.io/address/0xe95004c7f061577df60e9e46c1e724cc75b01850">
+                <BrandLogo><EtherscanLogo height={18} /></BrandLogo>
+                <BrandName>Etherscan</BrandName>
               </NavBar.Link>
             </NavBar.Item.AboveSm>
-            <NavBar.Item>
+            <NavBar.Item.Right>
               <WalletConnectorButton />
-            </NavBar.Item>
+            </NavBar.Item.Right>
           </NavBar.List>
         </NavBar>
       </NavBarWrapper>
