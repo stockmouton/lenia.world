@@ -82,7 +82,7 @@ const IndexPage = () => {
                     To do so we built a new library to simulate Lenia called Leniax. Which consist of a set of tools written in <Link href="https://github.com/google/jax">JAX</Link> to facilitate the exploration of the Leniaverse.
                   </p>
                   <p>The algorithm discovered hundreds of potentials creatures. And we curated the 202 most interesting ones from that set manually.</p>
-                  <p>This is currently the best way to show your support! Each sells reward the DAO and help us fund more research!</p>
+                  <p>This is the second best way to show your support (the first one is to join us)! Each sells reward the DAO and help us fund more research!</p>
                 </article>
                 <div style={{ textAlign: 'center', marginTop: '1rem'}}>
                   <Link href="/lenia-genesis" target="">
