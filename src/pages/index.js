@@ -59,7 +59,7 @@ const IndexPage = () => {
 
                 <article>
                   <h2 id="dao">DAO</h2>
-                  <p>We aim at building a self-funding, decentralized ans transparent research lab for all our projects. All our work is open-source.</p>
+                  <p>We aim at building a self-funding, decentralized and transparent research lab for all our projects. All our work is open-source.</p>
                   <p>You can expect us to make the project live in the long term by developing more AI x Crypto work, which will bring more value to the <Link href="#dao">DAO</Link>.</p>
                   <p>
                     Currently the DAO gets income from:
@@ -78,11 +78,11 @@ const IndexPage = () => {
                 <article>
                   <h2>Lenia Genesis NFT collection</h2>
                   <p>
-                    Our first project has been to work on an <Link href="https://quality-diversity.github.io">quality-diversity algorithm</Link> which could find automatically Lenia creatures.
+                    Our first project has been to work on a <Link href="https://quality-diversity.github.io">quality-diversity algorithm</Link> that could find automatically Lenia creatures.
                     To do so we built a new library to simulate Lenia called Leniax. Which consist of a set of tools written in <Link href="https://github.com/google/jax">JAX</Link> to facilitate the exploration of the Leniaverse.
                   </p>
-                  <p>The algorithm discovered hundreds of potentials creatures. And we curated the 202 most interesting ones from that set manually.</p>
-                  <p>This is the second best way to show your support (the first one is to join us)! Each sells reward the DAO and help us fund more research!</p>
+                  <p>The algorithm discovered hundreds of potential creatures. And we curated the 202 most interesting ones from that set manually.</p>
+                  <p>Each sale rewards the DAO and helps us fund more research!</p>
                 </article>
                 <div style={{ textAlign: 'center', marginTop: '1rem'}}>
                   <Link href="/lenia-genesis" target="">
