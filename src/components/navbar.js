@@ -57,12 +57,19 @@ NavBar.Item.AboveSm = styled(NavBar.Item)`
   ${createMediaQuery(BREAKPOINTS.sm, 'display: block;')}
 `
 
-const LinkElement = styled.a`
-  color: #000000;
+NavBar.Item.Right = styled(NavBar.Item)`
+  float: right;
+`
+
+NavBar.RawLink = styled.a`
   text-decoration: none;
   padding: 0 10px;
   display: block;
   height: 100%;
+` 
+
+const LinkElement = styled(NavBar.RawLink)`
+  color: #000000;
 
   :hover {
     color: #bbbbbb;
